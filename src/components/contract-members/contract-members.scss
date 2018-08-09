@@ -1,0 +1,158 @@
+/*
+  Copyright (C) 2018-present evan GmbH. 
+  
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3, 
+  as published by the Free Software Foundation. 
+  
+  This program is distributed in the hope that it will be useful, 
+  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details. 
+  
+  You should have received a copy of the GNU Affero General Public License along with this program.
+  If not, see http://www.gnu.org/licenses/ or write to the
+  
+  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
+  
+  or download the license from the following URL: https://evan.network/license/ 
+  
+  You can be released from the requirements of the GNU Affero General Public License
+  by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts of it
+  on other blockchains than evan.network. 
+  
+  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+*/
+
+@import 'ui-angular-sass/src/variables/colors';
+
+contract-members {
+  display: block;
+
+  padding-right: 0;
+
+  .person-add-button {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
+
+  .evan-tag-container {
+    overflow: hidden;
+
+    height: 35px;
+    margin-top: -35px;
+    margin-right: 60px;
+
+    border-bottom: 0;
+
+    .member-count {
+      line-height: 35px;
+
+      z-index: 1;
+
+      order: 0;
+
+      width: 100%;
+      height: 35px;
+
+      color: $light-gray;
+    }
+  }
+
+  .evan-tag {
+    background-color: $medium-gray;
+
+    &.outstanding {
+      background-color: $medium-gray;
+    }
+
+    &.active {
+      background-color: $green;
+
+      span, ion-icon, ion-icon:hover {
+        color: $background-color !important;
+      }
+    }
+
+    &.rejected {
+      background-color: $red;
+    }
+
+    &.closed {
+      background-color: $background-color-2;
+    }
+
+    &.cannot-delete {
+      padding: 0 12px 0 12px;
+    }
+
+    ion-icon, ion-icon:hover {
+      color: $light !important;
+    }
+  }
+}
+
+ion-menu.member-add-menu {
+  & > .menu-inner {
+    right: 0;
+    left: auto;
+
+    background: $background-gradient !important;
+  }
+
+  ion-content.content-md {
+    background-color: rgba($background-color, $background-opacity);
+  }
+
+  &:not(.show-menu) {
+    & > .menu-inner {
+      transform: translateX(312px) !important;
+    }
+  }
+
+  &.show-menu {
+    & > .menu-inner {
+      transform: translateX(0) !important;
+    }
+  }
+
+  .scroll-content {
+    & > ion-item {
+      background-color: rgba($medium-blue, 0.5) !important;
+
+      .item-inner {
+        border-bottom-color: $primary !important;
+
+        ion-input {
+          padding-left: 10px !important;
+        }
+      }
+    }
+  }
+
+  ion-list {
+    margin: 10px;
+
+    ion-item {
+      &.clickable:hover {
+        h2, span {
+          color: $primary !important;
+        }
+      }
+    }
+
+    blockie-component {
+      &, canvas {
+        width: 30px;
+        height: 30px;
+      }
+
+      canvas {
+        margin-top: 3px;
+        margin-left: 5px;
+      }
+    }
+  }
+}

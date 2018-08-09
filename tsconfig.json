@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "module": "es2015",
+    "target": "es5",
+    "baseUrl": "./src",
+    "stripInternal": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "outDir": "../build",
+    "rootDir": "./src",
+    "lib": [
+      "es2015",
+      "dom"
+    ],
+    "skipLibCheck": true,
+    "types": [],
+    "paths": {
+      "bcc": ["../../api-blockchain-core/bundles/bcc/bcc"],
+      "smart-contracts": ["../../smart-contracts-core/index.js"],
+      "dapp-browser": ["../../ui-dapp-browser/runtime/build/main"],
+      "angular-libs": ["../../ui-angular-libs/dist/angularlibs.js"]
+    }
+  },
+  "angularCompilerOptions": {
+    "skipTemplateCodegen": true,
+    "genDir": "aot",
+    "skipMetadataEmit" : false
+  },
+  "files": [
+    "./index.ts"
+  ],
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "../node_modules",
+    "**/*.spec.ts"
+  ]
+}
