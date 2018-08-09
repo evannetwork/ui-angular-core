@@ -1,0 +1,155 @@
+<!--
+  Copyright (C) 2018-present evan GmbH. 
+  
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3, 
+  as published by the Free Software Foundation. 
+  
+  This program is distributed in the hope that it will be useful, 
+  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details. 
+  
+  You should have received a copy of the GNU Affero General Public License along with this program.
+  If not, see http://www.gnu.org/licenses/ or write to the
+  
+  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
+  
+  or download the license from the following URL: https://evan.network/license/ 
+  
+  You can be released from the requirements of the GNU Affero General Public License
+  by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts of it
+  on other blockchains than evan.network. 
+  
+  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+-->
+
+<div class="member-search" *ngIf="!loading">
+  <ion-item (focus)="openMenu()">
+    <ion-label stacked>
+      <ng-content select="[label]"></ng-content>
+    </ion-label>
+    <ion-input #searchInput class="clickable" readonly
+      (click)="openMenu()"
+      [placeholder]="groupedMemberKeys?.length > 0 ? '' : ('_angularcore.contract-members.search-text' | translate)">
+    </ion-input>
+    <button ion-button icon-only round outline item-end class="person-add-button" (click)="openMenu()">
+      <ion-icon name="person-add" *ngIf="!readonly"></ion-icon>
+      <ion-icon name="people" *ngIf="readonly"></ion-icon>
+    </button>
+  </ion-item>
+  <ion-menu class="member-add-menu" swipeEnabled="false" id="contactMemberAdd" text-left #ionMenu
+    [content]="contactMemberContent" side="right">
+    <ion-header>
+      <ion-toolbar>
+        <ion-buttons start>
+          <button ion-button icon-only menuClose="contactMemberAdd" (click)="closeMenu()">
+            <ion-icon name="close"></ion-icon>
+          </button>
+        </ion-buttons>
+        <h4>{{ '_angularcore.contract-members.members' | translate }}</h4>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ng-container *ngIf="!readonly">
+        <ion-item>
+          <ion-label stacked>
+            <ng-content select="[label]"></ng-content>
+          </ion-label>
+          <ion-input
+            [(ngModel)]="contactSearch"
+            (keydown)="contactSearchChanged($event)"
+            [placeholder]="'_angularcore.contract-members.search-text' | translate" #searchInput>
+          </ion-input>
+        </ion-item>
+        <ion-list margin-bottom>
+          <h3 class="content-header standalone m-b-0" margin-top>
+            {{ '_angularcore.contract-members.suggested-members' | translate }}
+          </h3>
+          <div margin-horinzontal *ngIf="suggestions?.length === 0">
+            {{ '_angularcore.contract-members.no-suggestions' | translate }}
+          </div>
+          <ion-item class="clickable"
+            *ngFor="let suggestion of suggestions; let i = index"
+            (click)="addMember(suggestion)">
+            <ion-avatar item-start margin-right>
+              <blockie-component class="small-blockie"
+                [address]="suggestion"
+                [size]="8"
+                [scale]="15">
+              </blockie-component>
+            </ion-avatar>
+            <h2>{{ getContactAlias(suggestion) }}</h2>
+            <span>{{ suggestion }}</span>
+  
+            <button ion-button item-end icon-only clear>
+              <ion-icon name="add"></ion-icon>
+            </button>
+          </ion-item>
+        </ion-list>
+      </ng-container>
+      <ion-list *ngIf="groupedMemberKeys?.length > 0">
+        <ng-container *ngFor="let stateKey of groupedMemberKeys">
+          <h3 class="content-header standalone m-b-0" margin-top>
+            {{ '_angularcore.contract-members.states.' + stateKey | translate }}
+          </h3>
+          <ion-item *ngFor="let member of groupedMembers[stateKey]">
+            <ion-avatar item-start margin-right>
+              <blockie-component class="small-blockie" [address]="member" [size]="8" [scale]="15">
+              </blockie-component>
+            </ion-avatar>
+            <h2 *ngIf="isMyAccount(member)">{{  '_angularcore.contract-members.i' | translate }}</h2>
+            <h2 *ngIf="!isMyAccount(member)">{{ getContactAlias(member) }}</h2>
+
+            <span> {{ member }} </span>
+          
+            <button ion-button item-end icon-only clear
+              (click)="removeMember(member)"
+              *ngIf="origin.indexOf(member) === -1 && stateKey !== 'loading'">
+              <ion-icon name="close"></ion-icon>
+            </button>
+    
+            <ion-spinner name="close" color="primary"
+              *ngIf="stateKey === 'loading'">
+            </ion-spinner>
+          </ion-item>
+        </ng-container>
+      </ion-list>
+    </ion-content>
+    <ion-nav #contactMemberContent></ion-nav>
+  </ion-menu>
+</div>
+
+<ion-spinner *ngIf="loading" [color]="light"></ion-spinner>
+
+<div class="evan-tag-container" *ngIf="!loading">
+  <div *ngIf="!showTags" class="member-count" (click)="openMenu()">
+    {{ members.concat(origin).length }} {{ '_angularcore.contract-members.members' | translate }}
+    <ng-container *ngIf="members.length > 0">
+      , {{ '_angularcore.contract-members.new-members' | translate:{ count: members.length } }}
+    </ng-container>
+  </div>
+  <div class="evan-tag" *ngFor="let member of members.concat(origin)"
+    [class.cannot-delete]="origin.indexOf(member) !== -1 && getMemberState(member) !== 'loading'"
+    [class.outstanding]="getMemberState(member) === '2'"
+    [class.active]="getMemberState(member) === '4'"
+    [class.rejected]="getMemberState(member) === '3'"
+    [class.closed]="getMemberState(member) === '5'">
+    <span *ngIf="isMyAccount(member)">
+      {{ '_angularcore.contract-members.i' | translate }}
+    </span>
+
+    <span *ngIf="!isMyAccount(member)">
+      {{ contacts[member]?.alias || contacts[member]?.email || member }}
+    </span>
+
+    <ion-icon name="close"
+      (click)="removeMember(member)"
+      *ngIf="origin.indexOf(member) === -1 && getMemberState(member) !== 'loading'">
+    </ion-icon>
+
+    <ion-spinner name="close" color="primary" *ngIf="getMemberState(member) === 'loading'">
+    </ion-spinner>
+  </div>
+</div>

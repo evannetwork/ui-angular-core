@@ -1,0 +1,34 @@
+{
+  "public": {
+    "author": "contractus",
+    "dapp": {
+      "dependencies": {
+        "angular-libs": "^1.0.1",
+        "bcc": "^1.0.1",
+        "smart-contracts": "^1.0.1"
+      },
+      "entrypoint": "angularcore.js",
+      "files": [
+        "angularcore.js",
+        "angularcore.css"
+      ],
+      "origin": "QmfZiCmFvz5H6r5Jp3VU8RpB6rtuT96U6CupaYVpgv5mnt",
+      "type": "library"
+    },
+    "description": "Contractus core angular modules & components.",
+    "name": "angularcore",
+    "tags": [
+      "contractus",
+      "library"
+    ],
+    "version": "1.0.2",
+    "versions": {
+      "0.9.0": "QmYAWXwey3t8i9YM3LJ5vjkd7t7TyY8FTyuZGsafMzW9vt",
+      "0.1.0": "QmbWyV5nby2Sy1oTQ8yJFy3gMmCH8Knz4u94JPrChEqYUT",
+      "1.0.0": "QmeLVyMykg9sQgqvAPWf1W1m1bYLVsz67BGQBB3Xjpn1zr",
+      "1.0.1": "QmZcWauUT6UvkPe2wRPJ7J3kjd2NQzARsEn2MvyS235dmf",
+      "1.0.2": "QmfLorWNC2okvBbTiMsKTtcBfsDsR7ndfpMdiWFj8TqNYA"
+    },
+    "dbcpVersion": 1
+  }
+}

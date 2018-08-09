@@ -1,0 +1,87 @@
+/*
+  Copyright (C) 2018-present evan GmbH. 
+  
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3, 
+  as published by the Free Software Foundation. 
+  
+  This program is distributed in the hope that it will be useful, 
+  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details. 
+  
+  You should have received a copy of the GNU Affero General Public License along with this program.
+  If not, see http://www.gnu.org/licenses/ or write to the
+  
+  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
+  
+  or download the license from the following URL: https://evan.network/license/ 
+  
+  You can be released from the requirements of the GNU Affero General Public License
+  by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts of it
+  on other blockchains than evan.network. 
+  
+  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+*/
+
+@import 'ui-angular-sass/src/variables/colors';
+
+snapshot-dialog {
+  .evan-modal {
+    padding-top: 0;
+  }
+
+  video {
+    position: absolute;
+    z-index: 1001;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    min-width: 70%;
+    max-width: 90%;
+    max-height: 70%;
+    margin: auto;
+  }
+
+  .button-container {
+    position: absolute;
+    z-index: 1002;
+    right: 0;
+    bottom: 30px;
+    left: 0;
+
+    overflow: hidden;
+
+    width: 240px;
+    margin: auto;
+    padding: 10px;
+    text-align: center;
+
+    white-space: nowrap;
+
+    border-radius: 40px;
+    background-color: $background-color-2;
+
+    button.big-button {
+      width: 70px;
+      height: 70px;
+    }
+
+    button.color-gray {
+      background-color: $medium-gray;
+
+      &:hover {
+        background-color: $dark-gray;
+      }
+    }
+
+    button.color-yellow {
+      &, &:hover {
+        background-color: $yellow;
+      }
+    }
+  }
+}

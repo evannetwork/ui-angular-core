@@ -1,0 +1,168 @@
+/*
+  Copyright (C) 2018-present evan GmbH. 
+  
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3, 
+  as published by the Free Software Foundation. 
+  
+  This program is distributed in the hope that it will be useful, 
+  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details. 
+  
+  You should have received a copy of the GNU Affero General Public License along with this program.
+  If not, see http://www.gnu.org/licenses/ or write to the
+  
+  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
+  
+  or download the license from the following URL: https://evan.network/license/ 
+  
+  You can be released from the requirements of the GNU Affero General Public License
+  by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts of it
+  on other blockchains than evan.network. 
+  
+  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+*/
+
+@import 'ui-angular-sass/src/variables/colors';
+@import 'ui-angular-sass/src/variables/positions';
+
+evan-loading {
+  position: relative;
+
+  display: block;
+
+  text-align: center;
+
+  opacity: 0.7;
+
+  .evan-logo-favicon {
+    position: absolute;
+
+    width: 200px;
+    height: 200px;
+    margin-top: 100px;
+    margin-left: calc(50% - 100px);
+
+    border-radius: 50%;
+    background-repeat: no-repeat;
+    background-size: 200px;
+  }
+
+  .spinner {
+    position: absolute;
+    z-index: 10;
+
+    display: inline-block;
+
+    box-sizing: border-box;
+    width: 200px;
+    height: 200px;
+    margin-top: 100px;
+    margin-left: -100px;
+
+    transition: border-top-color 0.20s linear,
+    border-left-color 0.20s linear 0.10s;
+    -webkit-animation: ld-spin 1.5s infinite;
+            animation: ld-spin 1.5s infinite;
+
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent $green transparent transparent;
+    border-radius: 50%;
+    -webkit-background-clip: padding-box;
+
+    &:after {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+
+      display: inline-block;
+
+      width: 100%;
+      height: 100%;
+      margin: auto;
+
+      content: ' ';
+
+      background: center center no-repeat;
+      background-size: cover;
+    };
+  }
+
+  h2 {
+    font-style: italic;
+
+    position: absolute;
+
+    width: 100%;
+    margin-top: 320px;
+
+    text-align: center;
+
+    color: $text-color;
+  }
+
+  .back-buttons {
+    position: absolute;
+    width: 500px;
+    left: 0;
+    right: 0;
+    max-width: 100%;
+    top: 340px;
+    margin: auto;
+
+    div {
+      color: $light;
+    }
+
+    &.with-loading-text {
+      top: 400px; 
+    }
+  }
+}
+
+ion-split-pane {
+  ion-menu {
+    evan-loading {
+      .evan-beauty-screen {
+      }
+    }
+  }
+}
+
+// https://loading.io/animation
+@keyframes ld-spin {
+  0% {
+    -webkit-transform: rotate(0);
+            transform: rotate(0);
+    animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);
+  }
+  50% {
+    -webkit-transform: rotate(180deg);
+            transform: rotate(180deg);
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
+}
+
+@keyframes ld-color {
+  0% {
+    border-color: transparent $green transparent transparent;
+  }
+  75% {
+    transition: border-top-color 0.20s linear,
+    border-left-color 0.20s linear 0.10s;
+
+    border-color: $green $green transparent $green;
+  }
+  100% {
+    border-color: transparent $green transparent transparent;
+  }
+}

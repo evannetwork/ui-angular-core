@@ -1,0 +1,87 @@
+<!--
+  Copyright (C) 2018-present evan GmbH. 
+  
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3, 
+  as published by the Free Software Foundation. 
+  
+  This program is distributed in the hope that it will be useful, 
+  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details. 
+  
+  You should have received a copy of the GNU Affero General Public License along with this program.
+  If not, see http://www.gnu.org/licenses/ or write to the
+  
+  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
+  
+  or download the license from the following URL: https://evan.network/license/ 
+  
+  You can be released from the requirements of the GNU Affero General Public License
+  by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts of it
+  on other blockchains than evan.network. 
+  
+  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+-->
+
+<div class="evan-modal trust-modal">
+  <div class="backdrop" (click)="rejectDialog()"></div>
+
+  <div class="evan-content evan-small-content">
+    <h2 class="content-header">
+      <ion-icon name="ribbon"></ion-icon>
+      {{ smartAgentName }}
+    </h2>
+
+    <div class="table-responsive">
+      <table>
+        <tr>
+          <td>{{ '_angularcore.smart-agent.desc' | translate }}</td>
+          <td text-wrap>{{ smartAgentDetails.description }}</td>
+        </tr>
+        <tr>
+          <td>{{ '_angularcore.smart-agent.trusted-by' | translate }}</td>
+          <td text-wrap>{{ smartAgentDetails.verifiedBy }}</td>
+        </tr>
+        <tr>
+          <td>{{ '_angularcore.smart-agent.trusted-at' | translate }}</td>
+          <td text-wrap>{{ smartAgentDetails.verifiedAt }}</td>
+        </tr>
+        <tr>
+          <td>{{ '_angularcore.smart-agent.created-by' | translate }}</td>
+          <td text-wrap>{{ smartAgentDetails.createdBy }}</td>
+        </tr>
+        <tr>
+          <td>{{ '_angularcore.smart-agent.created-at' | translate }}</td>
+          <td text-wrap>{{ smartAgentDetails.createdAt }}</td>
+        </tr>
+      </table>
+    </div>
+
+    <h2 class="content-header" margin-top>
+      {{ smartAgentName }} {{ '_angularcore.requests-permissions' | translate }}:
+    </h2>
+
+    <div class="table-responsive">
+      <table>
+        <tr *ngFor="let right of smartAgentRights;">
+          <td>{{ '_angularcore.smart-agent.rights.' + right | translate }}</td>
+          <td>{{ '_angularcore.smart-agent.rights.' + right + '-desc' | translate }}</td>
+        </tr>   
+      </table>
+    </div>
+    <div text-center margin-top>
+      <button ion-button icon-left color="medium-gray"
+        (click)="rejectDialog()">
+        <ion-icon name="close" color="light"></ion-icon>
+        <span color="light">{{ '_angularcore.form-alert.cancel' | translate }}</span>
+      </button>
+      <button ion-button icon-left [disabled]="loading" (click)="finish()">
+        <ion-icon *ngIf="!loading" name="send" color="light"></ion-icon>
+        <ion-spinner *ngIf="loading" color="light"></ion-spinner>
+        <span>{{ '_angularcore.form-alert.submit' | translate }}</span>
+      </button>
+    </div>
+  </div>
+</div>

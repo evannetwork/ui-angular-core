@@ -1,0 +1,84 @@
+<!--
+  Copyright (C) 2018-present evan GmbH. 
+  
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3, 
+  as published by the Free Software Foundation. 
+  
+  This program is distributed in the hope that it will be useful, 
+  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details. 
+  
+  You should have received a copy of the GNU Affero General Public License along with this program.
+  If not, see http://www.gnu.org/licenses/ or write to the
+  
+  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
+  
+  or download the license from the following URL: https://evan.network/license/ 
+  
+  You can be released from the requirements of the GNU Affero General Public License
+  by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts of it
+  on other blockchains than evan.network. 
+  
+  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+-->
+
+<ion-split-pane *ngIf="displaySplitPane" [when]="utils.isMD">
+  <ion-menu *ngIf="!disableSidepanel && rootDApp"
+    [content]="content"
+    [class.small]="smallToolbar && utils.isMD">
+    <ion-header (click)="toggleSmallToolbar()" *ngIf="!customHeader">
+      <ng-container>
+        <div class="dapp-logo" item-start *ngIf="(smallToolbar && utils.isMD) || !rootDApp.imgWide">
+          <ng-container *ngIf="rootDApp.imgSquare">
+            <img class="img-small" *oneTime
+              [src]="_DomSanitizer.bypassSecurityTrustUrl(rootDApp.imgSquare)"/>
+          </ng-container>
+        </div>
+        <div class="dapp-name" *ngIf="!(smallToolbar && utils.isMD)">
+          <ng-container item-start *ngIf="rootDApp.imgWide">
+            <img class="img-large" *oneTime [src]="_DomSanitizer.bypassSecurityTrustUrl(rootDApp.imgWide)" />
+          </ng-container>
+    
+          <ng-container item-start *ngIf="!rootDApp.imgWide">
+            <h2>{{ rootDApp?.translated?.name }}</h2>
+          </ng-container>
+        </div>
+      </ng-container>
+    </ion-header>
+    <ng-content *ngIf="customHeader" select="[evan-header]"></ng-content>
+    
+    <ion-content>
+      <ng-content select="[evan-menu-content]"></ng-content>
+    </ion-content>
+    <ion-footer *ngIf="showRootDApps && rootDApps">
+      <ion-item>
+        <ion-avatar item-start *ngIf="rootDApps.length > 0">
+          <img item-start large *oneTime [src]="_DomSanitizer.bypassSecurityTrustUrl(rootDApps[0].imgSquare)" />
+        </ion-avatar>
+        <ion-label>{{ '_angularcore.evan-network' | translate }} {{ '_angularcore.dapps' | translate }}</ion-label>
+        <button ion-button icon-only clear item-end
+          [class.display-none]="smallToolbar" 
+          (click)="rootDAppSelect.open($event)">
+          <ion-icon name="arrow-forward" color="light"></ion-icon>
+        </button>
+        <ion-select class="evan-callout" interface="popover" #rootDAppSelect
+          [(ngModel)]="rootDAppSelectValue"
+          [selectOptions]="footerSelectOptions"
+          (ionChange)="openDApp(rootDAppSelect)">
+          <ion-option *ngFor="let rootDApp of rootDApps"
+            [value]="rootDApp">
+            {{ rootDApp?.translated.name }}
+          </ion-option>
+        </ion-select>
+      </ion-item>
+    </ion-footer>
+    <ion-nav #content></ion-nav>
+  </ion-menu>
+  <ion-content>
+    <ng-content select="[evan-content]"></ng-content>
+  </ion-content>
+</ion-split-pane>
+

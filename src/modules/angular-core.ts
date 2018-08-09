@@ -1,0 +1,246 @@
+/*
+  Copyright (C) 2018-present evan GmbH. 
+  
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3, 
+  as published by the Free Software Foundation. 
+  
+  This program is distributed in the hope that it will be useful, 
+  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details. 
+  
+  You should have received a copy of the GNU Affero General Public License along with this program.
+  If not, see http://www.gnu.org/licenses/ or write to the
+  
+  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
+  
+  or download the license from the following URL: https://evan.network/license/ 
+  
+  You can be released from the requirements of the GNU Affero General Public License
+  by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts of it
+  on other blockchains than evan.network. 
+  
+  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+*/
+
+import {
+  NgModule, ErrorHandler, enableProdMode,   // @angular/core
+  CommonModule, registerLocaleData,         // @angular/common
+  RouterModule, Routes, RouteReuseStrategy, // @angular/router
+  FormsModule,                              // @angular/forms
+  IonicModule, IonicApp,                    // ionic-angular
+  TranslateModule, TranslateService,        // @ngx-translate/core
+  BrowserAnimationsModule,                  // @angular/platform-browser/animations'
+  NgCircleProgressModule,                   // ng-circle-progress
+  IonTagsInputModule,                       // ionic-tags-input
+  ZXingScannerModule,                       // qr-code-scanner module
+  Camera,                                   // @ionic-native/camera
+  QRScanner,                                // @ionic-native/qr-scanner
+  languages                                 // everything from @angular/common/locales
+} from 'angular-libs';
+
+// services
+import { AngularCoreTranslations } from '../i18n/registy';
+import { EvanAddressBookService } from '../services/bcc/address-book';
+import { EvanAlertService } from '../services/ui/alert';
+import { EvanBCCService } from '../services/bcc/bcc';
+import { EvanBcService } from '../services/bcc/bc';
+import { EvanBookmarkService } from '../services/bcc/bookmark';
+import { EvanCoreService } from '../services/bcc/core';
+import { EvanDescriptionService } from '../services/bcc/description';
+import { EvanExceptionHandler } from '../services/ui/exception-handler';
+import { EvanFileService } from '../services/ui/files';
+import { EvanInputService } from '../services/ui/inputs';
+import { EvanMailboxService } from '../services/bcc/mailbox';
+import { EvanModalService } from '../services/ui/modal';
+import { EvanOnboardingService } from '../services/bcc/onboarding';
+import { EvanPictureService } from '../services/ui/picture';
+import { EvanQrCodeService } from '../services/ui/qr-code';
+import { EvanQueue } from '../services/bcc/queue';
+import { EvanRoutingService } from '../services/ui/routing';
+import { EvanSlidesService } from '../services/ui/slides';
+import { EvanToastService } from '../services/ui/toast';
+import { EvanTranslationService } from '../services/ui/translate';
+import { EvanUtilService } from '../services/utils';
+import { SingletonService } from '../services/singleton-service';
+import { EvanLoggingService } from '../services/ui/logging';
+
+// components
+import { DAppLoaderComponent } from '../components/dapp-loader/dapp-loader';
+import { BlockieComponent } from '../components/blockie/blockie';
+import { EvanLoadingComponent } from '../components/evan-loading/evan-loading';
+import { EvanSplitPaneComponent } from '../components/split-pane/split-pane';
+import { NotImplementedComponent } from '../components/not-implemented/not-implemented';
+import { EvanReloadComponent } from '../components/reload-route/reload-route';
+import { EmptyDAppDisplayComponent } from '../components/empty-dapp-display/empty-dapp-display';
+import { MailDialogComponent } from '../components/mail-dialog/mail-dialog';
+import { GlobalPasswordComponent } from '../components/global-password/global-password';
+import { TrustDialogComponent } from '../components/trust-dialog/trust-dialog';
+import { ContractMembersComponent } from '../components/contract-members/contract-members';
+import { EvanDAppWrapperComponent } from '../components/dapp-wrapper/dapp-wrapper';
+import { SnapshotDialogComponent } from '../components/take-snapshot/take-snapshot';
+import { QRCodeScannerDialogComponent } from '../components/qr-code-scanner/qr-code-scanner';
+import { DashboardTopButtons } from '../components/dashboard-top-buttons/dashboard-top-buttons';
+import { BigPictureDialog } from '../components/big-picture/big-picture';
+import { EvanFileSelectComponent } from '../components/file-select/file-select';
+import { ListPagingComponent } from '../components/list-paging/list-paging';
+import { ContractListEntriesComponent } from '../components/contract-listentries/contract-listentries';
+
+// pipes
+import { ObjectToArrayPipe } from '../pipes/ObjectToArray';
+import { ObjectKeysPipe } from '../pipes/object-keys';
+// directives
+import { OneTimeDirective } from '../directives/oneTime';
+
+/**************************************************************************************************/
+enableProdMode();
+
+/**
+ * angular-core module configuration
+ */
+const moduleConfig = {
+  imports: [
+    IonicModule,
+    TranslateModule.forRoot(),
+    CommonModule,
+    FormsModule,
+    IonTagsInputModule,
+    RouterModule,
+    NgCircleProgressModule.forRoot({
+      // set defaults here
+      radius: 100,
+      outerStrokeWidth: 16,
+      innerStrokeWidth: 8,
+      outerStrokeColor: '#004f7d',
+      innerStrokeColor: '#0081c7',
+      animationDuration: 300
+    }),
+    // ZXing scanner module
+    ZXingScannerModule.forRoot()
+  ],
+  declarations: [
+    DAppLoaderComponent,
+    BlockieComponent,
+    EvanLoadingComponent,
+    EvanSplitPaneComponent,
+    ObjectToArrayPipe,
+    ObjectKeysPipe,
+    NotImplementedComponent,
+    EvanReloadComponent,
+    EmptyDAppDisplayComponent,
+    MailDialogComponent,
+    GlobalPasswordComponent,
+    OneTimeDirective,
+    TrustDialogComponent,
+    SnapshotDialogComponent,
+    QRCodeScannerDialogComponent,
+    ContractMembersComponent,
+    EvanDAppWrapperComponent,
+    DashboardTopButtons,
+    BigPictureDialog,
+    EvanFileSelectComponent,
+    ListPagingComponent,
+    ContractListEntriesComponent,
+  ],
+  providers : [
+    AngularCoreTranslations,
+    Camera,
+    EvanAddressBookService,
+    EvanAlertService,
+    EvanBCCService,
+    EvanBcService,
+    EvanBookmarkService,
+    EvanCoreService,
+    EvanDescriptionService,
+    EvanExceptionHandler,
+    EvanFileService,
+    EvanInputService,
+    EvanLoggingService,
+    EvanMailboxService,
+    EvanModalService,
+    EvanOnboardingService,
+    EvanPictureService,
+    EvanQrCodeService,
+    EvanQueue,
+    EvanRoutingService,
+    EvanSlidesService,
+    EvanToastService,
+    EvanTranslationService,
+    EvanUtilService,
+    ObjectKeysPipe,
+    ObjectToArrayPipe,
+    QRScanner,
+    SingletonService,
+    TranslateService,
+    { provide: ErrorHandler, useClass: EvanExceptionHandler },
+  ],
+  exports: [
+    // angular exports
+    RouterModule,
+    TranslateModule,
+    CommonModule,
+    IonicModule,
+    NgCircleProgressModule,
+    IonTagsInputModule,
+
+    // components
+    DAppLoaderComponent,
+    BlockieComponent,
+    EvanLoadingComponent,
+    EvanSplitPaneComponent,
+    NotImplementedComponent,
+    EvanReloadComponent,
+    EmptyDAppDisplayComponent,
+    MailDialogComponent,
+    GlobalPasswordComponent,
+    TrustDialogComponent,
+    SnapshotDialogComponent,
+    QRCodeScannerDialogComponent,
+    ContractMembersComponent,
+    EvanDAppWrapperComponent,
+    DashboardTopButtons,
+    BigPictureDialog,
+    EvanFileSelectComponent,
+    ListPagingComponent,
+    ContractListEntriesComponent,
+
+    // pipes
+    ObjectToArrayPipe,
+    ObjectKeysPipe,
+
+    // directives
+    OneTimeDirective,
+  ],
+  entryComponents: [
+    MailDialogComponent,
+    GlobalPasswordComponent,
+    TrustDialogComponent,
+    SnapshotDialogComponent,
+    QRCodeScannerDialogComponent,
+    BigPictureDialog,
+  ]
+};
+
+/**
+ * Angular Core Module
+ *
+ * @class      NgModule AngularCore
+ */
+@NgModule(moduleConfig)
+export class AngularCore {
+  constructor(
+    translations: AngularCoreTranslations,
+    translate: EvanTranslationService,
+  ) {
+    translate.setLanguage();
+  }
+}
+
+/**************************************************************************************************/
+
+const languageKeys = Object.keys(languages);
+for (let i = 0; i < languageKeys.length; i++) {
+  registerLocaleData(languages[languageKeys[i]].default);
+}

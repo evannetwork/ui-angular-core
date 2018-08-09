@@ -1,0 +1,169 @@
+<!--
+  Copyright (C) 2018-present evan GmbH. 
+  
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3, 
+  as published by the Free Software Foundation. 
+  
+  This program is distributed in the hope that it will be useful, 
+  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details. 
+  
+  You should have received a copy of the GNU Affero General Public License along with this program.
+  If not, see http://www.gnu.org/licenses/ or write to the
+  
+  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
+  
+  or download the license from the following URL: https://evan.network/license/ 
+  
+  You can be released from the requirements of the GNU Affero General Public License
+  by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts of it
+  on other blockchains than evan.network. 
+  
+  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+-->
+
+<ion-header *ngIf="showHeader && !loading">
+  <ion-navbar>
+    <ion-buttons start>
+      <button ion-button icon-only
+        *ngIf="showMenuButton && !utilService.isMD"
+        (click)="openSplitPane()">
+        <ion-icon name='menu'></ion-icon>
+      </button>
+      <button ion-button icon-only *ngIf="routing.navigateBackStatus" (click)="routing.goBack()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-buttons end
+      class="evan-queue-status"
+      *ngIf="queueButtonCount() > 0"
+      [@queueButtonTransition]>
+      <button ion-button icon-only 
+        *ngIf="mailboxService.newMailCount > 0"
+        (click)="routing.goToMails()">
+        <ion-icon name="mail" color="light"></ion-icon>
+
+        <span class="notification-count" *ngIf="mailboxService.newMailCount > 0">
+          {{ mailboxService.newMailCount > 9 ? 9 + '+' : mailboxService.newMailCount }}
+        </span>
+      </button>
+      <button ion-button icon-only
+        *ngIf="evanQueue.queue.entries.length > 0"
+        (click)="toggleQueueSidePanel()"
+        [class.both-active]="queueButtonCount() > 1"
+        [class.error]="!evanQueue.loading && evanQueue.exception">
+        <ng-container *ngIf="!evanQueue.loading">
+          <ion-icon *ngIf="!evanQueue.exception" name="send" color="light"></ion-icon>
+          <ion-icon *ngIf="evanQueue.exception" name="flag" color="light"></ion-icon>
+        </ng-container>
+        <ion-spinner *ngIf="evanQueue.loading" color="light"></ion-spinner>
+      </button>
+      <button ion-button icon-only class="error"
+        *ngIf="logErrors.length > 0 && !evanQueue.exception"
+        (click)="logging.logQuestionAlert()"
+        [class.both-active]="queueButtonCount() > 1">
+        <ion-icon name="flag" color="light"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title *ngIf="!contentLoading && activeDApp !== accountId">
+      {{ activeDApp | translate }}
+      <ion-icon class="clickable refresh-icon" *ngIf="reloadAction && !evanQueue.loading" name="refresh" (click)="startRefreshContent()"></ion-icon>
+    </ion-title>
+    <ion-title *ngIf="!contentLoading && activeDApp === accountId">
+      {{ '_angularcore.my-profile' | translate }}
+    </ion-title>
+    <ion-title *ngIf="contentLoading">
+      {{ '_angularcore.loading' | translate }}
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content
+  [class.queue-button-active]="queueButtonCount() === 1"
+  [class.queue-button-active-2]="queueButtonCount() === 2"
+  [class.queue-button-active-3]="queueButtonCount() === 3">
+  <ng-content select="[evan-content]"></ng-content>
+</ion-content>
+<ion-menu side="right" swipeEnabled="false" id="queueMenu" text-center [content]="sequenceContent">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons start>
+        <button ion-button icon-only menuClose="queueMenu">
+          <ion-icon name="close"></ion-icon>
+        </button>
+      </ion-buttons>
+      <h4>{{ '_angularcorequeue.sidepanel-header' | translate }}</h4>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <div padding-bottom></div>
+    <ng-container *ngIf="evanQueue.queue.entries.length === 0">
+      <div class="evan-seperator small"></div>
+
+      {{ '_angularcorequeue.sidepanel-empty-queue' | translate }}
+
+      <div class="evan-seperator small"></div>
+    </ng-container>
+    <ng-container *ngIf="evanQueue.queue.entries.length > 0">
+      <ion-spinner color="light"
+        *ngIf="evanQueue.loading"
+        [class.error]="evanQueue.exception"></ion-spinner>
+      <ion-icon *ngIf="evanQueue.exception" name="flag" color="danger"></ion-icon>
+
+      <div class="evan-seperator small"></div>
+      <div>
+        {{ '_angularcorequeue.saving' | translate }}
+        <b>{{ evanQueue.queue.entries.length }}</b>
+        {{ '_angularcorequeue.sidepanel-data-sets' | translate }}
+      </div>
+      
+      <div class="evan-seperator small"></div>
+
+      <div class="queue-exception" *ngIf="evanQueue.exception">
+        <span>
+          {{ '_angularcorequeue.error-occured' | translate }}
+        </span>
+      </div>
+
+      <div *ngIf="evanQueue.enableSyncAll()">
+        <ng-container *ngIf="evanQueue.exception">
+          <button ion-button icon-left round outline color="danger"
+            (click)="reportLogs()" menuClose="queueMenu">
+            <ion-icon name="alert"></ion-icon>
+            <span>{{ '_angularcorequeue.report-error' | translate }}</span>
+          </button>
+          <div class="evan-seperator small"></div>
+          <div margin>
+            {{ '_angularcorequeue.retry-description' | translate }}
+          </div>
+          <button ion-button icon-left round outline
+            (click)="evanQueue.startSyncAll()" menuClose="queueMenu">
+            <ion-icon name="refresh"></ion-icon>
+            <span>{{ '_angularcorequeue.retry' | translate }}</span>
+          </button>
+        </ng-container>
+
+        <button ion-button icon-left 
+          *ngIf="!evanQueue.exception"
+          (click)="evanQueue.startSyncAll()" menuClose="queueMenu">
+          <span>{{ '_angularcorequeue.startsync' | translate }}</span>
+        </button>
+      </div>
+    </ng-container>
+  </ion-content>
+
+  <ion-footer>
+    <ion-toolbar>
+      <ion-buttons>
+        <button ion-button icon-left (click)="routing.goToQueue()" menuClose="queueMenu">
+          <ion-icon name="arrow-back" color="light"></ion-icon>
+          <span color="light">{{ 'go-to-queue' | translate }}</span>
+        </button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-footer>
+  <ion-nav #sequenceContent class="queue-ion-nav"></ion-nav>
+</ion-menu>

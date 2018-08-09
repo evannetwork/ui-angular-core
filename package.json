@@ -1,0 +1,23 @@
+{
+  "license": "AGPL-3.0-only",
+  "author": "Contractus",
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "smart-contracts",
+    "javascript",
+    "typescript",
+    "API",
+    "Angular 5",
+    "Ionic",
+    "DApp",
+    "SASS"
+  ],
+  "main": "dist/index.js",
+  "name": "@evan.network/ui-angular-core",
+  "scripts": {
+    "compodoc": "./node_modules/.bin/compodoc -p src/tsconfig.json"
+  },
+  "typings": "dist/index.d.ts",
+  "version": "1.0.2"
+}

@@ -1,0 +1,254 @@
+/*
+  Copyright (C) 2018-present evan GmbH. 
+  
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3, 
+  as published by the Free Software Foundation. 
+  
+  This program is distributed in the hope that it will be useful, 
+  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details. 
+  
+  You should have received a copy of the GNU Affero General Public License along with this program.
+  If not, see http://www.gnu.org/licenses/ or write to the
+  
+  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
+  
+  or download the license from the following URL: https://evan.network/license/ 
+  
+  You can be released from the requirements of the GNU Affero General Public License
+  by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts of it
+  on other blockchains than evan.network. 
+  
+  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+*/
+
+@import 'ui-angular-sass/src/variables/colors';
+
+evan-split-pane, .evan-split-pane {
+  ion-split-pane {
+    ion-menu {
+      z-index: 10;
+
+      box-shadow: 1px 0 20px rgba(0, 0, 0, 0.15) !important;
+
+      &.small {
+        min-width: 56px !important;
+
+        ion-content, ion-footer {
+          ion-list, ion-buttons {
+            img, ion-icon {
+              position: absolute;
+              right: 0;
+              left: 0;
+
+              margin: auto;
+            }
+
+            img {
+              margin: 0 8px !important;
+            }
+          }
+        }
+      }
+
+      ion-header {
+        float: left;
+
+        white-space: nowrap;
+
+        @media (min-width: 769px) {
+          cursor: pointer;
+
+          &:hover {
+            background-color: $hover;
+          }
+        }
+
+        & > * {
+          display: inline-block;
+        }
+
+        &, .dapp-logo, .dapp-name {
+          line-height: 50px;
+
+          height: $toolbar-height;
+
+          vertical-align: top;
+        }
+
+        .dapp-logo {
+          width: 56px;
+        }
+
+        .dapp-name {
+          h2 {
+            overflow: hidden;
+
+            width: 100%;
+
+            text-overflow: ellipsis;
+          }
+        }
+
+        img {
+          &.img-small {
+            width: 31px;
+            height: 31px;
+            margin: 8px 12px;
+
+            vertical-align: top;
+          }
+
+          &.img-large {
+            max-width: 100%;
+            max-height: 40px;
+            padding-left: 25px;
+
+            vertical-align: middle;
+          }
+        }
+
+        &:after {
+          display: none;
+        }
+
+        button {
+          position: absolute !important;
+          top: 0;
+          right: 0;
+          bottom: 0;
+
+          margin: auto !important;
+        }
+      }
+
+      h4 {
+        color: $light;
+      }
+
+      ion-content {
+        ion-list {
+          button {
+            height: 73px;
+
+            img {
+              padding: 2px;
+
+              border-radius: 50%;
+              background-color: $light;
+            }
+          }
+
+          .left-panel-notification {
+            font-size: 12px;
+
+            position: absolute;
+            top: 5px;
+            right: 8px;
+
+            width: 20px;
+            height: 20px;
+            padding: 3px;
+
+            text-align: center;
+
+            color: $light;
+            border-radius: 50%;
+            background-color: $red;
+          }
+        }
+      }
+    }
+
+    ion-content {
+      ion-header {
+        ion-navbar {
+          .notification-count {
+            font-size: 12px;
+
+            position: absolute;
+            top: 7px;
+            right: 7px;
+
+            width: 20px;
+            height: 20px;
+            padding: 4px;
+
+            border-radius: 50%;
+            background-color: $red;
+          }
+        }
+      }
+
+      .evan-queue-status {
+        position: absolute;
+        top: 0;
+        right: -2px;
+
+        button {
+          width: 56px;
+          height: 56px;
+          margin: 0;
+          margin-right: -4px;
+
+          border-radius: 0;
+
+          ion-spinner {
+            width: 30px;
+            height: 30px;
+          }
+
+          @media(min-width: 768px) {
+            background-color: $medium-blue;
+
+            &.error {
+              background-color: $red;
+            }
+
+            &.both-active {
+              border-left: 1px solid #699fbd;
+            }
+          }
+
+          @media(max-width: 768px) {
+            background-color: $dark-blue;
+
+            &.error {
+              ion-icon {
+                color: $red;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  ion-footer {
+    ion-toolbar {
+      min-height: 45px;
+    }
+
+    ion-avatar {
+      margin-right: 0 !important;
+      margin-left: 10px !important;
+    }
+
+    .item-inner {
+      border-bottom: 0 !important;
+    }
+
+    ion-select {
+      .select-text {
+        display: none;
+      }
+    }
+
+    button.display-none {
+      display: none;
+    }
+  }
+}
