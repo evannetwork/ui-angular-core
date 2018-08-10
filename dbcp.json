@@ -12,7 +12,7 @@
         "angularcore.js",
         "angularcore.css"
       ],
-      "origin": "QmfZiCmFvz5H6r5Jp3VU8RpB6rtuT96U6CupaYVpgv5mnt",
+      "origin": "Qme6KSSeKTKtHDBafA98tXhPYf8FHEQqL8RNZvq3XDzNDa",
       "type": "library"
     },
     "description": "Contractus core angular modules & components.",
@@ -27,7 +27,7 @@
       "0.1.0": "QmbWyV5nby2Sy1oTQ8yJFy3gMmCH8Knz4u94JPrChEqYUT",
       "1.0.0": "QmeLVyMykg9sQgqvAPWf1W1m1bYLVsz67BGQBB3Xjpn1zr",
       "1.0.1": "QmZcWauUT6UvkPe2wRPJ7J3kjd2NQzARsEn2MvyS235dmf",
-      "1.0.2": "QmfLorWNC2okvBbTiMsKTtcBfsDsR7ndfpMdiWFj8TqNYA"
+      "1.0.2": "QmcbXt9zyx2QAPsx1bwSNUbhH1XFs9vVqrDM6Soa52yWJZ"
     },
     "dbcpVersion": 1
   }
