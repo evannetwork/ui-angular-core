@@ -81,9 +81,13 @@ The angular-core operates as an global and central library for the evan.network 
 - Angular 5 Onetime binding directive
 - I18N handling using ngx-translate
 
+## API Documentation and Tutorials
+- [DApp Tutorials](https://evannetwork.github.io/dapps/basics)
+- [API Reference UI](https://ipfs.evan.network/ipns/QmReXE5YkiXviaHNG1ASfY6fFhEoiDKuSkgY4hxgZD9Gm8/angular-core/index.html)
+
 ## Installation
 ```sh
-npm i angular-core
+npm i @evan.network/ui-angular-core
 ```
 
 ## Usage
@@ -115,22 +119,4 @@ import {
   startAngularApplication,
   createIonicAppElement
 } from 'angular-core';
-```
-
-## Loading
-- typescript
-
-tsconfig.json
-```json
-{
-  "compilerOptions": {
-    ...,
-    "paths": {
-      "angular-libs": [
-        "../node_modules/@evan.network/ui-angular-core/dist/angularlibs.js"
-      ]
-    }
-    ...
-  }
-}
 ```
