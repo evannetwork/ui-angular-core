@@ -113,9 +113,18 @@ export class EvanDescriptionService {
         if (ensAddress.indexOf('0x') === 0) {
           description = await this.bcc.description.getDescriptionFromContract(ensAddress, this.core.activeAccount());
         } else {
-          try {
-            description = await System.import(`${ ensAddress }!ens`);
-          } catch (ex) { }
+          // check if the devMode is available for this dapp
+          const devName = ensAddress.replace(`.${ getDomainName() }`, '');
+          if (utils.isDevAvailable(devName)) {
+            description = await evanGlobals.System.import(`${ window.location.origin }/external/${ devName }/dbcp.json!json`);
+          }
+
+          // if no devMode is available for this application, load it directly from ens
+          if (!description) {
+            try {
+              description = await System.import(`${ ensAddress }!ens`);
+            } catch (ex) { }
+          }
 
           // load definition via ens, if System.import ens could not get a value
           if (!description) {
@@ -208,7 +217,7 @@ export class EvanDescriptionService {
    * @return     {string}  The ens origin url.
    */
   public async getENSOriginUrl(ensAddress: string): Promise<string> {
-    const withoutDomain = ensAddress.split('.')[0];
+    const withoutDomain = utils.getDAppName(ensAddress);
 
     if (utils.isDevAvailable(withoutDomain)) {
       return `${window.location.origin}/external/${ withoutDomain }`;

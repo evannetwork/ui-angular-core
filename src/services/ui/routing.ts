@@ -29,7 +29,8 @@ import {
   getDomainName,
   importDApp,
   System,
-  routing
+  routing,
+  utils
 } from 'dapp-browser';
 
 import {
@@ -291,7 +292,7 @@ export class EvanRoutingService {
       // get last part of url => the active iteration one
       let dappName = route.firstChild.routeConfig.path.split('/').pop();
       // get first entry of ens path
-      dappName = dappName.split('.')[0];
+      dappName = utils.getDAppName(dappName);
 
       // split out the first ens entry
       if (dappName.endsWith(childPath)) {
@@ -336,7 +337,7 @@ export class EvanRoutingService {
    * @return     {string}  dappName
    */
   getDAppNameFromRoutePath(routePath: string): string {
-    return routePath.split('/').pop().split('.')[0];
+    return utils.getDAppName(routePath.split('/').pop());
   }
 
     /**
@@ -347,7 +348,7 @@ export class EvanRoutingService {
   getDAppNameFromCurrRoutePath(): string {
     const routePath = this.getRouteFromUrl(this.router.url);
 
-    return routePath.split('/').pop().split('.')[0];
+    return this.getDAppNameFromRoutePath(routePath);
   }
 
   /**
