@@ -25,3 +25,33 @@
   https://evan.network/license/
 */
 
+@import 'ui-angular-sass/src/variables/colors';
+
+evan-file-select {
+  input[type='file'] {
+    display: none;
+  }
+
+  ion-list {
+    ion-item.item-md {
+      display: inline-block;
+
+      width: auto;
+      margin: 10px 10px 0 0;
+      padding: 0;
+      padding: 10px 0 10px 15px !important;
+
+      background-color: rgba(5, 61, 73, 0.5) !important;
+
+      div[item-content] {
+        margin-left: 10px;
+      }
+    }
+  }
+
+  button.add-button {
+    margin-top: 35px;
+
+    vertical-align: top;
+  }
+}

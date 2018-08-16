@@ -173,6 +173,11 @@ export class ContractMembersComponent extends AsyncComponent {
    */
   private suggestions: Array<string>;
 
+  /**
+   * specify, if the contract members input were adjusted
+   */
+  public touched: boolean;
+
   /***************** initialization  *****************/
   constructor(
     private addressBook: EvanAddressBookService,
@@ -435,5 +440,16 @@ export class ContractMembersComponent extends AsyncComponent {
     }
 
     return name;
+  }
+
+  /**
+   * If the menu was closed, we need to set the component to touched, so a using component can show
+   * an required error or something.
+   */
+  private setTouched() {
+    // set that the component was touched
+    this.touched = true;
+    this.onChange.emit();
+    this.ref.detectChanges();
   }
 }

@@ -27,16 +27,25 @@
 
 <ion-label class="standalone">
   {{ (label || '_angularcore.file-select') | translate }}
-
-  <button class="top-right" ion-button icon-only clear outline
+</ion-label>
+<input #fileSelect type="file" multiple="multiple" (change)="filesChanged($event)" />
+<ion-list>
+  <ion-item *ngFor="let file of ngModel; let i = index">
+    <ion-label>
+      <h2>{{ file.name }}</h2>
+      <h3>{{ parseFileSize(file.size)}}</h3>
+    </ion-label>
+    <div item-content>
+      <button ion-button icon-only clear color="red"
+        *ngIf="!disabled"
+        (click)="removeFile(file, i)">
+        <ion-icon name="trash"></ion-icon>
+      </button>
+    </div>
+  </ion-item>
+  <button ion-button icon-only outline round class="add-button"
+    *ngIf="!disabled"
     (click)="selectFiles()">
     <ion-icon name="add"></ion-icon>
   </button>
-</ion-label>
-<ion-list>
-  <ion-item *ngFor="let file of [ ].concat(files, ngModel)">
-    <button ion-button icon-only *ngIf="files.indexOf(file) !== -1" (click)="removeFile(file)">
-      <ion-icon name="trash"></ion-icon>
-    </button>
-  </ion-item>
 </ion-list>

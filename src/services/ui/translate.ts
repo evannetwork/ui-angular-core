@@ -50,6 +50,11 @@ export class EvanTranslationService implements OnDestroy {
   private translateWatcher: any;
 
   /**
+   * translated month short names for simple ion-date usage
+   */
+  public monthShortNames: Array<string>;
+
+  /**
    * load dependencies and register translation updater watcher
    */
   constructor(
@@ -58,6 +63,10 @@ export class EvanTranslationService implements OnDestroy {
     private utils: EvanUtilService
   ) {
     this.translateWatcher = this.watchTranslationUpdate();
+
+    setTimeout(() => {
+      this.monthShortNames = this.instant('_angularcore.month-short-names').split(',');
+    });
   }
 
   /**

@@ -40,7 +40,7 @@
     </button>
   </ion-item>
   <ion-menu class="member-add-menu" swipeEnabled="false" id="contactMemberAdd" text-left #ionMenu
-    [content]="contactMemberContent" side="right">
+    [content]="contactMemberContent" side="right" (ionClose)="setTouched()">
     <ion-header>
       <ion-toolbar>
         <ion-buttons start>

@@ -92,6 +92,7 @@ export class EvanBCCService {
   public CoreBundle: any;
   public cryptoProvider: any;
   public dataContract: ProfileBundle.DataContract;
+  public serviceContract: ProfileBundle.ServiceContract;
   public description: any;
   public dfs: any;
   public executor: any;
@@ -163,15 +164,16 @@ export class EvanBCCService {
    * Copy BCC profile object instances into the service this scope.
    */
   copyProfileToInstance() {
-    this.keyProvider = ProfileBundle.ProfileRuntime.keyProvider;
-    this.ipldInstance = ProfileBundle.ProfileRuntime.ipldInstance;
-    this.dfs = ProfileBundle.ProfileRuntime.dfs;
-    this.mailbox = ProfileBundle.ProfileRuntime.mailbox;
-    this.keyExchange = ProfileBundle.ProfileRuntime.keyExchange;
-    this.profile = ProfileBundle.ProfileRuntime.profile;
-    this.sharing = ProfileBundle.ProfileRuntime.sharing;
     this.dataContract = ProfileBundle.ProfileRuntime.dataContract;
+    this.dfs = ProfileBundle.ProfileRuntime.dfs;
+    this.ipldInstance = ProfileBundle.ProfileRuntime.ipldInstance;
+    this.keyExchange = ProfileBundle.ProfileRuntime.keyExchange;
+    this.keyProvider = ProfileBundle.ProfileRuntime.keyProvider;
+    this.mailbox = ProfileBundle.ProfileRuntime.mailbox;
+    this.profile = ProfileBundle.ProfileRuntime.profile;
     this.ProfileBundle = ProfileBundle;
+    this.serviceContract = ProfileBundle.ProfileRuntime.serviceContract;
+    this.sharing = ProfileBundle.ProfileRuntime.sharing;
   }
 
   /**

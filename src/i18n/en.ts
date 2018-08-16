@@ -207,7 +207,9 @@ export const en = {
       'header': 'Scan QR code',
       'camera-select': 'Camera Selection',
       'no-camera-selected': 'No camera selected'
-    }
+    },
+    "month-short-names": "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec",
+    "file-select": "Select files"
   },
   '_logging': {
     'logs-sent': 'Thank you very much! Your logs have been forwarded to evan.network developers.',

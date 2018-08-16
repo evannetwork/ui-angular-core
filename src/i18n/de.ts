@@ -198,7 +198,9 @@ export const de = {
     'snapshot': {
       'header': 'Bild aufnehmen',
       'video_no_available': 'Kamera ist nicht verfügbar'
-    }
+    },
+    "month-short-names": "Jan,Feb,Mär,Apr,Mai,Jun,Jul,Aug,Sep,Okt,Nov,Dez",
+    "file-select": "Dateien auswählen"
   },
   '_logging': {
     'logs-sent': 'Vielen Dank! Ihre logs wurden an evan.network Entwickler weitergeleitet.',

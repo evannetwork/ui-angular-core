@@ -26,16 +26,28 @@
 */
 
 import {
-  Component, OnInit, Input, Output,  // @angular/core
-  Observable, ChangeDetectorRef,
-  EventEmitter
+  ChangeDetectorRef,
+  Component,
+  ControlValueAccessor,
+  ElementRef,
+  EventEmitter,
+  forwardRef,
+  Input,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  Observable,
+  OnInit,
+  Output,
+  ViewChild,
 } from 'angular-libs';
 
 import {
   EvanRoutingService
 } from '../../services/ui/routing'
 
-//TODO: this is not finished and not working!
+import {
+  EvanUtilService
+} from '../../services/utils';
 
 
 /**************************************************************************************************/
@@ -54,9 +66,16 @@ import {
  */
 @Component({
   selector: 'evan-file-select',
-  templateUrl: 'file-select.html'
+  templateUrl: 'file-select.html',
+  providers: [
+    { 
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => EvanFileSelectComponent),
+      multi: true,
+    }
+  ]
 })
-export class EvanFileSelectComponent implements OnInit {
+export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
   /***************** inputs & outpus *****************/
   /**
    * this component is displayed like an ionic input, defines property or hides it
@@ -83,31 +102,51 @@ export class EvanFileSelectComponent implements OnInit {
    */
   @Input() maxFiles: number;
 
+  /**
+   * Event emitter to tell using component, that something has changed
+   */
+  @Output() onChange: EventEmitter<any> = new EventEmitter();
+
+
   /*****************    variables    *****************/
+
+  /**
+   * input element for selection more items
+   */
+  @ViewChild('fileSelect') fileSelect: ElementRef;
+
   /**
    * check if min files and max files requirements are resolved
    */
   public isValid: boolean;
-  /**
-   * { item_description }
-   */
-  private files: Array<any>;
 
   /***************** initialization  *****************/
   constructor(
-    private ref: ChangeDetectorRef
+    private ref: ChangeDetectorRef,
+    private utils: EvanUtilService
   ) { }
 
   ngOnInit() {
     this.ref.detach();
 
-    this.files = [ ];
     this.ngModel = this.ngModel || [ ];
 
     this.setIsValid();
 
     this.ref.detectChanges();
   }
+
+  writeValue(value: any) {
+    this.ngModel = value;
+  }
+
+  propagateChange = (_: any) => {};
+
+  registerOnChange(fn) {
+    this.propagateChange = fn;
+  }
+
+  registerOnTouched() {}
 
   /*****************    functions    *****************/
   setIsValid() {
@@ -126,14 +165,52 @@ export class EvanFileSelectComponent implements OnInit {
    * Add new files to the file upload list
    */
   selectFiles() {
+    this.fileSelect.nativeElement.click();
+  }
 
+  /**
+   * Is triggered when files were changed.
+   */
+  filesChanged($event) {
+    for (let i = 0; i < $event.srcElement.files.length; i++) {
+      const file = $event.srcElement.files[i];
+      const found = this.ngModel.filter(existing => existing.name === file.name).length > 0;
+
+      if (!found) {
+        this.ngModel.push(file);
+      }
+    }
+
+    this.onChange.emit();
+    this.ref.detectChanges();
   }
 
   /**
    * Remove a newly selected file from the upload list
+   *
+   * @param      {file}    file    file object that should be removed
+   * @param      {number}  index   index of the file within the ngModel
    */
-  removeFiles(file: any) {
-    this.files.splice(this.files.indexOf(file));
-    this.ngModel.splice(this.ngModel.indexOf(file));
+  removeFile(file: any, index: number) {
+    this.ngModel.splice(index, 1);
+
+    this.onChange.emit();
+    this.ref.detectChanges();
+  }
+
+  /**
+   * Parse the file size to a human readable format
+   *
+   * @param      {number}  size    size in B
+   * @return     {string}  XXX KB / XXX MB
+   */
+  parseFileSize(size: number) {
+    if ((size / 1000000) > 1) {
+      return `${ (size / 1000000).toFixed(2) } MB`;
+    } else if ((size / 1000) > 1) {
+      return `${ (size / 1000).toFixed(2) } KB`;
+    } else {
+      return `${ size.toFixed(2) }B`;
+    }
   }
 }
