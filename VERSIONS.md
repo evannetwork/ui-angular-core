@@ -2,7 +2,14 @@
 
 ## Next Version
 ### Features
+- basic implementation of file-select component
+- add devMode support for descriptionService; add subdonmain suppior
+- add some options to contract-members
+- add shortMonthNames to translateService
+
 ### Fixes
+- correct installation documentation
+
 ### Deprecations
 
 ## Version 1.0.2
