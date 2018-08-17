@@ -2,6 +2,11 @@
 
 ## Next Version
 ### Features
+### Fixes
+### Deprecations
+
+## Version 1.1.0
+### Features
 - basic implementation of file-select component
 - add devMode support for descriptionService; add subdonmain suppior
 - add some options to contract-members

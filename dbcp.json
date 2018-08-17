@@ -1,34 +1,35 @@
 {
   "public": {
-    "author": "contractus",
+    "author": "evan GmbH",
     "dapp": {
       "dependencies": {
-        "angular-libs": "^1.0.1",
-        "bcc": "^1.0.1",
-        "smart-contracts": "^1.0.1"
+        "angular-libs": "^1.1.0",
+        "bcc": "^1.1.0",
+        "smart-contracts": "^1.0.3"
       },
       "entrypoint": "angularcore.js",
       "files": [
         "angularcore.js",
         "angularcore.css"
       ],
-      "origin": "Qme6KSSeKTKtHDBafA98tXhPYf8FHEQqL8RNZvq3XDzNDa",
+      "origin": "QmUZieLeSbhkJ2MXxbyrU788Pc2uUBPiQpyv4UG9Wh7Qom",
       "type": "library"
     },
+    "dbcpVersion": 1,
     "description": "Contractus core angular modules & components.",
     "name": "angularcore",
     "tags": [
       "contractus",
       "library"
     ],
-    "version": "1.0.2",
+    "version": "1.1.0",
     "versions": {
-      "0.9.0": "QmYAWXwey3t8i9YM3LJ5vjkd7t7TyY8FTyuZGsafMzW9vt",
       "0.1.0": "QmbWyV5nby2Sy1oTQ8yJFy3gMmCH8Knz4u94JPrChEqYUT",
+      "0.9.0": "QmYAWXwey3t8i9YM3LJ5vjkd7t7TyY8FTyuZGsafMzW9vt",
       "1.0.0": "QmeLVyMykg9sQgqvAPWf1W1m1bYLVsz67BGQBB3Xjpn1zr",
       "1.0.1": "QmZcWauUT6UvkPe2wRPJ7J3kjd2NQzARsEn2MvyS235dmf",
-      "1.0.2": "QmcbXt9zyx2QAPsx1bwSNUbhH1XFs9vVqrDM6Soa52yWJZ"
-    },
-    "dbcpVersion": 1
+      "1.0.2": "QmfLorWNC2okvBbTiMsKTtcBfsDsR7ndfpMdiWFj8TqNYA",
+      "1.1.0": "QmVNFgSLJKN4T8H4UZNXKnxPo8iirMXsYqade5RVkxogHX"
+    }
   }
 }
