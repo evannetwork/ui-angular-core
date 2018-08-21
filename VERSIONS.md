@@ -2,6 +2,8 @@
 
 ## Next Version
 ### Features
+- file selector for display attached files
+
 ### Fixes
 - fill empty members array within contract-members component as fallback
 
