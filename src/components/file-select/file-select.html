@@ -26,7 +26,7 @@
 -->
 
 <ion-label class="standalone">
-  {{ (label || '_angularcore.file-select') | translate }}
+  {{ label | translate }}
 </ion-label>
 <input #fileSelect type="file" multiple="multiple" (change)="filesChanged($event)" />
 <ion-list>

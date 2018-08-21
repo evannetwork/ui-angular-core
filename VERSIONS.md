@@ -3,6 +3,8 @@
 ## Next Version
 ### Features
 ### Fixes
+- fill empty members array within contract-members component as fallback
+
 ### Deprecations
 
 ## Version 1.1.0

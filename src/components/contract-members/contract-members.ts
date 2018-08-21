@@ -198,6 +198,7 @@ export class ContractMembersComponent extends AsyncComponent {
     this.contactSearch = '';
     this.suggestions = [ ];
 
+    this.members = this.members || [ ];
     this.origin = this.origin || [ ];
     this.contacts = await this.addressBook.loadAccounts();
     this.contactKeys = Object
