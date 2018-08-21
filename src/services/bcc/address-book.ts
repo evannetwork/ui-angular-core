@@ -233,4 +233,20 @@ export class EvanAddressBookService {
       return this.translate.instant('_angularcore.no-alias');
     }
   }
+
+  /**
+   * Gets the name for a account from the addressbook.
+   *
+   * @param      {string}  accountId  account id to load the alias for
+   * @return     {string}  The name / email for account. Default is the account id.
+   */
+  async getNameForAccount(accountId: string) {
+    const addressbook = await this.loadAccounts();
+
+    if (addressbook && addressbook[accountId]) {
+      return addressbook[accountId].alias || addressbook[accountId].email || accountId;
+    } else {
+      return accountId;
+    }
+  }
 }
