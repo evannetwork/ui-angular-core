@@ -29,6 +29,7 @@ import {
   ChangeDetectorRef,
   Component,
   ControlValueAccessor,
+  DomSanitizer,
   ElementRef,
   EventEmitter,
   forwardRef,
@@ -93,6 +94,11 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
   @Input() disabled: boolean;
 
   /**
+   * enable download of files
+   */
+  @Input() downloadable: boolean;
+
+  /**
    * minimum amount of files that must be uploaded
    */
   @Input() minFiles: number;
@@ -123,7 +129,8 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
   /***************** initialization  *****************/
   constructor(
     private ref: ChangeDetectorRef,
-    private utils: EvanUtilService
+    private utils: EvanUtilService,
+    private _DomSanitizer: DomSanitizer,
   ) { }
 
   ngOnInit() {
@@ -132,6 +139,19 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
     this.ngModel = this.ngModel || [ ];
 
     this.setIsValid();
+
+    if(this.downloadable) {
+      const urlCreator = (<any>window).URL || (<any>window).webkitURL;
+
+      for (let file of this.ngModel) {
+        let blob = file;
+        if(file.file) {
+          blob = new Blob([file.file], { type: file.type });
+        }
+        const blobUri = urlCreator.createObjectURL(blob);
+        file.blobURI = this._DomSanitizer.bypassSecurityTrustUrl(blobUri);
+      }
+    }
 
     this.ref.detectChanges();
   }

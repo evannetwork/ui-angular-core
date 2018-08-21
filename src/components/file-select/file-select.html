@@ -30,7 +30,7 @@
 </ion-label>
 <input #fileSelect type="file" multiple="multiple" (change)="filesChanged($event)" />
 <ion-list>
-  <ion-item *ngFor="let file of ngModel; let i = index">
+  <ion-item  *ngFor="let file of ngModel; let i = index">
     <ion-label>
       <h2>{{ file.name }}</h2>
       <h3>{{ parseFileSize(file.size)}}</h3>
@@ -41,6 +41,10 @@
         (click)="removeFile(file, i)">
         <ion-icon name="trash"></ion-icon>
       </button>
+      <a ion-button outline icon-only clear color="red"
+        *ngIf="downloadable" target="_blank" [download]="file.name" [href]="file.blobURI">
+        <ion-icon name="download"></ion-icon>
+      </a>      
     </div>
   </ion-item>
   <button ion-button icon-only outline round class="add-button"
