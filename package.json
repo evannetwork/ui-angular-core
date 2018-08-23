@@ -1,5 +1,6 @@
 {
   "author": "Contractus",
+  "homepage": "https://evannetwork.github.io/",
   "keywords": [
     "blockchain",
     "ethereum",
@@ -15,6 +16,10 @@
   "license": "AGPL-3.0-only",
   "main": "dist/index.js",
   "name": "@evan.network/ui-angular-core",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:evannetwork/ui-angular-core.git"
+  },
   "scripts": {
     "compodoc": "./node_modules/.bin/compodoc -p src/tsconfig.json"
   },
