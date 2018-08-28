@@ -436,8 +436,15 @@ export class EvanRoutingService {
         this.forceUrlNavigation(splitHash.join('/'));
       }
     } else {
+      // use last value from history
+      let goBackRoute = routing.history.pop();
+
+      while (goBackRoute === this.getRouteFromUrl(window.location.hash) && routing.history.length > 1) {
+        goBackRoute = routing.history.pop();
+      }
+
       // use latest history
-      this.forceUrlNavigation(routing.history.pop());
+      this.forceUrlNavigation(goBackRoute);
     }
   }
 

@@ -140,7 +140,7 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
 
     this.setIsValid();
 
-    if(this.downloadable) {
+    if (this.downloadable) {
       const urlCreator = (<any>window).URL || (<any>window).webkitURL;
 
       for (let file of this.ngModel) {
@@ -151,7 +151,6 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
           if(file.file.type === 'Buffer' && file.file.data) {
             file.file = new Uint8Array(file.file.data);
           }
-          
           blob = new Blob([file.file], { type: file.type });
         }
         const blobUri = urlCreator.createObjectURL(blob);
@@ -162,16 +161,16 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
     this.ref.detectChanges();
   }
 
+  /**
+   * Append this functions to handle a correct formular reaction including name, required and so on.
+   */
   writeValue(value: any) {
     this.ngModel = value;
   }
-
   propagateChange = (_: any) => {};
-
   registerOnChange(fn) {
     this.propagateChange = fn;
   }
-
   registerOnTouched() {}
 
   /*****************    functions    *****************/
