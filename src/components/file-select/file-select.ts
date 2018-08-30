@@ -202,8 +202,9 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    * Is triggered when files were changed.
    */
   filesChanged($event) {
-    for (let i = 0; i < $event.srcElement.files.length; i++) {
-      const file = $event.srcElement.files[i];
+    var target = $event.target || $event.srcElement;
+    for (let i = 0; i < target.files.length; i++) {
+      const file = target.files[i];
       const found = this.ngModel.filter(existing => existing.name === file.name).length > 0;
 
       if (!found) {
