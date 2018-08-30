@@ -65,6 +65,33 @@ dapp-wrapper {
         order: 2;
       }
     }
+
+    ion-buttons.header-img-wrapper {
+      display: inline-block;
+
+      height: 40px;
+
+      vertical-align: middle;
+
+      & > div {
+        display: inline-block;
+
+        margin-right: 12px;
+        padding-right: 20px;
+
+        vertical-align: middle;
+
+        border-right: 1px solid #1d616a;
+
+        &, img {
+          height: 40px;
+        }
+      }
+
+      button {
+        vertical-align: middle !important;
+      }
+    }
   }
 
   .evan-queue-status {

@@ -103,6 +103,11 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
    */
   @Output() refreshing: EventEmitter<any> = new EventEmitter();
 
+  /**
+   * img that should be displayed at the start oft the dapp-wrapper header
+   */
+  @Input() headerImg: string;
+
   /*****************    variables    *****************/
   /**
    * active route name that is opening this dapp-wrapper

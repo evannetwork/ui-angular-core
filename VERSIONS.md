@@ -3,9 +3,12 @@
 ## Next Version
 ### Features
 - file selector for display attached files
+- add getNameForAccount to utils function
 
 ### Fixes
 - fill empty members array within contract-members component as fallback
+- add logic to handle duplicated go back route on the same hash
+- fix preview img for addDAppAlertStyle (trimmed name must not contain a dot)
 
 ### Deprecations
 

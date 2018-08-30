@@ -84,6 +84,11 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
   @Input() label: string;
 
   /**
+   * optional button text that should be displayed for the add button
+   */
+  @Input() buttonText: string;
+
+  /**
    * files that should be uploaded
    */
   @Input() ngModel: Array<any>;

@@ -27,7 +27,10 @@
 
 <ion-header *ngIf="showHeader && !loading">
   <ion-navbar>
-    <ion-buttons start>
+    <ion-buttons [class.header-img-wrapper]="headerImg" start>
+      <div *ngIf="headerImg">
+        <img *oneTime [src]="_DomSanitizer.bypassSecurityTrustUrl(headerImg)"/>
+      </div>
       <button ion-button icon-only
         *ngIf="showMenuButton && !utilService.isMD"
         (click)="openSplitPane()">

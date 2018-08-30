@@ -47,9 +47,12 @@
       </a>      
     </div>
   </ion-item>
-  <button ion-button icon-only outline round class="add-button"
+  <button ion-button outline round class="add-button"
     *ngIf="!disabled"
+    [attr.icon-only]="!buttonText ? '' : null"
+    [attr.icon-left]="buttonText ? '' : null"
     (click)="selectFiles()">
     <ion-icon name="add"></ion-icon>
+    <span *ngIf="buttonText">{{ buttonText }}</span>
   </button>
 </ion-list>

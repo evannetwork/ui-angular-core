@@ -175,7 +175,7 @@ export class EvanAlertService {
       secondaryColor = definition.dapp.secondaryColor || secondaryColor;
     }
 
-    const trimmedName = definition.name.replace(/\s/g, '');
+    const trimmedName = definition.name.replace(/\s|\./g, '');
     this.utils.addTemporaryStyle(trimmedName, `
       .evan-temporary-${trimmedName} {
         min-width: 257px;
