@@ -27,9 +27,7 @@
 
 import {
   Component, OnInit, ViewChild,     // @angular/core
-  DomSanitizer,
-  ZXingScannerComponent,
-  Result
+  DomSanitizer
 } from 'angular-libs';
 
 import { createOpacityTransition } from '../../animations/opacity';
@@ -66,7 +64,7 @@ export class QRCodeScannerDialogComponent implements OnInit {
   /**
    * qr code scanned result
    */
-  private qrResult: Result;
+  private qrResult: any;
 
   /**
    * formatted result to resolved dialog
@@ -86,7 +84,7 @@ export class QRCodeScannerDialogComponent implements OnInit {
   /**
    * ZXingsScanner instance
    */
-  @ViewChild('scanner') private scanner: ZXingScannerComponent;
+  @ViewChild('scanner') private scanner: any;
 
   /**
    * active selected device
@@ -118,7 +116,7 @@ export class QRCodeScannerDialogComponent implements OnInit {
       }
     });
 
-    this.scanner.scanComplete.subscribe((result: Result) => {
+    this.scanner.scanComplete.subscribe((result: any) => {
       this.qrResult = result;
     });
   }
