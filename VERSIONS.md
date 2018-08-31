@@ -9,6 +9,7 @@
 - fill empty members array within contract-members component as fallback
 - add logic to handle duplicated go back route on the same hash
 - fix preview img for addDAppAlertStyle (trimmed name must not contain a dot)
+- remove ngxscanner interfaces, so angular-libs can include the umd duiled files
 
 ### Deprecations
 
