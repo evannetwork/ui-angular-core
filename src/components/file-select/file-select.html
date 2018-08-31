@@ -25,7 +25,7 @@
   https://evan.network/license/
 -->
 
-<ion-label class="standalone">
+<ion-label class="standalone" *ngIf="label">
   {{ label | translate }}
 </ion-label>
 <input #fileSelect type="file" multiple="multiple" (change)="filesChanged($event)" />
