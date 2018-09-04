@@ -28,6 +28,8 @@
 @import 'ui-angular-sass/src/variables/colors';
 
 evan-file-select {
+  display: block;
+
   input[type='file'] {
     display: none;
   }
@@ -37,14 +39,23 @@ evan-file-select {
       display: inline-block;
 
       width: auto;
+      max-width: 100%;
       margin: 10px 10px 0 0;
-      padding: 0;
       padding: 10px 0 10px 15px !important;
 
       background-color: rgba(5, 61, 73, 0.5) !important;
 
       div[item-content] {
         margin-left: 10px;
+      }
+
+      ion-label {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+
+      @media (max-width: 768px) {
+        width: 100%;
       }
     }
   }
