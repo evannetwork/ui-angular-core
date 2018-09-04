@@ -11,6 +11,7 @@
 - fix preview img for addDAppAlertStyle (trimmed name must not contain a dot)
 - remove ngxscanner interfaces, so angular-libs can include the umd duiled files
 - fix file-selct mobile styling
+- missing i18n keys for dispatcher runtime (the service was retrieved, after the dispatcher was loaded so resubmit i18n to all current translation services)
 
 ### Deprecations
 

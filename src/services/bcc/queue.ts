@@ -436,6 +436,10 @@ export class EvanQueue implements OnDestroy {
 
       const dispatcherService = await this.getDispatcherService(queueEntry);
 
+      // the service was retrieved, after the dispatcher was loaded so resubmit i18n to all current
+      // translation services
+      this.translate.setMultipleLanguageTranslations(queueEntry.dispatcher.i18n)
+
       // run the dispatcher
       const dispatcherResult = await queueEntry.dispatcher.sequence[queueEntry.status].run(
         // look in to module
