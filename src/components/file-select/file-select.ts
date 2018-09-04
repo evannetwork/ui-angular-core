@@ -213,6 +213,10 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
     }
 
     this.onChange.emit();
+
+    // reset the file input array
+    this.fileSelect.nativeElement.value = "";
+    
     this.ref.detectChanges();
   }
 
