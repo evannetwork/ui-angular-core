@@ -126,11 +126,21 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    */
   @ViewChild('fileSelect') fileSelect: ElementRef;
 
+
+  /**
+   * dropArea for files
+   */
+  @ViewChild('dropArea') dropArea: ElementRef;
+
   /**
    * check if min files and max files requirements are resolved
    */
   public isValid: boolean;
 
+  /**
+   * allow the drop of files
+   */
+  private allowDropZone: boolean;
   /***************** initialization  *****************/
   constructor(
     private ref: ChangeDetectorRef,
@@ -216,9 +226,45 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
 
     // reset the file input array
     this.fileSelect.nativeElement.value = "";
-    
+
     this.ref.detectChanges();
   }
+
+  /**
+   * Is triggered when files were dropped.
+   */
+  filesDropped($event) {
+    $event.preventDefault();
+    $event.stopPropagation();
+    for (let i = 0; i < $event.dataTransfer.files.length; i++) {
+      const file = $event.dataTransfer.files[i];
+      const found = this.ngModel.filter(existing => existing.name === file.name).length > 0;
+
+      if (!found) {
+        this.ngModel.push(file);
+      }
+    }
+    this.allowDropZone = false;
+    this.ref.detectChanges();
+  }
+
+  /**
+   * allows the drop of files
+   *
+   * @param      {object}  ev      drop event
+   */
+  allowDrop(ev) {
+    ev.preventDefault();
+    this.allowDropZone = true;
+    this.ref.detectChanges();
+  }
+
+  denyDrop(ev) {
+    ev.preventDefault();
+    this.allowDropZone = false;
+    this.ref.detectChanges();
+  }
+
 
   /**
    * Remove a newly selected file from the upload list

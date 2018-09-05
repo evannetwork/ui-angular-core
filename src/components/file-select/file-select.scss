@@ -34,7 +34,18 @@ evan-file-select {
     display: none;
   }
 
+  .dropzone {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    background-color: gray;
+    z-index: 1;
+    border: 1px dashed #000;
+    opacity: 0.5;
+  }
+
   ion-list {
+    min-height: 100px;
     ion-item.item-md {
       display: inline-block;
 
