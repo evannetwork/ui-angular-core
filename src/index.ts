@@ -43,7 +43,9 @@ export * from './services/bcc/queue-utilities';
 export * from './services/singleton-service';
 export * from './services/ui/alert';
 export * from './services/ui/exception-handler';
+export * from './services/ui/files';
 export * from './services/ui/inputs';
+export * from './services/ui/logging';
 export * from './services/ui/modal';
 export * from './services/ui/picture';
 export * from './services/ui/qr-code';
@@ -51,7 +53,6 @@ export * from './services/ui/routing';
 export * from './services/ui/slides';
 export * from './services/ui/toast';
 export * from './services/ui/translate';
-export * from './services/ui/logging';
 export * from './services/utils';
 
 // components

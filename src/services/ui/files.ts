@@ -31,29 +31,65 @@ import {
 } from 'angular-libs';
 
 import { EvanUtilService } from '../utils';
+import { EvanBCCService } from '../bcc/bcc';
 
 /**************************************************************************************************/
 
 /**
- * TODO: TBD.
+ * Service to handle files and its encryption / decryption.
  *
- * @class      Injectable (name)
- * @return     {<type>}  { description_of_the_return_value }
+ * @class      Injectable EvanFileService
  */
 @Injectable()
 export class EvanFileService implements OnDestroy {
   constructor(
-    private utils: EvanUtilService
+    private utils: EvanUtilService,
+    private bcc: EvanBCCService
   ) { }
 
-  ngOnDestroy() {
-
-  }
-
   /**
-   * Opens the file chooser and returns file paths to upload
+   * Uploads an array of fils that were selected with an HTML 5 <input type="file"> selector or using
+   * the evan-file-select component and transforms them into an encryption object
+   *
+   * @param      {Array<any>}    files    array of files
+   * @return     {Promise<any>}  uploaded files transformed into an encryption object 
    */
-  selectFiles() {
+  public async uploadFilesAndSetEncryption(files: Array<any>) {
+    files = await Promise.all(
+      files.map((file) => new Promise((resolve, reject) => {
+        if(file.file) {
+          return resolve(file);
+        }                
+        const fileReader = new FileReader();
 
+        // when the file was loaded successfully, return the uploaded file object
+        fileReader.onloadend = function (e) {
+          const ret = {
+            file: (<any>e.target).result
+          };
+
+          // write keys into the file object for creating a copy with correct syntax
+          for (let fileProp in file) {
+            ret[fileProp] = file[fileProp];
+          };
+
+          // resolve the file
+          resolve(ret);
+        };
+
+        // start file reading
+        fileReader.readAsArrayBuffer(file);
+      }))
+    );
+
+    // overwrite the attachments object with the crypto informations, how the data needs to
+    // be decrypted
+    return {
+      'private': files,
+      cryptoInfo: {
+        algorithm: 'aes-blob',
+        originator: this.bcc.nameResolver.soliditySha3('*')
+      }
+    };
   }
 }

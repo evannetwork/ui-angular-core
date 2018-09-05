@@ -131,6 +131,16 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    */
   public isValid: boolean;
 
+  /**
+   * true when file selector was opened initially
+   */
+  public touched: boolean;
+
+  /**
+   * From ControlValueAccessor interface
+   */
+  private onTouchedCallback: Function;
+
   /***************** initialization  *****************/
   constructor(
     private ref: ChangeDetectorRef,
@@ -176,10 +186,22 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
   registerOnChange(fn) {
     this.propagateChange = fn;
   }
-  registerOnTouched() {}
+  registerOnTouched(fn: any) {
+    this.onTouchedCallback = fn;
+  }
 
   /*****************    functions    *****************/
+  /**
+   * Is everything is valid?
+   *
+   * @return     {<type>}  { description_of_the_return_value }
+   */
   setIsValid() {
+    // if is valid was set before (not first time) set the is touched 
+    if (typeof this.isValid !== 'undefined') {
+      this.touched = true;
+    }
+
     this.isValid = true;
 
     if (this.minFiles && this.ngModel.length < this.minFiles) {
@@ -189,6 +211,8 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
     if (this.maxFiles && this.ngModel.length > this.maxFiles) {
       this.isValid = false;
     }
+
+    this.onChange.emit();
   }
 
   /**
@@ -212,11 +236,13 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
       }
     }
 
-    this.onChange.emit();
+    // set is valid
+    this.setIsValid();
 
     // reset the file input array
     this.fileSelect.nativeElement.value = "";
     
+    this.onChange.emit();
     this.ref.detectChanges();
   }
 

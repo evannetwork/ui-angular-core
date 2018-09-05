@@ -319,7 +319,7 @@ export class ContractMembersComponent extends AsyncComponent {
     }
 
     this.menuController._menus.forEach(async (menu) => {
-      if (menu.id === 'contactMemberAdd') {
+      if (menu.getElementRef().nativeElement === this.ionMenu) {
         menu.enable(true);
         menu.open('contactMemberAdd');
 
@@ -337,7 +337,7 @@ export class ContractMembersComponent extends AsyncComponent {
 
   private async closeMenu() {
     this.menuController._menus.forEach(async (menu) => {
-      if (menu.id === 'contactMemberAdd') {
+      if (menu.getElementRef().nativeElement === this.ionMenu) {
         menu.enable(true);
         menu.close('contactMemberAdd');
       }
