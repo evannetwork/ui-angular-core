@@ -322,6 +322,7 @@ export class ContractMembersComponent extends AsyncComponent {
       if (menu.getElementRef().nativeElement === this.ionMenu) {
         menu.enable(true);
         menu.open('contactMemberAdd');
+        menu.getElementRef().nativeElement.style.display = 'block';
 
         if (!this.core.utils.isMobile()) {
           await this.core.utils.timeout(0);
@@ -340,6 +341,7 @@ export class ContractMembersComponent extends AsyncComponent {
       if (menu.getElementRef().nativeElement === this.ionMenu) {
         menu.enable(true);
         menu.close('contactMemberAdd');
+        menu.getElementRef().nativeElement.style.display = 'none';
       }
     });
   }
@@ -448,6 +450,8 @@ export class ContractMembersComponent extends AsyncComponent {
    * an required error or something.
    */
   private setTouched() {
+    this.closeMenu();
+
     // set that the component was touched
     this.touched = true;
     this.onChange.emit();

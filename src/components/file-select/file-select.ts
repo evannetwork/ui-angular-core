@@ -126,7 +126,6 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    */
   @ViewChild('fileSelect') fileSelect: ElementRef;
 
-
   /**
    * dropArea for files
    */
@@ -224,6 +223,7 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
     }
 
     this.onChange.emit();
+    this.ref.detectChanges();
   }
 
   /**
@@ -305,6 +305,7 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    */
   removeFile(file: any, index: number) {
     this.ngModel.splice(index, 1);
+    this.setIsValid();
 
     this.onChange.emit();
     this.ref.detectChanges();

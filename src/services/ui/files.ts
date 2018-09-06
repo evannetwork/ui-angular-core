@@ -54,7 +54,7 @@ export class EvanFileService implements OnDestroy {
    * @param      {Array<any>}    files    array of files
    * @return     {Promise<any>}  uploaded files transformed into an encryption object 
    */
-  public async uploadFilesAndSetEncryption(files: Array<any>) {
+  public async readFilesAsArrayBuffer(files: Array<any>, encryption?: any) {
     files = await Promise.all(
       files.map((file) => new Promise((resolve, reject) => {
         if(file.file) {
@@ -84,12 +84,6 @@ export class EvanFileService implements OnDestroy {
 
     // overwrite the attachments object with the crypto informations, how the data needs to
     // be decrypted
-    return {
-      'private': files,
-      cryptoInfo: {
-        algorithm: 'aes-blob',
-        originator: this.bcc.nameResolver.soliditySha3('*')
-      }
-    };
+    return files;
   }
 }
