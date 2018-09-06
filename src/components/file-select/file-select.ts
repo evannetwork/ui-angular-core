@@ -261,6 +261,9 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    * Is triggered when files were dropped.
    */
   filesDropped($event) {
+    if(this.disabled) {
+      return;
+    }
     $event.preventDefault();
     $event.stopPropagation();
     for (let i = 0; i < $event.dataTransfer.files.length; i++) {
@@ -281,6 +284,9 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    * @param      {object}  ev      drop event
    */
   allowDrop(ev) {
+    if(this.disabled) {
+      return;
+    }    
     ev.preventDefault();
     this.allowDropZone = true;
     this.ref.detectChanges();
@@ -292,6 +298,9 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    * @param      {object}  ev      drop event
    */
   denyDrop(ev) {
+    if(this.disabled) {
+      return;
+    }    
     ev.preventDefault();
     this.allowDropZone = false;
     this.ref.detectChanges();
