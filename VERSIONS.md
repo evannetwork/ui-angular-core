@@ -13,6 +13,8 @@
 - fix file-selct mobile styling
 - missing i18n keys for dispatcher runtime (the service was retrieved, after the dispatcher was loaded so resubmit i18n to all current translation services)
 - support multiple instances of contract-member components at the same time
+- contract-members touched property
+- fix file select touched setting
 
 ### Deprecations
 
