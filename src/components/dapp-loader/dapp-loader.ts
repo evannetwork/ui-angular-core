@@ -120,13 +120,18 @@ export class DAppLoaderComponent extends AsyncComponent  {
     // get module id
     const moduleIds = currentHash.split('/');
     for (let moduleId of moduleIds) {
-      const defintion = await this.definitionService.getDescription(moduleId);
+      try {
+        // only start the dapp if a dbcp exists!
+        if (!document.getElementById(moduleId)) {
+          const defintion = await this.definitionService.getDescription(moduleId);
+          
+          if (defintion.status !== 'invalid' && !document.getElementById(defintion.name)) {
+            this.dappToStart = moduleId;
 
-      if (!document.getElementById(moduleId) && !document.getElementById(defintion.name)) {
-        this.dappToStart = moduleId;
-
-        break;
-      }
+            break;
+          }
+        }
+      } catch (ex) { }
     }
 
     // if no dapp to start is found with the url (e.g. when opening an contract

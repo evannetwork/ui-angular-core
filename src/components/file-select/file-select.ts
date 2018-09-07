@@ -222,7 +222,7 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
       this.isValid = false;
     }
 
-    this.onChange.emit();
+    this.onChange.emit(this.ngModel);
     this.ref.detectChanges();
   }
 
@@ -253,7 +253,7 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
     // reset the file input array
     this.fileSelect.nativeElement.value = "";
 
-    this.onChange.emit();
+    this.onChange.emit(this.ngModel);
     this.ref.detectChanges();
   }
 
@@ -316,7 +316,7 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
     this.ngModel.splice(index, 1);
     this.setIsValid();
 
-    this.onChange.emit();
+    this.onChange.emit(this.ngModel);
     this.ref.detectChanges();
   }
 

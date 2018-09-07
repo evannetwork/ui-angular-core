@@ -15,6 +15,7 @@
 - support multiple instances of contract-member components at the same time
 - contract-members touched property
 - fix file select touched setting
+- DAppLoaderComponent tried to load DApps that have not a valid DBCP description, component was adjusted to skip this entries
 
 ### Deprecations
 
