@@ -4,6 +4,7 @@
 ### Features
 - file selector for display attached files
 - add getNameForAccount to utils function
+- add download function for mobile devices
 
 ### Fixes
 - fill empty members array within contract-members component as fallback

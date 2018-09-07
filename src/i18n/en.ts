@@ -132,6 +132,8 @@ export const en = {
     'synchronising': 'Synchronising'
   },
   '_angularcore': {
+    'error-downloading': 'Error occurred while downloading the file.',
+    'finished-downloading': 'The file {{ fileName }} was successfully saved in the downloads',
     'new-notification': 'New Notification',
     'load-more': 'Load more...',
     'loaded-paging-entries': 'Loaded',

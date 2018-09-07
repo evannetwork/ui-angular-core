@@ -50,6 +50,10 @@ import {
   EvanUtilService
 } from '../../services/utils';
 
+import {
+  EvanFileService
+} from '../../services/ui/files'
+
 
 /**************************************************************************************************/
 /**
@@ -156,6 +160,7 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
     private ref: ChangeDetectorRef,
     private utils: EvanUtilService,
     private _DomSanitizer: DomSanitizer,
+    private fileService: EvanFileService
   ) { }
 
   ngOnInit() {
@@ -170,8 +175,7 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
 
       for (let file of this.ngModel) {
         let blob = file;
-        if(file.file) {
-
+        if (file.file) {
           // check if the file is a JSON.parsed buffer and convert it back
           if(file.file.type === 'Buffer' && file.file.data) {
             file.file = new Uint8Array(file.file.data);
@@ -179,6 +183,7 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
           blob = new Blob([file.file], { type: file.type });
         }
         const blobUri = urlCreator.createObjectURL(blob);
+        file.blob = blob;
         file.blobURI = this._DomSanitizer.bypassSecurityTrustUrl(blobUri);
       }
     }

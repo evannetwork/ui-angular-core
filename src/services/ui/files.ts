@@ -26,12 +26,26 @@
 */
 
 import {
-  Injectable,               // '@angular/core';
-  OnDestroy
+  File,
+  Injectable,
+  OnDestroy,
 } from 'angular-libs';
 
 import { EvanUtilService } from '../utils';
 import { EvanBCCService } from '../bcc/bcc';
+import { EvanToastService } from '../ui/toast';
+import { EvanTranslationService } from '../ui/translate';
+
+if (window['FileReader'] && window['cordova']) {
+  const WrappedFileReader = window['FileReader'];
+
+  window['FileReader'] = function OriginalFileReader(...args) {
+    WrappedFileReader.apply(this, args)
+    const originalInstance = this[window['Zone'].__symbol__('originalInstance')] // eslint-disable-line
+
+    return originalInstance || this
+  };
+}
 
 /**************************************************************************************************/
 
@@ -44,7 +58,10 @@ import { EvanBCCService } from '../bcc/bcc';
 export class EvanFileService implements OnDestroy {
   constructor(
     private utils: EvanUtilService,
-    private bcc: EvanBCCService
+    private bcc: EvanBCCService,
+    private file: File,
+    private toast: EvanToastService,
+    private translateService: EvanTranslationService
   ) { }
 
   /**
@@ -85,5 +102,64 @@ export class EvanFileService implements OnDestroy {
     // overwrite the attachments object with the crypto informations, how the data needs to
     // be decrypted
     return files;
+  }
+
+  /**
+   * Link element using blob uris and download flag does not work on mobile decives. Use this
+   * funciton to download files on mobile devices
+   *
+   * @param      {string}  name    name of the file
+   * @param      {Blob}    blob    Blob of the file
+   */
+  async downloadMobile(name: string, blob: any) {
+    try {
+      const downloadFolder = this.file.externalRootDirectory + 'Download/';
+      let index = 0;
+      let fileExists = true;
+
+      // get the file name without any extension so we can append download numbers if the file already
+      // exists
+      let withoutExtension: any = name.split('.');
+      let extension = withoutExtension.pop();
+      withoutExtension = withoutExtension.join('.');
+
+      // get the file name including a counter
+      let getFileName = () => {
+        return withoutExtension + (index === 0 ? '' : ` (${ index })`) + `.${ extension }`;
+      };
+
+      // check if the file exists and update the counter
+      while (fileExists) {
+        try {
+          await this.file.checkFile(downloadFolder, getFileName());
+          index++;
+        } catch (ex) {
+          fileExists = false;
+        }
+      }
+
+      // write the file
+      await this.file.writeFile(
+        downloadFolder,
+        getFileName(),
+        blob
+      );
+
+      // show toast if finished
+      this.toast.showToast({
+        message: this.translateService.instant('_angularcore.finished-downloading', {
+          fileName: getFileName()
+        }),
+        duration: 3000
+      });
+    } catch (ex) {
+      this.utils.log(this.utils.getErrorLog(ex), 'error');
+
+      // show toast if finished
+      this.toast.showToast({
+        message: this.translateService.instant('_angularcore.error-downloading'),
+        duration: 3000
+      });
+    }
   }
 }

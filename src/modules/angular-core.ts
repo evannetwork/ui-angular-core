@@ -38,7 +38,8 @@ import {
   ZXingScannerModule,                       // qr-code-scanner module
   Camera,                                   // @ionic-native/camera
   QRScanner,                                // @ionic-native/qr-scanner
-  languages                                 // everything from @angular/common/locales
+  languages,                                // everything from @angular/common/locales
+  File,
 } from 'angular-libs';
 
 // services
@@ -169,6 +170,7 @@ const moduleConfig = {
     EvanToastService,
     EvanTranslationService,
     EvanUtilService,
+    File,
     ObjectKeysPipe,
     ObjectToArrayPipe,
     QRScanner,

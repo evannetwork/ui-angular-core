@@ -123,6 +123,8 @@ export const de = {
     'report-error': 'Fehler senden'
   },
   '_angularcore': {
+    'error-downloading': 'Fehler beim herunterladen der Datei aufgetreten.',
+    'finished-downloading': 'Die Datei {{ fileName }} wurde erfolgreich in den Downloads gespeichert.',
     'new-notification': 'Neue Benachrichtigung',
     'load-more': 'Mehr laden...',
     'loaded-paging-entries': 'Geladen',
