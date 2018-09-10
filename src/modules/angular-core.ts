@@ -39,7 +39,7 @@ import {
   Camera,                                   // @ionic-native/camera
   QRScanner,                                // @ionic-native/qr-scanner
   languages,                                // everything from @angular/common/locales
-  File,
+  File,                                     // @ionic-native/file
 } from 'angular-libs';
 
 // services
@@ -69,25 +69,26 @@ import { SingletonService } from '../services/singleton-service';
 import { EvanLoggingService } from '../services/ui/logging';
 
 // components
-import { DAppLoaderComponent } from '../components/dapp-loader/dapp-loader';
-import { BlockieComponent } from '../components/blockie/blockie';
-import { EvanLoadingComponent } from '../components/evan-loading/evan-loading';
-import { EvanSplitPaneComponent } from '../components/split-pane/split-pane';
-import { NotImplementedComponent } from '../components/not-implemented/not-implemented';
-import { EvanReloadComponent } from '../components/reload-route/reload-route';
-import { EmptyDAppDisplayComponent } from '../components/empty-dapp-display/empty-dapp-display';
-import { MailDialogComponent } from '../components/mail-dialog/mail-dialog';
-import { GlobalPasswordComponent } from '../components/global-password/global-password';
-import { TrustDialogComponent } from '../components/trust-dialog/trust-dialog';
-import { ContractMembersComponent } from '../components/contract-members/contract-members';
-import { EvanDAppWrapperComponent } from '../components/dapp-wrapper/dapp-wrapper';
-import { SnapshotDialogComponent } from '../components/take-snapshot/take-snapshot';
-import { QRCodeScannerDialogComponent } from '../components/qr-code-scanner/qr-code-scanner';
-import { DashboardTopButtons } from '../components/dashboard-top-buttons/dashboard-top-buttons';
 import { BigPictureDialog } from '../components/big-picture/big-picture';
-import { EvanFileSelectComponent } from '../components/file-select/file-select';
-import { ListPagingComponent } from '../components/list-paging/list-paging';
+import { BlockieComponent } from '../components/blockie/blockie';
 import { ContractListEntriesComponent } from '../components/contract-listentries/contract-listentries';
+import { ContractMembersComponent } from '../components/contract-members/contract-members';
+import { DAppLoaderComponent } from '../components/dapp-loader/dapp-loader';
+import { DashboardTopButtons } from '../components/dashboard-top-buttons/dashboard-top-buttons';
+import { EmptyDAppDisplayComponent } from '../components/empty-dapp-display/empty-dapp-display';
+import { EvanDAppWrapperComponent } from '../components/dapp-wrapper/dapp-wrapper';
+import { EvanFileSelectComponent } from '../components/file-select/file-select';
+import { EvanLoadingComponent } from '../components/evan-loading/evan-loading';
+import { EvanReloadComponent } from '../components/reload-route/reload-route';
+import { EvanSplitPaneComponent } from '../components/split-pane/split-pane';
+import { GlobalPasswordComponent } from '../components/global-password/global-password';
+import { ListPagingComponent } from '../components/list-paging/list-paging';
+import { MailDialogComponent } from '../components/mail-dialog/mail-dialog';
+import { NotImplementedComponent } from '../components/not-implemented/not-implemented';
+import { QrCodeComponent } from '../components/qr-code/qr-code';
+import { QRCodeScannerDialogComponent } from '../components/qr-code-scanner/qr-code-scanner';
+import { SnapshotDialogComponent } from '../components/take-snapshot/take-snapshot';
+import { TrustDialogComponent } from '../components/trust-dialog/trust-dialog';
 
 // pipes
 import { ObjectToArrayPipe } from '../pipes/ObjectToArray';
@@ -119,31 +120,32 @@ const moduleConfig = {
       animationDuration: 300
     }),
     // ZXing scanner module
-    ZXingScannerModule.forRoot()
+    ZXingScannerModule.forRoot(),
   ],
   declarations: [
-    DAppLoaderComponent,
-    BlockieComponent,
-    EvanLoadingComponent,
-    EvanSplitPaneComponent,
-    ObjectToArrayPipe,
-    ObjectKeysPipe,
-    NotImplementedComponent,
-    EvanReloadComponent,
-    EmptyDAppDisplayComponent,
-    MailDialogComponent,
-    GlobalPasswordComponent,
-    OneTimeDirective,
-    TrustDialogComponent,
-    SnapshotDialogComponent,
-    QRCodeScannerDialogComponent,
-    ContractMembersComponent,
-    EvanDAppWrapperComponent,
-    DashboardTopButtons,
     BigPictureDialog,
-    EvanFileSelectComponent,
-    ListPagingComponent,
+    BlockieComponent,
     ContractListEntriesComponent,
+    ContractMembersComponent,
+    DAppLoaderComponent,
+    DashboardTopButtons,
+    EmptyDAppDisplayComponent,
+    EvanDAppWrapperComponent,
+    EvanFileSelectComponent,
+    EvanLoadingComponent,
+    EvanReloadComponent,
+    EvanSplitPaneComponent,
+    GlobalPasswordComponent,
+    ListPagingComponent,
+    MailDialogComponent,
+    NotImplementedComponent,
+    ObjectKeysPipe,
+    ObjectToArrayPipe,
+    OneTimeDirective,
+    QrCodeComponent,
+    QRCodeScannerDialogComponent,
+    SnapshotDialogComponent,
+    TrustDialogComponent,
   ],
   providers : [
     AngularCoreTranslations,
@@ -188,25 +190,26 @@ const moduleConfig = {
     IonTagsInputModule,
 
     // components
-    DAppLoaderComponent,
-    BlockieComponent,
-    EvanLoadingComponent,
-    EvanSplitPaneComponent,
-    NotImplementedComponent,
-    EvanReloadComponent,
-    EmptyDAppDisplayComponent,
-    MailDialogComponent,
-    GlobalPasswordComponent,
-    TrustDialogComponent,
-    SnapshotDialogComponent,
-    QRCodeScannerDialogComponent,
-    ContractMembersComponent,
-    EvanDAppWrapperComponent,
-    DashboardTopButtons,
     BigPictureDialog,
-    EvanFileSelectComponent,
-    ListPagingComponent,
+    BlockieComponent,
     ContractListEntriesComponent,
+    ContractMembersComponent,
+    DAppLoaderComponent,
+    DashboardTopButtons,
+    EmptyDAppDisplayComponent,
+    EvanDAppWrapperComponent,
+    EvanFileSelectComponent,
+    EvanLoadingComponent,
+    EvanReloadComponent,
+    EvanSplitPaneComponent,
+    GlobalPasswordComponent,
+    ListPagingComponent,
+    MailDialogComponent,
+    NotImplementedComponent,
+    QrCodeComponent,
+    QRCodeScannerDialogComponent,
+    SnapshotDialogComponent,
+    TrustDialogComponent,
 
     // pipes
     ObjectToArrayPipe,

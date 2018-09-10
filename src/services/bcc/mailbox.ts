@@ -138,6 +138,8 @@ export class EvanMailboxService {
         'SendMailDispatcher',
         'sendMail'
       );
+      this.receivedMails = [ ];
+      this.sentMails = [ ];
 
       this.readMails = this.getReadMails();
     }, true);
@@ -282,6 +284,20 @@ export class EvanMailboxService {
   }
 
   /**
+   * Reset the current bunch of mails and starts at the beginning
+   *
+   * @return     {Promise<void>}  Resolved when done.
+   */
+  async resetMails() {
+    this.receivedMailLoadCount = 0;
+    this.sentMailLoadCount = 0;
+    this.receivedMails = [ ];
+    this.sentMails = [ ];
+
+    return await this.getMails();
+  }
+
+  /**
    * Load the mails for the current account.
    * 
    * result:
@@ -294,11 +310,11 @@ export class EvanMailboxService {
    */
   async getMails() {
     const [receivedMails, sentMails] = await Promise.all([
-      this.bcc.mailbox.getReceivedMails(this.receivedMailLoadCount),
-      this.bcc.mailbox.getSentMails(this.sentMailLoadCount)
+      this.bcc.mailbox.getReceivedMails(10, this.receivedMailLoadCount),
+      this.bcc.mailbox.getSentMails(10, this.sentMailLoadCount)
     ]);
 
-    this.receivedMails = Object.keys(receivedMails.mails).map((key) => {
+    Object.keys(receivedMails.mails).map((key) => {
       const ret = {
         id: key
       };
@@ -306,10 +322,13 @@ export class EvanMailboxService {
         return null;
       }
       Object.assign(ret, receivedMails.mails[key]);
-      return ret;
-    }).filter((value) => value != null);
+      
+      if (ret !== null && this.receivedMails.filter((mail: any) => mail.id === key).length === 0) {
+        this.receivedMails.push(ret);
+      }
+    })
 
-    this.sentMails = Object.keys(sentMails.mails).map((key) => {
+    Object.keys(sentMails.mails).map((key) => {
       const ret = {
         id: key
       };
@@ -317,8 +336,10 @@ export class EvanMailboxService {
         return null;
       }
       Object.assign(ret, sentMails.mails[key]);
-      return ret;
-    }).filter((value) => value != null);
+      if (ret !== null && this.sentMails.filter((mail: any) => mail.id === key).length === 0) {
+        this.sentMails.push(ret);
+      }
+    })
 
     this.totalSentMailCount = sentMails.totalResultCount;
     this.totalReceivedMailCount = receivedMails.totalResultCount;

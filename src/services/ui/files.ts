@@ -36,15 +36,16 @@ import { EvanBCCService } from '../bcc/bcc';
 import { EvanToastService } from '../ui/toast';
 import { EvanTranslationService } from '../ui/translate';
 
+// fix dordova file download event listeners
 if (window['FileReader'] && window['cordova'] && !window['FileReaderFixed']) {
   const WrappedFileReader = window['FileReader'];
 
   window['FileReaderFixed'] = true;
   window['FileReader'] = function OriginalFileReader(...args) {
     WrappedFileReader.apply(this, args)
-    const originalInstance = this[window['Zone'].__symbol__('originalInstance')] // eslint-disable-line
-
-    return originalInstance || this
+    return this[window['Zone'].__symbol__('originalInstance')] ||
+      (this._realReader ? this._realReader[window['Zone'].__symbol__('originalInstance')] : null) ||
+      this;
   };
 }
 
