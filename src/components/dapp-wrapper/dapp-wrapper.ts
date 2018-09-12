@@ -29,7 +29,8 @@ import { logLog } from 'bcc';
 
 import {
   notifications,
-  utils
+  utils,
+  getDomainName
 } from 'dapp-browser';
 
 import {
@@ -179,6 +180,16 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
    */
   private logErrorWatcher: any;
 
+  /**
+   * is the developer mode enabled?
+   */
+  private isDeveloperMode: boolean;
+
+  /**
+   * watch for developer mode switch
+   */
+  private developerModeSwitch: Function;
+
   /***************** initialization  *****************/
   constructor(
     private _DomSanitizer: DomSanitizer,
@@ -266,6 +277,14 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
       // create an new watcher to handle incoming notifications
       this.notificationWatcher = this.utilService.onEvent('evan-notification',
         (notification) => this.handleNotification());
+
+      // watch for developer mode is changing
+      this.isDeveloperMode = window.localStorage['evan-developer-mode'] === 'true';
+      this.developerModeSwitch = this.core.utils
+        .onEvent('evan-developer-mode', () => {
+          this.isDeveloperMode = window.localStorage['evan-developer-mode'] === 'true';
+          this.ref.detectChanges();
+        });
     }
 
     this.ref.detectChanges();
@@ -282,6 +301,7 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
     this.onQueueUpdate && this.onQueueUpdate();
     this.translationUpdate && this.translationUpdate();
     this.notificationWatcher && this.notificationWatcher();
+    this.developerModeSwitch && this.developerModeSwitch();
   }
 
   /**
@@ -433,5 +453,14 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
     await this.logging.logQuestionAlert();
 
     this.ref.detectChanges();
+  }
+
+  /**
+   * Opens an explorer for the current opened DApp.
+   */
+  private openExplorer() {
+    const dappToOpen = this.routing.getRouteFromUrl(window.location.hash).split('/').pop();
+
+    this.routing.navigate(`/explorer.${ getDomainName() }/${ dappToOpen }`);
   }
 }

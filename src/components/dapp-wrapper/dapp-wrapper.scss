@@ -45,6 +45,16 @@ dapp-wrapper {
       display: none;
     }
 
+    ion-title.clickable {
+      .toolbar-title {
+        &:hover {
+          text-decoration: underline;
+
+          color: $primary;
+        }
+      }
+    }
+
     ion-navbar {
       .notification-count {
         font-size: 12px;

@@ -29,7 +29,13 @@
   <ion-label class="standalone" *ngIf="label">
     {{ label | translate }}
   </ion-label>
-  <input #fileSelect type="file" multiple="multiple" (change)="filesChanged($event)" />
+  <input #fileSelect
+    type="file"
+    multiple="multiple"
+    (change)="filesChanged($event)" 
+    [accept]="accept ? accept : null"
+    [multiple]="multiple ? multiple : null"
+  />
   <ion-list>
     <ion-item  *ngFor="let file of ngModel; let i = index">
       <ion-label>

@@ -103,6 +103,11 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
   @Input() disabled: boolean;
 
   /**
+   * input type="file" accept attribute
+   */
+  @Input() accept: string;
+
+  /**
    * enable download of files
    */
   @Input() downloadable: boolean;
@@ -116,6 +121,11 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    * maximum amount of files that can be uploaded
    */
   @Input() maxFiles: number;
+
+  /**
+   * are multiple files allowed?
+   */
+  @Input() multiple: boolean = true;
 
   /**
    * Event emitter to tell using component, that something has changed
@@ -242,6 +252,11 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    * Is triggered when files were changed.
    */
   filesChanged($event) {
+    // if only one file should be selected, clear the input
+    if (!this.multiple) {
+      this.ngModel.splice(0, this.ngModel.length);
+    }
+
     var target = $event.target || $event.srcElement;
     for (let i = 0; i < target.files.length; i++) {
       const file = target.files[i];
@@ -266,11 +281,18 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    * Is triggered when files were dropped.
    */
   filesDropped($event) {
-    if(this.disabled) {
+    if (this.disabled) {
       return;
     }
+    // if only one file should be selected, clear the input
+    if (!this.multiple) {
+      this.ngModel.splice(0, this.ngModel.length);
+    }
+
+    // stop event bubbling
     $event.preventDefault();
     $event.stopPropagation();
+
     for (let i = 0; i < $event.dataTransfer.files.length; i++) {
       const file = $event.dataTransfer.files[i];
       const found = this.ngModel.filter(existing => existing.name === file.name).length > 0;
@@ -279,7 +301,10 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
         this.ngModel.push(file);
       }
     }
+
     this.allowDropZone = false;
+
+    this.onChange.emit(this.ngModel);
     this.ref.detectChanges();
   }
 

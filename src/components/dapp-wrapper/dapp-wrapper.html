@@ -71,15 +71,17 @@
         <ion-icon name="flag" color="light"></ion-icon>
       </button>
     </ion-buttons>
-    <ion-title *ngIf="!contentLoading && activeDApp !== accountId">
-      {{ activeDApp | translate }}
-      <ion-icon class="clickable refresh-icon" *ngIf="reloadAction && !evanQueue.loading" name="refresh" (click)="startRefreshContent()"></ion-icon>
-    </ion-title>
-    <ion-title *ngIf="!contentLoading && activeDApp === accountId">
-      {{ '_angularcore.my-profile' | translate }}
-    </ion-title>
-    <ion-title *ngIf="contentLoading">
-      {{ '_angularcore.loading' | translate }}
+    <ion-title [class.clickable]="isDeveloperMode" (click)="isDeveloperMode && openExplorer()">
+      <ng-container *ngIf="!contentLoading && activeDApp !== accountId">
+        {{ activeDApp | translate }}
+        <ion-icon class="clickable refresh-icon" *ngIf="reloadAction && !evanQueue.loading" name="refresh" (click)="startRefreshContent()"></ion-icon>
+      </ng-container>
+      <ng-container *ngIf="!contentLoading && activeDApp === accountId">
+        {{ '_angularcore.my-profile' | translate }}
+      </ng-container>
+      <ng-container *ngIf="contentLoading">
+        {{ '_angularcore.loading' | translate }}
+      </ng-container>
     </ion-title>
   </ion-navbar>
 </ion-header>

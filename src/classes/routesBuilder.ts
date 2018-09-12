@@ -148,10 +148,18 @@ export function getDashboardRoutes(routes: Routes, enableBack?: boolean): Routes
  * @param      {Component}  CoreComponent  root routing component of the
  *                                         application
  * @param      {Routes}     routes         routing Tree
+ * @param      {Routes}     disableDashboardRoutes disable dashboard routes
  * @return     {Routes}     full routing tree
  */
-export function buildModuleRoutes(dappEns: string, CoreComponent: Component, routes: Routes): Routes {
-  const enhancedRoutes = [ ].concat(getDashboardRoutes(routes, true));
+export function buildModuleRoutes(dappEns: string, CoreComponent: Component, routes: Routes, disableDashboardRoutes?: boolean): Routes {
+  let enhancedRoutes;
+
+  // only add dashboard routes, if its not disabled
+  if (!disableDashboardRoutes) {
+    enhancedRoutes = [ ].concat(getDashboardRoutes(routes, true));
+  } else {
+    enhancedRoutes = [ ].concat(routes);
+  }
 
   for (let i = 0; i < routes.length; i++) {
     if (routes[i].path === '' && routes[i].component) {

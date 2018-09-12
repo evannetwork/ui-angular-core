@@ -157,6 +157,7 @@ export class EvanBCCService {
     this.nameResolver = CoreBundle.CoreRuntime.nameResolver;
     this.cryptoProvider = this.description.cryptoProvider;
     this.contracts = CoreBundle.CoreRuntime.contracts;
+    this.dfs = CoreBundle.CoreRuntime.dfs;
 
     this.CoreBundle = CoreBundle;
   }
@@ -165,7 +166,6 @@ export class EvanBCCService {
    */
   copyProfileToInstance() {
     this.dataContract = ProfileBundle.ProfileRuntime.dataContract;
-    this.dfs = ProfileBundle.ProfileRuntime.dfs;
     this.ipldInstance = ProfileBundle.ProfileRuntime.ipldInstance;
     this.keyExchange = ProfileBundle.ProfileRuntime.keyExchange;
     this.keyProvider = ProfileBundle.ProfileRuntime.keyProvider;

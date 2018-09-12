@@ -115,9 +115,15 @@ export class EvanFileService implements OnDestroy {
    */
   async downloadMobile(name: string, blob: any) {
     try {
-      const downloadFolder = this.file.externalRootDirectory + 'Download/';
+      let downloadFolder;
       let index = 0;
       let fileExists = true;
+
+      if (this.utils.isMobileAndroid()) {
+        downloadFolder = this.file.externalRootDirectory + 'Download/';
+      } else {
+        downloadFolder = this.file.documentsDirectory;
+      }
 
       // get the file name without any extension so we can append download numbers if the file already
       // exists
@@ -154,6 +160,36 @@ export class EvanFileService implements OnDestroy {
         }),
         duration: 3000
       });
+
+      (<any>window).resolveLocalFileSystemURL(
+        downloadFolder + getFileName(),
+        (fileEntry) => {
+          var parentEntry = downloadFolder + "Download";
+          
+           // move the file to a new directory and rename it
+          fileEntry.moveTo(parentEntry, getFileName(), () => {
+            console.log('success')
+          }, (ex) => {
+            console.dir(ex);
+          });
+        },
+        (ex) => {
+          console.dir(ex);
+        }
+      );
+
+
+      /*(<any>window).requestFileSystem((<any>window).LocalFileSystem.PERSISTENT, 0, function (fs) {
+        fs.root.getFile(getFileName(), { create: true, exclusive: false }, function (fileEntry) {
+          // open the file within browser
+          window.open(
+            fileEntry.toInternalURL(),
+            '_system',
+            'location=no,closebuttoncaption=Cerrar,toolbar=yes,enableViewportScale=yes'
+          );
+        });
+      });*/
+
     } catch (ex) {
       this.utils.log(this.utils.getErrorLog(ex), 'error');
 
