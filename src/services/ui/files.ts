@@ -29,6 +29,7 @@ import {
   File,
   Injectable,
   OnDestroy,
+  FileOpener,
 } from 'angular-libs';
 
 import { EvanUtilService } from '../utils';
@@ -63,7 +64,8 @@ export class EvanFileService implements OnDestroy {
     private bcc: EvanBCCService,
     private file: File,
     private toast: EvanToastService,
-    private translateService: EvanTranslationService
+    private translateService: EvanTranslationService,
+    private fileOpener: FileOpener
   ) { }
 
   /**
@@ -122,7 +124,7 @@ export class EvanFileService implements OnDestroy {
       if (this.utils.isMobileAndroid()) {
         downloadFolder = this.file.externalRootDirectory + 'Download/';
       } else {
-        downloadFolder = this.file.documentsDirectory;
+        downloadFolder = this.file.tempDirectory;
       }
 
       // get the file name without any extension so we can append download numbers if the file already
@@ -153,43 +155,17 @@ export class EvanFileService implements OnDestroy {
         blob
       );
 
-      // show toast if finished
-      this.toast.showToast({
-        message: this.translateService.instant('_angularcore.finished-downloading', {
-          fileName: getFileName()
-        }),
-        duration: 3000
-      });
-
-      (<any>window).resolveLocalFileSystemURL(
-        downloadFolder + getFileName(),
-        (fileEntry) => {
-          var parentEntry = downloadFolder + "Download";
-          
-           // move the file to a new directory and rename it
-          fileEntry.moveTo(parentEntry, getFileName(), () => {
-            console.log('success')
-          }, (ex) => {
-            console.dir(ex);
-          });
-        },
-        (ex) => {
-          console.dir(ex);
-        }
-      );
-
-
-      /*(<any>window).requestFileSystem((<any>window).LocalFileSystem.PERSISTENT, 0, function (fs) {
-        fs.root.getFile(getFileName(), { create: true, exclusive: false }, function (fileEntry) {
-          // open the file within browser
-          window.open(
-            fileEntry.toInternalURL(),
-            '_system',
-            'location=no,closebuttoncaption=Cerrar,toolbar=yes,enableViewportScale=yes'
-          );
+      // show toast if finished only on android, ios has no Download folder (???)
+      if (this.utils.isMobileAndroid()) {
+        this.toast.showToast({
+          message: this.translateService.instant('_angularcore.finished-downloading', {
+            fileName: getFileName()
+          }),
+          duration: 3000
         });
-      });*/
+      }
 
+      this.fileOpener.open(downloadFolder + '/' + getFileName(), blob.type);
     } catch (ex) {
       this.utils.log(this.utils.getErrorLog(ex), 'error');
 

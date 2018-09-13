@@ -165,6 +165,11 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    */
   private allowDropZone: boolean;
 
+  /**
+   * only deny drop, if one second after the event triggered, no dragover event occures
+   */
+  private denyDropTimeout: any;
+
   /***************** initialization  *****************/
   constructor(
     private ref: ChangeDetectorRef,
@@ -314,9 +319,14 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    * @param      {object}  ev      drop event
    */
   allowDrop(ev) {
-    if(this.disabled) {
+    if (this.disabled) {
       return;
-    }    
+    }
+
+    if (this.denyDropTimeout) {
+      window.clearTimeout(this.denyDropTimeout);
+    }
+
     ev.preventDefault();
     this.allowDropZone = true;
     this.ref.detectChanges();
@@ -328,12 +338,19 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
    * @param      {object}  ev      drop event
    */
   denyDrop(ev) {
-    if(this.disabled) {
+    if (this.disabled) {
       return;
-    }    
-    ev.preventDefault();
-    this.allowDropZone = false;
-    this.ref.detectChanges();
+    }
+
+    if (this.denyDropTimeout) {
+      window.clearTimeout(this.denyDropTimeout);
+    }
+
+    this.denyDropTimeout = setTimeout(() => {
+      ev.preventDefault();
+      this.allowDropZone = false;
+      this.ref.detectChanges();
+    }, 100);
   }
 
   /**
