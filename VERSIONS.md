@@ -6,6 +6,7 @@
 - add getNameForAccount to utils function
 - add download function for mobile devices
 - add ionic-file-opener support for file download
+- ExecutorAgent support
 
 ### Fixes
 - fill empty members array within contract-members component as fallback

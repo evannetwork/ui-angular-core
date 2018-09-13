@@ -40,6 +40,7 @@ import {
   updateCoreRuntime,
   web3,
   web3Helper,
+  core,
 } from 'dapp-browser';
 
 import {
@@ -247,15 +248,33 @@ export class EvanBCCService {
       this.copyCoreToInstance();
 
       if (activeAccount) {
-        // initialize bcc for an profile
-        const bccProfile = ProfileBundle.createAndSet((<any>{
+        const bccProfileOptions: any ={
           accountId: activeAccount,
+          CoreBundle: CoreBundle,
           coreOptions: coreOptions,
-          signer: this.getSigner(provider),
           keyProvider: getLatestKeyProvider(),
-          CoreBundle,
-          SmartContracts
-        }));
+          signer: this.getSigner(provider),
+          SmartContracts: SmartContracts
+        };
+  
+        // if we are loading all data via an smart-agent, we need to create a new ExecutorAgent
+        if (provider === 'agent-executor') {
+          const agentExecutor = await core.getAgentExecutor();
+
+          bccProfileOptions.executor = new CoreBundle.ExecutorAgent({
+            agentUrl: agentExecutor.agentUrl,
+            config: {},
+            contractLoader: CoreBundle.CoreRuntime.contractLoader,
+            logLog: CoreBundle.logLog,
+            logLogLevel: CoreBundle.logLogLevel,
+            signer: bccProfileOptions,
+            token: agentExecutor.token,
+            web3: this.web3,
+          });
+        }
+
+        // initialize bcc for an profile
+        const bccProfile = ProfileBundle.createAndSet(bccProfileOptions);
         this.copyProfileToInstance();
         this.copyCoreToInstance();
 

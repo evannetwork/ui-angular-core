@@ -75,7 +75,7 @@ export class EvanFileService implements OnDestroy {
    * @param      {Array<any>}    files    array of files
    * @return     {Promise<any>}  uploaded files transformed into an encryption object 
    */
-  public async readFilesAsArrayBuffer(files: Array<any>, encryption?: any) {
+  public async readFilesAsArrayBuffer(files: Array<any>) {
     files = await Promise.all(
       files.map((file) => new Promise((resolve, reject) => {
         if(file.file) {
