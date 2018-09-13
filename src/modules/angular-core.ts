@@ -26,20 +26,21 @@
 */
 
 import {
-  NgModule, ErrorHandler, enableProdMode,   // @angular/core
+  BrowserAnimationsModule,                  // @angular/platform-browser/animations'
+  Camera,                                   // @ionic-native/camera
   CommonModule, registerLocaleData,         // @angular/common
-  RouterModule, Routes, RouteReuseStrategy, // @angular/router
+  File,                                     // @ionic-native/file
+  FileOpener,                               // @ionic-native/file-opener
   FormsModule,                              // @angular/forms
   IonicModule, IonicApp,                    // ionic-angular
-  TranslateModule, TranslateService,        // @ngx-translate/core
-  BrowserAnimationsModule,                  // @angular/platform-browser/animations'
-  NgCircleProgressModule,                   // ng-circle-progress
   IonTagsInputModule,                       // ionic-tags-input
-  ZXingScannerModule,                       // qr-code-scanner module
-  Camera,                                   // @ionic-native/camera
-  QRScanner,                                // @ionic-native/qr-scanner
   languages,                                // everything from @angular/common/locales
-  File,                                     // @ionic-native/file
+  NgCircleProgressModule,                   // ng-circle-progress
+  NgModule, ErrorHandler, enableProdMode,   // @angular/core
+  QRScanner,                                // @ionic-native/qr-scanner
+  RouterModule, Routes, RouteReuseStrategy, // @angular/router
+  TranslateModule, TranslateService,        // @ngx-translate/core
+  ZXingScannerModule,                       // qr-code-scanner module
 } from 'angular-libs';
 
 // services
@@ -173,6 +174,7 @@ const moduleConfig = {
     EvanTranslationService,
     EvanUtilService,
     File,
+    FileOpener,
     ObjectKeysPipe,
     ObjectToArrayPipe,
     QRScanner,

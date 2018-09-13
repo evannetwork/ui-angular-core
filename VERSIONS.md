@@ -5,6 +5,7 @@
 - file selector for display attached files
 - add getNameForAccount to utils function
 - add download function for mobile devices
+- add ionic-file-opener support for file download
 
 ### Fixes
 - fill empty members array within contract-members component as fallback
@@ -17,6 +18,7 @@
 - contract-members touched property
 - fix file select touched setting
 - DAppLoaderComponent tried to load DApps that have not a valid DBCP description, component was adjusted to skip this entries
+- fix file-select dropleave event
 
 ### Deprecations
 
