@@ -5,6 +5,42 @@
 ### Fixes
 ### Deprecations
 
+## Version 1.2.0
+### Features
+- file selector for display attached files
+- add getNameForAccount to utils function
+- add download function for mobile devices
+- add ionic-file-opener support for file download
+- ExecutorAgent support
+- add qr-code display component
+
+### Fixes
+- fill empty members array within contract-members component as fallback
+- add logic to handle duplicated go back route on the same hash
+- fix preview img for addDAppAlertStyle (trimmed name must not contain a dot)
+- remove ngxscanner interfaces, so angular-libs can include the umd duiled files
+- fix file-selct mobile styling
+- missing i18n keys for dispatcher runtime (the service was retrieved, after the dispatcher was loaded so resubmit i18n to all current translation services)
+- support multiple instances of contract-member components at the same time
+- contract-members touched property
+- fix file select touched setting
+- DAppLoaderComponent tried to load DApps that have not a valid DBCP description, component was adjusted to skip this entries
+- fix file-select dropleave event
+
+### Deprecations
+
+## Version 1.1.0
+### Features
+- basic implementation of file-select component
+- add devMode support for descriptionService; add subdonmain suppior
+- add some options to contract-members
+- add shortMonthNames to translateService
+
+### Fixes
+- correct installation documentation
+
+### Deprecations
+
 ## Version 1.0.2
 ### Features
 - register all languages from @angular/common/locales to handle all date formats, so angular data formatter don't die anymore 

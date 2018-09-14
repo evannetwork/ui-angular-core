@@ -1,28 +1,28 @@
 /*
-  Copyright (C) 2018-present evan GmbH. 
-  
+  Copyright (C) 2018-present evan GmbH.
+
   This program is free software: you can redistribute it and/or modify it
-  under the terms of the GNU Affero General Public License, version 3, 
-  as published by the Free Software Foundation. 
-  
-  This program is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  under the terms of the GNU Affero General Public License, version 3,
+  as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Affero General Public License for more details. 
-  
-  You should have received a copy of the GNU Affero General Public License along with this program.
-  If not, see http://www.gnu.org/licenses/ or write to the
-  
-  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
-  
-  or download the license from the following URL: https://evan.network/license/ 
-  
-  You can be released from the requirements of the GNU Affero General Public License
-  by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts of it
-  on other blockchains than evan.network. 
-  
-  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+  See the GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see http://www.gnu.org/licenses/ or
+  write to the Free Software Foundation, Inc., 51 Franklin Street,
+  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
+  the following URL: https://evan.network/license/
+
+  You can be released from the requirements of the GNU Affero General Public
+  License by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts
+  of it on other blockchains than evan.network.
+
+  For more information, please contact evan GmbH at this address:
+  https://evan.network/license/
 */
 
 export const en = {
@@ -34,6 +34,7 @@ export const en = {
   'remove': 'Remove',
   'submit' : 'Submit',
   'cancel' : 'Cancel',
+  'open' : 'Open',
   'loading-dapp' : 'Loading...',
   'go-to': 'Go to',
   'go-to-dappdashboard': 'Go to Dashboard',
@@ -131,6 +132,9 @@ export const en = {
     'synchronising': 'Synchronising'
   },
   '_angularcore': {
+    'error-downloading': 'Error occurred while downloading the file.',
+    'finished-downloading': 'The file {{ fileName }} was successfully saved in the downloads',
+    'new-notification': 'New Notification',
     'load-more': 'Load more...',
     'loaded-paging-entries': 'Loaded',
     'camera': 'Camera',
@@ -205,7 +209,9 @@ export const en = {
       'header': 'Scan QR code',
       'camera-select': 'Camera Selection',
       'no-camera-selected': 'No camera selected'
-    }
+    },
+    "month-short-names": "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec",
+    "file-select": "Select files"
   },
   '_logging': {
     'logs-sent': 'Thank you very much! Your logs have been forwarded to evan.network developers.',

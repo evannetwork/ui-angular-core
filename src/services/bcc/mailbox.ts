@@ -1,28 +1,28 @@
 /*
-  Copyright (C) 2018-present evan GmbH. 
-  
+  Copyright (C) 2018-present evan GmbH.
+
   This program is free software: you can redistribute it and/or modify it
-  under the terms of the GNU Affero General Public License, version 3, 
-  as published by the Free Software Foundation. 
-  
-  This program is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  under the terms of the GNU Affero General Public License, version 3,
+  as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Affero General Public License for more details. 
-  
-  You should have received a copy of the GNU Affero General Public License along with this program.
-  If not, see http://www.gnu.org/licenses/ or write to the
-  
-  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
-  
-  or download the license from the following URL: https://evan.network/license/ 
-  
-  You can be released from the requirements of the GNU Affero General Public License
-  by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts of it
-  on other blockchains than evan.network. 
-  
-  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+  See the GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see http://www.gnu.org/licenses/ or
+  write to the Free Software Foundation, Inc., 51 Franklin Street,
+  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
+  the following URL: https://evan.network/license/
+
+  You can be released from the requirements of the GNU Affero General Public
+  License by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts
+  of it on other blockchains than evan.network.
+
+  For more information, please contact evan GmbH at this address:
+  https://evan.network/license/
 */
 
 import {
@@ -138,6 +138,8 @@ export class EvanMailboxService {
         'SendMailDispatcher',
         'sendMail'
       );
+      this.receivedMails = [ ];
+      this.sentMails = [ ];
 
       this.readMails = this.getReadMails();
     }, true);
@@ -282,6 +284,20 @@ export class EvanMailboxService {
   }
 
   /**
+   * Reset the current bunch of mails and starts at the beginning
+   *
+   * @return     {Promise<void>}  Resolved when done.
+   */
+  async resetMails() {
+    this.receivedMailLoadCount = 0;
+    this.sentMailLoadCount = 0;
+    this.receivedMails = [ ];
+    this.sentMails = [ ];
+
+    return await this.getMails();
+  }
+
+  /**
    * Load the mails for the current account.
    * 
    * result:
@@ -294,11 +310,11 @@ export class EvanMailboxService {
    */
   async getMails() {
     const [receivedMails, sentMails] = await Promise.all([
-      this.bcc.mailbox.getReceivedMails(this.receivedMailLoadCount),
-      this.bcc.mailbox.getSentMails(this.sentMailLoadCount)
+      this.bcc.mailbox.getReceivedMails(10, this.receivedMailLoadCount),
+      this.bcc.mailbox.getSentMails(10, this.sentMailLoadCount)
     ]);
 
-    this.receivedMails = Object.keys(receivedMails.mails).map((key) => {
+    Object.keys(receivedMails.mails).map((key) => {
       const ret = {
         id: key
       };
@@ -306,10 +322,13 @@ export class EvanMailboxService {
         return null;
       }
       Object.assign(ret, receivedMails.mails[key]);
-      return ret;
-    }).filter((value) => value != null);
+      
+      if (ret !== null && this.receivedMails.filter((mail: any) => mail.id === key).length === 0) {
+        this.receivedMails.push(ret);
+      }
+    })
 
-    this.sentMails = Object.keys(sentMails.mails).map((key) => {
+    Object.keys(sentMails.mails).map((key) => {
       const ret = {
         id: key
       };
@@ -317,8 +336,10 @@ export class EvanMailboxService {
         return null;
       }
       Object.assign(ret, sentMails.mails[key]);
-      return ret;
-    }).filter((value) => value != null);
+      if (ret !== null && this.sentMails.filter((mail: any) => mail.id === key).length === 0) {
+        this.sentMails.push(ret);
+      }
+    })
 
     this.totalSentMailCount = sentMails.totalResultCount;
     this.totalReceivedMailCount = receivedMails.totalResultCount;

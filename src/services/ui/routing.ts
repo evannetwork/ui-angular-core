@@ -1,35 +1,36 @@
 /*
-  Copyright (C) 2018-present evan GmbH. 
-  
+  Copyright (C) 2018-present evan GmbH.
+
   This program is free software: you can redistribute it and/or modify it
-  under the terms of the GNU Affero General Public License, version 3, 
-  as published by the Free Software Foundation. 
-  
-  This program is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  under the terms of the GNU Affero General Public License, version 3,
+  as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Affero General Public License for more details. 
-  
-  You should have received a copy of the GNU Affero General Public License along with this program.
-  If not, see http://www.gnu.org/licenses/ or write to the
-  
-  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
-  
-  or download the license from the following URL: https://evan.network/license/ 
-  
-  You can be released from the requirements of the GNU Affero General Public License
-  by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts of it
-  on other blockchains than evan.network. 
-  
-  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+  See the GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see http://www.gnu.org/licenses/ or
+  write to the Free Software Foundation, Inc., 51 Franklin Street,
+  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
+  the following URL: https://evan.network/license/
+
+  You can be released from the requirements of the GNU Affero General Public
+  License by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts
+  of it on other blockchains than evan.network.
+
+  For more information, please contact evan GmbH at this address:
+  https://evan.network/license/
 */
 
 import {
   getDomainName,
   importDApp,
   System,
-  routing
+  routing,
+  utils
 } from 'dapp-browser';
 
 import {
@@ -106,7 +107,6 @@ Router.prototype.navigateByUrl = function(url: any, extras: any): Promise<any> {
   let urlTree = url instanceof UrlTree ? url : this.parseUrl(url);
   let mergedTree = this.urlHandlingStrategy.merge(urlTree, this.rawUrlTree);
 
-  //
   // save latest location
   routing.history.push(getRouteFromUrl(window.location.hash));
   routing.updateHistory();
@@ -162,7 +162,6 @@ export class EvanRoutingService {
     this.router.events.subscribe((event: RouterEvent) => {
       if (event instanceof NavigationEnd) {
         const ids = Object.keys(this.subscriptions);
-
         for (let i = 0; i < ids.length; i++) {
           this.subscriptions[ids[i]](event);
         }
@@ -176,6 +175,16 @@ export class EvanRoutingService {
       if (this.getActiveRoot()) {
         this.setNavigateBackStatus();
       }
+
+      // much better logic for handling history stacking, but it will end in routing endless loops
+      //   by using goback an history popping 
+      // 
+      // check for url navigation to handle correct back logic outside of router.navigate
+      // const beforeUrl = getRouteFromUrl(event.oldURL.split('#/')[1]);
+      // if (routing.history.length === 0 || routing.history[routing.history.length - 1] !== beforeUrl) {
+      //   routing.history.push(beforeUrl);
+      //   routing.updateHistory();
+      // }
     }
 
     platform.registerBackButtonAction(() => {
@@ -283,7 +292,7 @@ export class EvanRoutingService {
       // get last part of url => the active iteration one
       let dappName = route.firstChild.routeConfig.path.split('/').pop();
       // get first entry of ens path
-      dappName = dappName.split('.')[0];
+      dappName = utils.getDAppName(dappName);
 
       // split out the first ens entry
       if (dappName.endsWith(childPath)) {
@@ -328,7 +337,7 @@ export class EvanRoutingService {
    * @return     {string}  dappName
    */
   getDAppNameFromRoutePath(routePath: string): string {
-    return routePath.split('/').pop().split('.')[0];
+    return utils.getDAppName(routePath.split('/').pop());
   }
 
     /**
@@ -339,7 +348,7 @@ export class EvanRoutingService {
   getDAppNameFromCurrRoutePath(): string {
     const routePath = this.getRouteFromUrl(this.router.url);
 
-    return routePath.split('/').pop().split('.')[0];
+    return this.getDAppNameFromRoutePath(routePath);
   }
 
   /**
@@ -365,6 +374,32 @@ export class EvanRoutingService {
   }
 
   /**
+   * Uses an hash value and replaces the current hash with the new one. But it will use href = to
+   * force parent dapp router handling, if we only set the hash, the navigation will stuck within
+   * the current child DApp.
+   * 
+   *   e.g. dashboard/favorites goes back to dashboard with empty history stack
+   *        but nothing will happen because the favorites capured the navigation event and
+   *        stops bubbling
+   *
+   * @param      {string}  hash    new window.location.hash value
+   */
+  forceUrlNavigation(hash: string) {
+    // HACKY HACKY HACKY
+    //   by using goBack it could be possible that the logic navigates to dashboard.evan
+    //   a strange behavior occures 
+    //        dashboard.evan/XXX
+    //     => dashboard.evan
+    //     => dashboard.evan/favorites (everything is fine)
+    //     => dashboard.evan (why this is happening?)
+    if (hash === `dashboard.${ getDomainName() }`) {
+      hash = `${ hash }/favorites.${ getDomainName() }`
+    }
+
+    window.location.href = window.location.href.replace(window.location.hash, `#/${ hash }`);
+  }
+
+  /**
    * Goes back. If this.navigateBackStatus contains an route string, navigate to
    * this route else trigger location.back().
    */
@@ -385,6 +420,8 @@ export class EvanRoutingService {
       }
     }
 
+    // navigate back
+    //  => use 
     if (routing.history.length === 0) {
       const splitHash = this.getRouteFromUrl(window.location.hash).split('/');
 
@@ -393,14 +430,21 @@ export class EvanRoutingService {
 
       // if we are on / route, navigate to default dashboard
       if (splitHash.length === 0) {
-        window.location.hash = '#/' + (await routing.getDefaultDAppENS());
+        this.forceUrlNavigation(routing.defaultDAppENS);
       } else {
         // if we can navigate upwards, join the current splitHAsh
-        window.location.hash = '#/' + splitHash.join('/');
+        this.forceUrlNavigation(splitHash.join('/'));
       }
     } else {
+      // use last value from history
+      let goBackRoute = routing.history.pop();
+
+      while (goBackRoute === this.getRouteFromUrl(window.location.hash) && routing.history.length > 1) {
+        goBackRoute = routing.history.pop();
+      }
+
       // use latest history
-      window.location.hash = '#/' + routing.history.pop();
+      this.forceUrlNavigation(goBackRoute);
     }
   }
 

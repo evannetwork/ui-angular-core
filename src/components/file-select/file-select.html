@@ -1,42 +1,72 @@
 <!--
-  Copyright (C) 2018-present evan GmbH. 
-  
+  Copyright (C) 2018-present evan GmbH.
+
   This program is free software: you can redistribute it and/or modify it
-  under the terms of the GNU Affero General Public License, version 3, 
-  as published by the Free Software Foundation. 
-  
-  This program is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  under the terms of the GNU Affero General Public License, version 3,
+  as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Affero General Public License for more details. 
-  
-  You should have received a copy of the GNU Affero General Public License along with this program.
-  If not, see http://www.gnu.org/licenses/ or write to the
-  
-  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
-  
-  or download the license from the following URL: https://evan.network/license/ 
-  
-  You can be released from the requirements of the GNU Affero General Public License
-  by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts of it
-  on other blockchains than evan.network. 
-  
-  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+  See the GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see http://www.gnu.org/licenses/ or
+  write to the Free Software Foundation, Inc., 51 Franklin Street,
+  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
+  the following URL: https://evan.network/license/
+
+  You can be released from the requirements of the GNU Affero General Public
+  License by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts
+  of it on other blockchains than evan.network.
+
+  For more information, please contact evan GmbH at this address:
+  https://evan.network/license/
 -->
-
-<ion-label class="standalone">
-  {{ (label || '_angularcore.file-select') | translate }}
-
-  <button class="top-right" ion-button icon-only clear outline
-    (click)="selectFiles()">
-    <ion-icon name="add"></ion-icon>
-  </button>
-</ion-label>
-<ion-list>
-  <ion-item *ngFor="let file of [ ].concat(files, ngModel)">
-    <button ion-button icon-only *ngIf="files.indexOf(file) !== -1" (click)="removeFile(file)">
-      <ion-icon name="trash"></ion-icon>
+<div class="evan-relative" (drop)="filesDropped($event)" (dragover)="allowDrop($event)" (dragleave)="denyDrop($event)">
+  <div *ngIf="allowDropZone" class="dropzone"></div>
+  <ion-label class="standalone" *ngIf="label">
+    {{ label | translate }}
+  </ion-label>
+  <input #fileSelect
+    type="file"
+    multiple="multiple"
+    (change)="filesChanged($event)" 
+    [accept]="accept ? accept : null"
+    [multiple]="multiple ? multiple : null"
+  />
+  <ion-list>
+    <ion-item  *ngFor="let file of ngModel; let i = index">
+      <ion-label>
+        <h2>{{ file.name }}</h2>
+        <h3>{{ parseFileSize(file.size)}}</h3>
+      </ion-label>
+      <div item-content>
+        <button ion-button icon-only clear color="red"
+          *ngIf="!disabled"
+          (click)="removeFile(file, i)">
+          <ion-icon name="trash"></ion-icon>
+        </button>
+        <ng-container *ngIf="downloadable">
+          <a ion-button outline icon-only clear color="red"
+            *ngIf="!utils.isMobile()" target="_blank" [download]="file.name" [href]="file.blobURI">
+            <ion-icon name="download"></ion-icon>
+          </a>
+          <a ion-button outline icon-only clear color="red"
+            *ngIf="utils.isMobile()" target="_blank" (click)="fileService.downloadMobile(file.name, file.blob)">
+            <ion-icon name="download"></ion-icon>
+          </a>
+        </ng-container>
+      </div>
+    </ion-item>
+    <button ion-button outline round class="add-button"
+      *ngIf="!disabled"
+      [attr.icon-only]="!buttonText ? '' : null"
+      [attr.icon-left]="buttonText ? '' : null"
+      (click)="selectFiles()">
+      <ion-icon name="add"></ion-icon>
+      <span *ngIf="buttonText">{{ buttonText }}</span>
     </button>
-  </ion-item>
-</ion-list>
+  </ion-list>
+</div>

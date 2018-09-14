@@ -1,28 +1,28 @@
 /*
-  Copyright (C) 2018-present evan GmbH. 
-  
+  Copyright (C) 2018-present evan GmbH.
+
   This program is free software: you can redistribute it and/or modify it
-  under the terms of the GNU Affero General Public License, version 3, 
-  as published by the Free Software Foundation. 
-  
-  This program is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  under the terms of the GNU Affero General Public License, version 3,
+  as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Affero General Public License for more details. 
-  
-  You should have received a copy of the GNU Affero General Public License along with this program.
-  If not, see http://www.gnu.org/licenses/ or write to the
-  
-  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
-  
-  or download the license from the following URL: https://evan.network/license/ 
-  
-  You can be released from the requirements of the GNU Affero General Public License
-  by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts of it
-  on other blockchains than evan.network. 
-  
-  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+  See the GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see http://www.gnu.org/licenses/ or
+  write to the Free Software Foundation, Inc., 51 Franklin Street,
+  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
+  the following URL: https://evan.network/license/
+
+  You can be released from the requirements of the GNU Affero General Public
+  License by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts
+  of it on other blockchains than evan.network.
+
+  For more information, please contact evan GmbH at this address:
+  https://evan.network/license/
 */
 
 import * as CoreBundle from 'bcc';
@@ -40,6 +40,7 @@ import {
   updateCoreRuntime,
   web3,
   web3Helper,
+  core,
 } from 'dapp-browser';
 
 import {
@@ -92,6 +93,7 @@ export class EvanBCCService {
   public CoreBundle: any;
   public cryptoProvider: any;
   public dataContract: ProfileBundle.DataContract;
+  public serviceContract: ProfileBundle.ServiceContract;
   public description: any;
   public dfs: any;
   public executor: any;
@@ -156,6 +158,7 @@ export class EvanBCCService {
     this.nameResolver = CoreBundle.CoreRuntime.nameResolver;
     this.cryptoProvider = this.description.cryptoProvider;
     this.contracts = CoreBundle.CoreRuntime.contracts;
+    this.dfs = CoreBundle.CoreRuntime.dfs;
 
     this.CoreBundle = CoreBundle;
   }
@@ -163,15 +166,15 @@ export class EvanBCCService {
    * Copy BCC profile object instances into the service this scope.
    */
   copyProfileToInstance() {
-    this.keyProvider = ProfileBundle.ProfileRuntime.keyProvider;
-    this.ipldInstance = ProfileBundle.ProfileRuntime.ipldInstance;
-    this.dfs = ProfileBundle.ProfileRuntime.dfs;
-    this.mailbox = ProfileBundle.ProfileRuntime.mailbox;
-    this.keyExchange = ProfileBundle.ProfileRuntime.keyExchange;
-    this.profile = ProfileBundle.ProfileRuntime.profile;
-    this.sharing = ProfileBundle.ProfileRuntime.sharing;
     this.dataContract = ProfileBundle.ProfileRuntime.dataContract;
+    this.ipldInstance = ProfileBundle.ProfileRuntime.ipldInstance;
+    this.keyExchange = ProfileBundle.ProfileRuntime.keyExchange;
+    this.keyProvider = ProfileBundle.ProfileRuntime.keyProvider;
+    this.mailbox = ProfileBundle.ProfileRuntime.mailbox;
+    this.profile = ProfileBundle.ProfileRuntime.profile;
     this.ProfileBundle = ProfileBundle;
+    this.serviceContract = ProfileBundle.ProfileRuntime.serviceContract;
+    this.sharing = ProfileBundle.ProfileRuntime.sharing;
   }
 
   /**
@@ -245,15 +248,33 @@ export class EvanBCCService {
       this.copyCoreToInstance();
 
       if (activeAccount) {
-        // initialize bcc for an profile
-        const bccProfile = ProfileBundle.createAndSet((<any>{
+        const bccProfileOptions: any ={
           accountId: activeAccount,
+          CoreBundle: CoreBundle,
           coreOptions: coreOptions,
-          signer: this.getSigner(provider),
           keyProvider: getLatestKeyProvider(),
-          CoreBundle,
-          SmartContracts
-        }));
+          signer: this.getSigner(provider),
+          SmartContracts: SmartContracts
+        };
+  
+        // if we are loading all data via an smart-agent, we need to create a new ExecutorAgent
+        if (provider === 'agent-executor') {
+          const agentExecutor = await core.getAgentExecutor();
+
+          bccProfileOptions.executor = new CoreBundle.ExecutorAgent({
+            agentUrl: agentExecutor.agentUrl,
+            config: {},
+            contractLoader: CoreBundle.CoreRuntime.contractLoader,
+            logLog: CoreBundle.logLog,
+            logLogLevel: CoreBundle.logLogLevel,
+            signer: bccProfileOptions,
+            token: agentExecutor.token,
+            web3: this.web3,
+          });
+        }
+
+        // initialize bcc for an profile
+        const bccProfile = ProfileBundle.createAndSet(bccProfileOptions);
         this.copyProfileToInstance();
         this.copyCoreToInstance();
 

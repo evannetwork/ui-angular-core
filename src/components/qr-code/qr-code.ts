@@ -26,80 +26,72 @@
 */
 
 import {
-  Component, OnInit, Input, ViewChild, AfterViewInit, ElementRef, // @angular/core
-  OnChanges, SimpleChanges, SimpleChange, ChangeDetectorRef,      // @angular/core
-  DomSanitizer
+  Component, OnInit,     // @angular/core
+  Input, ViewChild, ElementRef, OnDestroy,
+  Output, EventEmitter,
+  ChangeDetectionStrategy, ChangeDetectorRef,
+  MenuController, AfterViewInit
 } from 'angular-libs';
 
-import {
-  EvanDescriptionService
-} from '../../services/bcc/description';
-
-
-import {
-  createOpacityTransition
-} from '../../animations/opacity';
-
-import { AsyncComponent } from '../../classes/AsyncComponent';
+import { EvanCoreService } from '../../services/bcc/core';
+import { EvanAddressBookService } from '../../services/bcc/address-book';
+import { EvanUtilService } from '../../services/utils';
 
 /**************************************************************************************************/
 
 /**
- * shows an generalized "Theirs no data." screen using DApp DBCP descriptions 
+ * QR-Code display component
  * 
- * Usage:
- *   <evan-empty-dapp
- *     [text]="'_dappcontacts.nothing-found' | translate:{ filter: filterString })"
- *     ensAddress="addressbook">
- *   </evan-empty-dapp>
- *
- * @class      Component EmptyDAppDisplayComponent
+ * @class      Component ListPagingComponent
  */
 @Component({
-  selector: 'evan-empty-dapp',
-  templateUrl: 'empty-dapp-display.html',
-  animations: [
-    createOpacityTransition()
-  ]
+  selector: 'evan-qr-code',
+  templateUrl: 'qr-code.html',
+  animations: [ ]
 })
-export class EmptyDAppDisplayComponent extends AsyncComponent {
+export class QrCodeComponent implements AfterViewInit {
   /***************** inputs & outpus *****************/
   /**
-   * ens address to load the empty preview img from
+   * text to generate the qr-code for
    */
-  @Input() ensAddress: string;
+  @Input() text: number;
 
   /**
-   * text to display under neath the window
+   * width of the qr-code
    */
-  @Input() text: string;
+  @Input() width: number;
 
   /**
-   * apply dynamic applied img, overwrites ensAddress img
+   * height of the qr-code
    */
-  @Input() img: string;
+  @Input() height: number;
+
+  /*****************    variables    *****************/
+  /**
+   * blockie element references
+   */
+  @ViewChild('qrCode') $qrCode: ElementRef;
 
   /***************** initialization  *****************/
   constructor(
-    private description: EvanDescriptionService,
     private ref: ChangeDetectorRef,
-    private _DomSanitizer: DomSanitizer,
-  ) {
-    super(ref);
-  }
+    private utils: EvanUtilService
+  ) { }
 
   /**
-   * load dbcp address and set img, if not set before.
+   * render the qr-code
    */
-  async _ngOnInit() {
-    if (!this.img) {
-      this.ref.detectChanges();
+  async ngAfterViewInit() {
+    this.$qrCode.nativeElement.id = this.utils.generateID();
+    const qrCode = new (<any>window).QRCode(this.$qrCode.nativeElement.id, {
+      text: this.text,
+      width: this.width,
+      height: this.height,
+      colorDark : "#000000",
+      colorLight : "#ffffff",
+      correctLevel : (<any>window).QRCode.CorrectLevel.H
+    });
 
-      const dbcp = (await this.description.getMultipleDescriptions([ this.ensAddress ]))[0];
-
-      if (dbcp && dbcp.imgSquare) {
-        this.img = dbcp.imgSquare;
-      }
-    }
+    this.ref.detach();
   }
 }

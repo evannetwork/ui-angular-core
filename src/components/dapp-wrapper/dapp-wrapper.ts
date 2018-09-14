@@ -1,32 +1,38 @@
 /*
-  Copyright (C) 2018-present evan GmbH. 
-  
+  Copyright (C) 2018-present evan GmbH.
+
   This program is free software: you can redistribute it and/or modify it
-  under the terms of the GNU Affero General Public License, version 3, 
-  as published by the Free Software Foundation. 
-  
-  This program is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  under the terms of the GNU Affero General Public License, version 3,
+  as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Affero General Public License for more details. 
-  
-  You should have received a copy of the GNU Affero General Public License along with this program.
-  If not, see http://www.gnu.org/licenses/ or write to the
-  
-  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
-  
-  or download the license from the following URL: https://evan.network/license/ 
-  
-  You can be released from the requirements of the GNU Affero General Public License
-  by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts of it
-  on other blockchains than evan.network. 
-  
-  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+  See the GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see http://www.gnu.org/licenses/ or
+  write to the Free Software Foundation, Inc., 51 Franklin Street,
+  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
+  the following URL: https://evan.network/license/
+
+  You can be released from the requirements of the GNU Affero General Public
+  License by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts
+  of it on other blockchains than evan.network.
+
+  For more information, please contact evan GmbH at this address:
+  https://evan.network/license/
 */
 
 import { logLog } from 'bcc';
-import { utils } from 'dapp-browser';
+
+import {
+  notifications,
+  utils,
+  getDomainName
+} from 'dapp-browser';
+
 import {
   Component, OnInit, OnDestroy,
   Router, NavigationEnd, RouterEvent,
@@ -48,6 +54,7 @@ import { EvanUtilService } from '../../services/utils';
 import { EvanBCCService } from '../../services/bcc/bcc';
 import { EvanTranslationService } from '../../services/ui/translate';
 import { EvanLoggingService } from '../../services/ui/logging';
+import { EvanAlertService } from '../../services/ui/alert';
 import { AsyncComponent } from '../../classes/AsyncComponent';
 
 /**************************************************************************************************/
@@ -96,6 +103,11 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
    * 
    */
   @Output() refreshing: EventEmitter<any> = new EventEmitter();
+
+  /**
+   * img that should be displayed at the start oft the dapp-wrapper header
+   */
+  @Input() headerImg: string;
 
   /*****************    variables    *****************/
   /**
@@ -154,6 +166,11 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
   private translationUpdate: Function;
 
   /**
+   * watch for new notifications
+   */
+  private notificationWatcher: Function;
+
+  /**
    * handle log errors
    */
   private logErrors: Array<any>;
@@ -162,6 +179,16 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
    * log error watcher
    */
   private logErrorWatcher: any;
+
+  /**
+   * is the developer mode enabled?
+   */
+  private isDeveloperMode: boolean;
+
+  /**
+   * watch for developer mode switch
+   */
+  private developerModeSwitch: Function;
 
   /***************** initialization  *****************/
   constructor(
@@ -178,7 +205,8 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
     private routing: EvanRoutingService,
     private translateService: EvanTranslationService,
     private utilService: EvanUtilService,
-    private logging: EvanLoggingService
+    private logging: EvanLoggingService,
+    private alertService: EvanAlertService
   ) {
     super(ref, false);
   }
@@ -237,6 +265,28 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
     // the current application
     this.translationUpdate = this.translateService.watchTranslationUpdate(() => this.ref.detectChanges());
 
+    // if the header is shown, apply the notification
+    if (this.showHeader) {
+      // if a notification is available, but we didn't ask the user before to open this notification
+      // show an alert and ask the user
+      if (notifications.notifications.length > 0 &&
+        !notifications.notifications[notifications.notifications.length - 1].evanNotificationOpened) {
+        this.handleNotification();
+      }
+
+      // create an new watcher to handle incoming notifications
+      this.notificationWatcher = this.utilService.onEvent('evan-notification',
+        (notification) => this.handleNotification());
+
+      // watch for developer mode is changing
+      this.isDeveloperMode = window.localStorage['evan-developer-mode'] === 'true';
+      this.developerModeSwitch = this.core.utils
+        .onEvent('evan-developer-mode', () => {
+          this.isDeveloperMode = window.localStorage['evan-developer-mode'] === 'true';
+          this.ref.detectChanges();
+        });
+    }
+
     this.ref.detectChanges();
   }
 
@@ -250,8 +300,62 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
     this.routerChange && this.routerChange.unsubscribe();
     this.onQueueUpdate && this.onQueueUpdate();
     this.translationUpdate && this.translationUpdate();
+    this.notificationWatcher && this.notificationWatcher();
+    this.developerModeSwitch && this.developerModeSwitch();
   }
 
+  /**
+   * Handles incoming notifications and asks the user, if he want to jump into the incoming
+   * notification application.
+   */
+  async handleNotification() {
+    const receivedNotifications = notifications.notifications;
+
+    // check if notifications are available and open the last one
+    if (receivedNotifications.length > 0 &&
+      !receivedNotifications[receivedNotifications.length - 1].evanNotificationOpened) {
+      const notification = notifications.notifications[receivedNotifications.length - 1];
+
+      // ask the user
+      try {
+        let title = '_angularcore.new-notification';
+        let body = '';
+
+        // check for the notification text, on ios capsuled within the aps object, on android we use
+        // simply the body attribute
+        if (notification.aps && notification.aps.alert) {
+          if (typeof notification.aps.alert === 'string') {
+            body = notification.aps.alert;
+          } else {
+            if (notification.aps.alert.body) {
+              body = notification.aps.alert.body;
+            }
+
+            if (notification.aps.alert.title) {
+              title = notification.aps.alert.title;
+            }
+          }
+        }
+
+        await this.alertService.showSubmitAlert(
+          title,
+          body,
+          'cancel',
+          'open'
+        );
+        window.location.href = await notifications.getDAppUrlFromNotification(notification);
+      } catch (ex) { }
+
+      // set that this notification was opened
+      notification.evanNotificationOpened = true;
+    }
+  }
+
+  /**
+   * Return the count of top right buttons that should be displayed (queue, mail, log)
+   *
+   * @return     {number}  Number of buttons to show
+   */
   queueButtonCount() {
     return [
       this.evanQueue.queue.entries.length > 0,
@@ -349,5 +453,14 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
     await this.logging.logQuestionAlert();
 
     this.ref.detectChanges();
+  }
+
+  /**
+   * Opens an explorer for the current opened DApp.
+   */
+  private openExplorer() {
+    const dappToOpen = this.routing.getRouteFromUrl(window.location.hash).split('/').pop();
+
+    this.routing.navigate(`/explorer.${ getDomainName() }/${ dappToOpen }`);
   }
 }

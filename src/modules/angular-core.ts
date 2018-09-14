@@ -1,44 +1,46 @@
 /*
-  Copyright (C) 2018-present evan GmbH. 
-  
+  Copyright (C) 2018-present evan GmbH.
+
   This program is free software: you can redistribute it and/or modify it
-  under the terms of the GNU Affero General Public License, version 3, 
-  as published by the Free Software Foundation. 
-  
-  This program is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  under the terms of the GNU Affero General Public License, version 3,
+  as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Affero General Public License for more details. 
-  
-  You should have received a copy of the GNU Affero General Public License along with this program.
-  If not, see http://www.gnu.org/licenses/ or write to the
-  
-  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
-  
-  or download the license from the following URL: https://evan.network/license/ 
-  
-  You can be released from the requirements of the GNU Affero General Public License
-  by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts of it
-  on other blockchains than evan.network. 
-  
-  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+  See the GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see http://www.gnu.org/licenses/ or
+  write to the Free Software Foundation, Inc., 51 Franklin Street,
+  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
+  the following URL: https://evan.network/license/
+
+  You can be released from the requirements of the GNU Affero General Public
+  License by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts
+  of it on other blockchains than evan.network.
+
+  For more information, please contact evan GmbH at this address:
+  https://evan.network/license/
 */
 
 import {
-  NgModule, ErrorHandler, enableProdMode,   // @angular/core
+  BrowserAnimationsModule,                  // @angular/platform-browser/animations'
+  Camera,                                   // @ionic-native/camera
   CommonModule, registerLocaleData,         // @angular/common
-  RouterModule, Routes, RouteReuseStrategy, // @angular/router
+  File,                                     // @ionic-native/file
+  FileOpener,                               // @ionic-native/file-opener
   FormsModule,                              // @angular/forms
   IonicModule, IonicApp,                    // ionic-angular
-  TranslateModule, TranslateService,        // @ngx-translate/core
-  BrowserAnimationsModule,                  // @angular/platform-browser/animations'
-  NgCircleProgressModule,                   // ng-circle-progress
   IonTagsInputModule,                       // ionic-tags-input
-  ZXingScannerModule,                       // qr-code-scanner module
-  Camera,                                   // @ionic-native/camera
+  languages,                                // everything from @angular/common/locales
+  NgCircleProgressModule,                   // ng-circle-progress
+  NgModule, ErrorHandler, enableProdMode,   // @angular/core
   QRScanner,                                // @ionic-native/qr-scanner
-  languages                                 // everything from @angular/common/locales
+  RouterModule, Routes, RouteReuseStrategy, // @angular/router
+  TranslateModule, TranslateService,        // @ngx-translate/core
+  ZXingScannerModule,                       // qr-code-scanner module
 } from 'angular-libs';
 
 // services
@@ -68,25 +70,26 @@ import { SingletonService } from '../services/singleton-service';
 import { EvanLoggingService } from '../services/ui/logging';
 
 // components
-import { DAppLoaderComponent } from '../components/dapp-loader/dapp-loader';
-import { BlockieComponent } from '../components/blockie/blockie';
-import { EvanLoadingComponent } from '../components/evan-loading/evan-loading';
-import { EvanSplitPaneComponent } from '../components/split-pane/split-pane';
-import { NotImplementedComponent } from '../components/not-implemented/not-implemented';
-import { EvanReloadComponent } from '../components/reload-route/reload-route';
-import { EmptyDAppDisplayComponent } from '../components/empty-dapp-display/empty-dapp-display';
-import { MailDialogComponent } from '../components/mail-dialog/mail-dialog';
-import { GlobalPasswordComponent } from '../components/global-password/global-password';
-import { TrustDialogComponent } from '../components/trust-dialog/trust-dialog';
-import { ContractMembersComponent } from '../components/contract-members/contract-members';
-import { EvanDAppWrapperComponent } from '../components/dapp-wrapper/dapp-wrapper';
-import { SnapshotDialogComponent } from '../components/take-snapshot/take-snapshot';
-import { QRCodeScannerDialogComponent } from '../components/qr-code-scanner/qr-code-scanner';
-import { DashboardTopButtons } from '../components/dashboard-top-buttons/dashboard-top-buttons';
 import { BigPictureDialog } from '../components/big-picture/big-picture';
-import { EvanFileSelectComponent } from '../components/file-select/file-select';
-import { ListPagingComponent } from '../components/list-paging/list-paging';
+import { BlockieComponent } from '../components/blockie/blockie';
 import { ContractListEntriesComponent } from '../components/contract-listentries/contract-listentries';
+import { ContractMembersComponent } from '../components/contract-members/contract-members';
+import { DAppLoaderComponent } from '../components/dapp-loader/dapp-loader';
+import { DashboardTopButtons } from '../components/dashboard-top-buttons/dashboard-top-buttons';
+import { EmptyDAppDisplayComponent } from '../components/empty-dapp-display/empty-dapp-display';
+import { EvanDAppWrapperComponent } from '../components/dapp-wrapper/dapp-wrapper';
+import { EvanFileSelectComponent } from '../components/file-select/file-select';
+import { EvanLoadingComponent } from '../components/evan-loading/evan-loading';
+import { EvanReloadComponent } from '../components/reload-route/reload-route';
+import { EvanSplitPaneComponent } from '../components/split-pane/split-pane';
+import { GlobalPasswordComponent } from '../components/global-password/global-password';
+import { ListPagingComponent } from '../components/list-paging/list-paging';
+import { MailDialogComponent } from '../components/mail-dialog/mail-dialog';
+import { NotImplementedComponent } from '../components/not-implemented/not-implemented';
+import { QrCodeComponent } from '../components/qr-code/qr-code';
+import { QRCodeScannerDialogComponent } from '../components/qr-code-scanner/qr-code-scanner';
+import { SnapshotDialogComponent } from '../components/take-snapshot/take-snapshot';
+import { TrustDialogComponent } from '../components/trust-dialog/trust-dialog';
 
 // pipes
 import { ObjectToArrayPipe } from '../pipes/ObjectToArray';
@@ -118,31 +121,32 @@ const moduleConfig = {
       animationDuration: 300
     }),
     // ZXing scanner module
-    ZXingScannerModule.forRoot()
+    ZXingScannerModule.forRoot(),
   ],
   declarations: [
-    DAppLoaderComponent,
-    BlockieComponent,
-    EvanLoadingComponent,
-    EvanSplitPaneComponent,
-    ObjectToArrayPipe,
-    ObjectKeysPipe,
-    NotImplementedComponent,
-    EvanReloadComponent,
-    EmptyDAppDisplayComponent,
-    MailDialogComponent,
-    GlobalPasswordComponent,
-    OneTimeDirective,
-    TrustDialogComponent,
-    SnapshotDialogComponent,
-    QRCodeScannerDialogComponent,
-    ContractMembersComponent,
-    EvanDAppWrapperComponent,
-    DashboardTopButtons,
     BigPictureDialog,
-    EvanFileSelectComponent,
-    ListPagingComponent,
+    BlockieComponent,
     ContractListEntriesComponent,
+    ContractMembersComponent,
+    DAppLoaderComponent,
+    DashboardTopButtons,
+    EmptyDAppDisplayComponent,
+    EvanDAppWrapperComponent,
+    EvanFileSelectComponent,
+    EvanLoadingComponent,
+    EvanReloadComponent,
+    EvanSplitPaneComponent,
+    GlobalPasswordComponent,
+    ListPagingComponent,
+    MailDialogComponent,
+    NotImplementedComponent,
+    ObjectKeysPipe,
+    ObjectToArrayPipe,
+    OneTimeDirective,
+    QrCodeComponent,
+    QRCodeScannerDialogComponent,
+    SnapshotDialogComponent,
+    TrustDialogComponent,
   ],
   providers : [
     AngularCoreTranslations,
@@ -169,6 +173,8 @@ const moduleConfig = {
     EvanToastService,
     EvanTranslationService,
     EvanUtilService,
+    File,
+    FileOpener,
     ObjectKeysPipe,
     ObjectToArrayPipe,
     QRScanner,
@@ -186,25 +192,26 @@ const moduleConfig = {
     IonTagsInputModule,
 
     // components
-    DAppLoaderComponent,
-    BlockieComponent,
-    EvanLoadingComponent,
-    EvanSplitPaneComponent,
-    NotImplementedComponent,
-    EvanReloadComponent,
-    EmptyDAppDisplayComponent,
-    MailDialogComponent,
-    GlobalPasswordComponent,
-    TrustDialogComponent,
-    SnapshotDialogComponent,
-    QRCodeScannerDialogComponent,
-    ContractMembersComponent,
-    EvanDAppWrapperComponent,
-    DashboardTopButtons,
     BigPictureDialog,
-    EvanFileSelectComponent,
-    ListPagingComponent,
+    BlockieComponent,
     ContractListEntriesComponent,
+    ContractMembersComponent,
+    DAppLoaderComponent,
+    DashboardTopButtons,
+    EmptyDAppDisplayComponent,
+    EvanDAppWrapperComponent,
+    EvanFileSelectComponent,
+    EvanLoadingComponent,
+    EvanReloadComponent,
+    EvanSplitPaneComponent,
+    GlobalPasswordComponent,
+    ListPagingComponent,
+    MailDialogComponent,
+    NotImplementedComponent,
+    QrCodeComponent,
+    QRCodeScannerDialogComponent,
+    SnapshotDialogComponent,
+    TrustDialogComponent,
 
     // pipes
     ObjectToArrayPipe,

@@ -1,41 +1,58 @@
 /*
-  Copyright (C) 2018-present evan GmbH. 
-  
+  Copyright (C) 2018-present evan GmbH.
+
   This program is free software: you can redistribute it and/or modify it
-  under the terms of the GNU Affero General Public License, version 3, 
-  as published by the Free Software Foundation. 
-  
-  This program is distributed in the hope that it will be useful, 
-  but WITHOUT ANY WARRANTY; without even the implied warranty of 
+  under the terms of the GNU Affero General Public License, version 3,
+  as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Affero General Public License for more details. 
-  
-  You should have received a copy of the GNU Affero General Public License along with this program.
-  If not, see http://www.gnu.org/licenses/ or write to the
-  
-  Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA, 02110-1301 USA,
-  
-  or download the license from the following URL: https://evan.network/license/ 
-  
-  You can be released from the requirements of the GNU Affero General Public License
-  by purchasing a commercial license.
-  Buying such a license is mandatory as soon as you use this software or parts of it
-  on other blockchains than evan.network. 
-  
-  For more information, please contact evan GmbH at this address: https://evan.network/license/ 
+  See the GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see http://www.gnu.org/licenses/ or
+  write to the Free Software Foundation, Inc., 51 Franklin Street,
+  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
+  the following URL: https://evan.network/license/
+
+  You can be released from the requirements of the GNU Affero General Public
+  License by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts
+  of it on other blockchains than evan.network.
+
+  For more information, please contact evan GmbH at this address:
+  https://evan.network/license/
 */
 
 import {
-  Component, OnInit, Input, Output,  // @angular/core
-  Observable, ChangeDetectorRef,
-  EventEmitter
+  ChangeDetectorRef,
+  Component,
+  ControlValueAccessor,
+  DomSanitizer,
+  ElementRef,
+  EventEmitter,
+  forwardRef,
+  Input,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  Observable,
+  OnInit,
+  Output,
+  ViewChild,
 } from 'angular-libs';
 
 import {
   EvanRoutingService
 } from '../../services/ui/routing'
 
-//TODO: this is not finished and not working!
+import {
+  EvanUtilService
+} from '../../services/utils';
+
+import {
+  EvanFileService
+} from '../../services/ui/files'
 
 
 /**************************************************************************************************/
@@ -54,14 +71,26 @@ import {
  */
 @Component({
   selector: 'evan-file-select',
-  templateUrl: 'file-select.html'
+  templateUrl: 'file-select.html',
+  providers: [
+    { 
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => EvanFileSelectComponent),
+      multi: true,
+    }
+  ]
 })
-export class EvanFileSelectComponent implements OnInit {
+export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
   /***************** inputs & outpus *****************/
   /**
    * this component is displayed like an ionic input, defines property or hides it
    */
   @Input() label: string;
+
+  /**
+   * optional button text that should be displayed for the add button
+   */
+  @Input() buttonText: string;
 
   /**
    * files that should be uploaded
@@ -74,6 +103,16 @@ export class EvanFileSelectComponent implements OnInit {
   @Input() disabled: boolean;
 
   /**
+   * input type="file" accept attribute
+   */
+  @Input() accept: string;
+
+  /**
+   * enable download of files
+   */
+  @Input() downloadable: boolean;
+
+  /**
    * minimum amount of files that must be uploaded
    */
   @Input() minFiles: number;
@@ -83,34 +122,116 @@ export class EvanFileSelectComponent implements OnInit {
    */
   @Input() maxFiles: number;
 
+  /**
+   * are multiple files allowed?
+   */
+  @Input() multiple: boolean = true;
+
+  /**
+   * Event emitter to tell using component, that something has changed
+   */
+  @Output() onChange: EventEmitter<any> = new EventEmitter();
+
+
   /*****************    variables    *****************/
+
+  /**
+   * input element for selection more items
+   */
+  @ViewChild('fileSelect') fileSelect: ElementRef;
+
+  /**
+   * dropArea for files
+   */
+  @ViewChild('dropArea') dropArea: ElementRef;
+
   /**
    * check if min files and max files requirements are resolved
    */
   public isValid: boolean;
+
   /**
-   * { item_description }
+   * true when file selector was opened initially
    */
-  private files: Array<any>;
+  public touched: boolean;
+
+  /**
+   * From ControlValueAccessor interface
+   */
+  private onTouchedCallback: Function;
+
+  /**
+   * allow the drop of files
+   */
+  private allowDropZone: boolean;
+
+  /**
+   * only deny drop, if one second after the event triggered, no dragover event occures
+   */
+  private denyDropTimeout: any;
 
   /***************** initialization  *****************/
   constructor(
-    private ref: ChangeDetectorRef
+    private ref: ChangeDetectorRef,
+    private utils: EvanUtilService,
+    private _DomSanitizer: DomSanitizer,
+    private fileService: EvanFileService
   ) { }
 
   ngOnInit() {
     this.ref.detach();
 
-    this.files = [ ];
     this.ngModel = this.ngModel || [ ];
 
     this.setIsValid();
 
+    if (this.downloadable) {
+      const urlCreator = (<any>window).URL || (<any>window).webkitURL;
+
+      for (let file of this.ngModel) {
+        let blob = file;
+        if (file.file) {
+          // check if the file is a JSON.parsed buffer and convert it back
+          if(file.file.type === 'Buffer' && file.file.data) {
+            file.file = new Uint8Array(file.file.data);
+          }
+          blob = new Blob([file.file], { type: file.type });
+        }
+        const blobUri = urlCreator.createObjectURL(blob);
+        file.blob = blob;
+        file.blobURI = this._DomSanitizer.bypassSecurityTrustUrl(blobUri);
+      }
+    }
+
     this.ref.detectChanges();
   }
 
+  /**
+   * Append this functions to handle a correct formular reaction including name, required and so on.
+   */
+  writeValue(value: any) {
+    this.ngModel = value;
+  }
+  propagateChange = (_: any) => {};
+  registerOnChange(fn) {
+    this.propagateChange = fn;
+  }
+  registerOnTouched(fn: any) {
+    this.onTouchedCallback = fn;
+  }
+
   /*****************    functions    *****************/
+  /**
+   * Is everything is valid?
+   *
+   * @return     {<type>}  { description_of_the_return_value }
+   */
   setIsValid() {
+    // if is valid was set before (not first time) set the is touched 
+    if (typeof this.isValid !== 'undefined') {
+      this.touched = true;
+    }
+
     this.isValid = true;
 
     if (this.minFiles && this.ngModel.length < this.minFiles) {
@@ -120,20 +241,145 @@ export class EvanFileSelectComponent implements OnInit {
     if (this.maxFiles && this.ngModel.length > this.maxFiles) {
       this.isValid = false;
     }
+
+    this.onChange.emit(this.ngModel);
+    this.ref.detectChanges();
   }
 
   /**
    * Add new files to the file upload list
    */
   selectFiles() {
+    this.fileSelect.nativeElement.click();
+  }
 
+  /**
+   * Is triggered when files were changed.
+   */
+  filesChanged($event) {
+    // if only one file should be selected, clear the input
+    if (!this.multiple) {
+      this.ngModel.splice(0, this.ngModel.length);
+    }
+
+    var target = $event.target || $event.srcElement;
+    for (let i = 0; i < target.files.length; i++) {
+      const file = target.files[i];
+      const found = this.ngModel.filter(existing => existing.name === file.name).length > 0;
+
+      if (!found) {
+        this.ngModel.push(file);
+      }
+    }
+
+    // set is valid
+    this.setIsValid();
+
+    // reset the file input array
+    this.fileSelect.nativeElement.value = "";
+
+    this.onChange.emit(this.ngModel);
+    this.ref.detectChanges();
+  }
+
+  /**
+   * Is triggered when files were dropped.
+   */
+  filesDropped($event) {
+    if (this.disabled) {
+      return;
+    }
+    // if only one file should be selected, clear the input
+    if (!this.multiple) {
+      this.ngModel.splice(0, this.ngModel.length);
+    }
+
+    // stop event bubbling
+    $event.preventDefault();
+    $event.stopPropagation();
+
+    for (let i = 0; i < $event.dataTransfer.files.length; i++) {
+      const file = $event.dataTransfer.files[i];
+      const found = this.ngModel.filter(existing => existing.name === file.name).length > 0;
+
+      if (!found) {
+        this.ngModel.push(file);
+      }
+    }
+
+    this.allowDropZone = false;
+
+    this.onChange.emit(this.ngModel);
+    this.ref.detectChanges();
+  }
+
+  /**
+   * allows the drop of files
+   *
+   * @param      {object}  ev      drop event
+   */
+  allowDrop(ev) {
+    if (this.disabled) {
+      return;
+    }
+
+    if (this.denyDropTimeout) {
+      window.clearTimeout(this.denyDropTimeout);
+    }
+
+    ev.preventDefault();
+    this.allowDropZone = true;
+    this.ref.detectChanges();
+  }
+
+  /**
+   * deny the drop of files
+   *
+   * @param      {object}  ev      drop event
+   */
+  denyDrop(ev) {
+    if (this.disabled) {
+      return;
+    }
+
+    if (this.denyDropTimeout) {
+      window.clearTimeout(this.denyDropTimeout);
+    }
+
+    this.denyDropTimeout = setTimeout(() => {
+      ev.preventDefault();
+      this.allowDropZone = false;
+      this.ref.detectChanges();
+    }, 100);
   }
 
   /**
    * Remove a newly selected file from the upload list
+   *
+   * @param      {file}    file    file object that should be removed
+   * @param      {number}  index   index of the file within the ngModel
    */
-  removeFiles(file: any) {
-    this.files.splice(this.files.indexOf(file));
-    this.ngModel.splice(this.ngModel.indexOf(file));
+  removeFile(file: any, index: number) {
+    this.ngModel.splice(index, 1);
+    this.setIsValid();
+
+    this.onChange.emit(this.ngModel);
+    this.ref.detectChanges();
+  }
+
+  /**
+   * Parse the file size to a human readable format
+   *
+   * @param      {number}  size    size in B
+   * @return     {string}  XXX KB / XXX MB
+   */
+  parseFileSize(size: number) {
+    if ((size / 1000000) > 1) {
+      return `${ (size / 1000000).toFixed(2) } MB`;
+    } else if ((size / 1000) > 1) {
+      return `${ (size / 1000).toFixed(2) } KB`;
+    } else {
+      return `${ size.toFixed(2) }B`;
+    }
   }
 }

@@ -1,6 +1,6 @@
 {
-  "license": "AGPL-3.0-only",
   "author": "Contractus",
+  "homepage": "https://evannetwork.github.io/",
   "keywords": [
     "blockchain",
     "ethereum",
@@ -13,11 +13,16 @@
     "DApp",
     "SASS"
   ],
+  "license": "AGPL-3.0-only",
   "main": "dist/index.js",
   "name": "@evan.network/ui-angular-core",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:evannetwork/ui-angular-core.git"
+  },
   "scripts": {
     "compodoc": "./node_modules/.bin/compodoc -p src/tsconfig.json"
   },
   "typings": "dist/index.d.ts",
-  "version": "1.0.2"
+  "version": "1.2.0"
 }
