@@ -7,6 +7,7 @@
 - add download function for mobile devices
 - add ionic-file-opener support for file download
 - ExecutorAgent support
+- add qr-code display component
 
 ### Fixes
 - fill empty members array within contract-members component as fallback
