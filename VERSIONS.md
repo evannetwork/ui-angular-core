@@ -2,6 +2,11 @@
 
 ## Next Version
 ### Features
+### Fixes
+### Deprecations
+
+## Version 1.2.0
+### Features
 - file selector for display attached files
 - add getNameForAccount to utils function
 - add download function for mobile devices
