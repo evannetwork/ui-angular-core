@@ -209,7 +209,7 @@ export const de = {
     'log_question_title': 'Fehler senden',
     'log_question_message': `
       Senden Sie Fehler zu Analysezwecken an die evan.network Entwickler.<br>
-      Nutzen Sie "Fehler senden" um nur die aufgetretenen Fehler zu senden.<br>
+      Nutzen Sie "Fehler senden", um nur die aufgetretenen Fehler zu senden.<br>
       Mit Hilfe von "Detailierte Auswertung senden" lässt sich die vollständige Historie der Applikation
       auswerten, filtern und versenden.
     `,
