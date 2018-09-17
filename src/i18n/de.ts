@@ -56,16 +56,16 @@ export const de = {
         <ul>
           <li>offline</li>
           <li>schnell</li>
-          <li>leicht gewichtig</li>
+          <li>leichtgewichtig</li>
         </ul>
 
         <div class="evan-seperator"></div>
-        Um diese Daten in die Blockchain zu persitieren, navigiere mit den
+        Um diese Daten in die Blockchain zu persitieren, navigieren Sie mit den
         folgenden Interaktionsmöglichkeiten zur Queue Übersicht:
 
         <ul>
           <li>der <b>hellblaue Button</b> in der <b>oberen, rechten</b> Ecke des Bildschirms</li>
-          <li>Nutze den <b>"zeigen"</b> Button in der <b>Toast Benachrichtigung</b> in der
+          <li>Nutzen Sie den <b>"zeigen"</b> Button in der <b>Toast Benachrichtigung</b> in der
           <b>unteren</b> Seite des Bildschirms</li>
         </ul>
       `,
@@ -75,22 +75,22 @@ export const de = {
     },
     'queue-hint': 'Datensynchronisation',
     'queue-hint-description': `
-      Diese Übersicht enthält alle für Sie lokal gespeicherten Daten. Durch klicken auf
+      Diese Übersicht enthält alle für Sie lokal gespeicherten Daten. Durch Klicken auf
       "Synchronisation starten" werden die Daten des jeweiligen Segments permantent gespeichert.
       <br><br>
       <b>Bitte beachten:</b><br><br> Die Synchronisation kann mehrere Minuten in Anspruch nehmen.<br>
-      Bitte schließen sie nicht diese Seite / Applikation.<br>
+      Bitte schließen Sie nicht diese Seite / Applikation.<br>
       Sie können während dessen jede andere Seite der Evan Applikation verwenden.
     `,
     'sync-finished': 'Synchronisation abgeschlossen',
     'show': 'Anzeigen',
     'removeQueueEntry': 'Eintrag entfernen',
-    'removeQueueEntryDescription': `Wollen sie diesen Eintrag wirklich löschen? Er wird permanent
+    'removeQueueEntryDescription': `Wollen Sie diesen Eintrag wirklich löschen? Er wird permanent
      von dem lokalen Speicher entfern.
     `,
     'remove': 'Entfernen',
     'slider': {
-      '0': 'Synchronisations Status',
+      '0': 'Synchronisations-Status',
       '1': 'Zu speichernde Daten',
       '2': 'Zu speichernde Daten'
     },
@@ -99,20 +99,20 @@ export const de = {
     'retry': 'Erneut versuchen...',
     'retry-description': `
       Meistens werden Synchronisationsprobleme durch Netzwerkeinschränkungen verursacht.
-      Bitte versuchen sie es erneut.
+      Bitte versuchen Sie es erneut.
     `,
     'empty-queue': 'Keine Daten zur Synchronisation verfügbar',
-    'empty-queue-description': 'Es existieren keine Daten zum Synchronisieren. Sie können mit ihrer Arbeit fortfahren.',
+    'empty-queue-description': 'Es existieren keine Daten zum Synchronisieren. Sie können mit Ihrer Arbeit fortfahren.',
     'go-back': 'Zurück',
     'sync-all': 'Alle Daten synchronisieren',
     'synchronising': 'Synchronisieren...',
     'enable-auto-sync': 'Automatische Synchronisierung',
     'configuration': 'Konfiguration',
     'enable-auto-sync-desc': `
-      Die automatische Synchronisierung ermöglicht das sofortige speichern Ihrer lokalen Daten.
+      Die automatische Synchronisierung ermöglicht das sofortige Speichern Ihrer lokalen Daten.
       <br><br>
-      Wenn sie disen Prozess manuell handhaben wollen, um Ihre lokalen Änderungen zu überprüfen,
-      können sie die automatische Synchronisation stoppen.
+      Wenn Sie disen Prozess manuell handhaben wollen, um Ihre lokalen Änderungen zu überprüfen,
+      können Sie die automatische Synchronisation stoppen.
     `,
     'detail-view': 'Ausführliche Synchronisationsdaten anzeigen',
     'sidepanel-header': 'Synchronisation',
@@ -123,7 +123,7 @@ export const de = {
     'report-error': 'Fehler senden'
   },
   '_angularcore': {
-    'error-downloading': 'Fehler beim herunterladen der Datei aufgetreten.',
+    'error-downloading': 'Fehler beim Herunterladen der Datei aufgetreten.',
     'finished-downloading': 'Die Datei {{ fileName }} wurde erfolgreich in den Downloads gespeichert.',
     'new-notification': 'Neue Benachrichtigung',
     'load-more': 'Mehr laden...',
@@ -142,7 +142,7 @@ export const de = {
     'not-implemented': 'Bald verfügbar...',
     'no-alias': 'Kein Alias',
     'form-alert': {
-      'from-alias': 'Ihr Name der in der Anfrage gesendet werden soll',
+      'from-alias': 'Ihr Name, der in der Anfrage gesendet werden soll',
       'from-title': 'Betreff',
       'from-body': 'Nachricht',
       'submit': 'Bestätigen',
@@ -154,7 +154,7 @@ export const de = {
     'password': 'Passwort',
     'use-password': 'Entsperren',
     'logout': 'Abmelden',
-    'logout-desc': 'Wollen sie sich wirklich abmelden?',
+    'logout-desc': 'Wollen Sie sich wirklich abmelden?',
     'cancel': 'Abbrechen',
     'user-locked': 'Profil gesperrt',
     'invalid-password': 'Es wurde ein falsches Passwort angegeben...',
@@ -205,11 +205,11 @@ export const de = {
     "file-select": "Dateien auswählen"
   },
   '_logging': {
-    'logs-sent': 'Vielen Dank! Ihre logs wurden an evan.network Entwickler weitergeleitet.',
+    'logs-sent': 'Vielen Dank! Ihre Logs wurden an evan.network Entwickler weitergeleitet.',
     'log_question_title': 'Fehler senden',
     'log_question_message': `
-      Senden sie Fehler zu Analysezwecken an die evan.network Entwickler.<br>
-      Nutzen Sie "Fehler senden" um nur die aufgetrenen Fehler zu senden.<br>
+      Senden Sie Fehler zu Analysezwecken an die evan.network Entwickler.<br>
+      Nutzen Sie "Fehler senden" um nur die aufgetretenen Fehler zu senden.<br>
       Mit Hilfe von "Detailierte Auswertung senden" lässt sich die vollständige Historie der Applikation
       auswerten, filtern und versenden.
     `,
