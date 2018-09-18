@@ -462,7 +462,7 @@ export class EvanQueue implements OnDestroy {
       }
 
       // stop the recursive working when all sequences were runned
-      if (queueEntry.status >= queueEntry.dispatcher.sequence.length) {
+      if (queueEntry.status >= queueEntry.dispatcher.sequence.length) {        
         // notify user that the synchronisation is finished
         this.toastService.showToast({
           message: '_angularcorequeue.sync-finished',
@@ -476,17 +476,38 @@ export class EvanQueue implements OnDestroy {
           }
         }
 
+        // generate the queue id to get the queueId string
         const queueId = new QueueId(
           queueEntry.queueId.ensAddress,
           queueEntry.queueId.dispatcher,
           queueEntry.queueId.id,
         );
-        const queueIdString = queueId.getString();
-        if (EvanQueue.onFinishFuncs[queueIdString]) {
-          const finishFuncIds = Object.keys(EvanQueue.onFinishFuncs[queueIdString]);
 
-          for (let i = 0; i < finishFuncIds.length; i++) {
-            EvanQueue.onFinishFuncs[queueIdString][finishFuncIds[i]](queueEntry.results);
+        // get the queue id string to check, if listeners are available
+        const queueIdString = queueId.getString();
+        const splitQueueIdString = queueIdString.split('-');
+        const idsToCheck = [
+          queueIdString,
+          `splitQueueIdString[0]-splitQueueIdString[1]-*`,
+          `splitQueueIdString[0]-*-*`
+        ];
+
+        // iterate through all finish funcs and check if the queueId (ens-dispatcher-id) or the
+        // queueGeneralString is available (ens-dispatcher-*)
+        const onFinishKeys = Object.keys(EvanQueue.onFinishFuncs);
+        for (let i = 0; i < onFinishKeys.length; i++) {
+          // check all generalized queue id's
+          for (let x = 0; x < idsToCheck.length; x++) {
+            if (onFinishKeys[i] === idsToCheck[x] ) {
+              const finishFuncIds = Object.keys(EvanQueue.onFinishFuncs[idsToCheck[x]]);
+
+              // call all watching functions
+              for (let i = 0; i < finishFuncIds.length; i++) {
+                EvanQueue.onFinishFuncs[idsToCheck[x]][finishFuncIds[i]](
+                  queueEntry.results
+                );
+              }
+            }
           }
         }
 

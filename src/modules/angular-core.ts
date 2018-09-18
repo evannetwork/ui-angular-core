@@ -41,6 +41,7 @@ import {
   RouterModule, Routes, RouteReuseStrategy, // @angular/router
   TranslateModule, TranslateService,        // @ngx-translate/core
   ZXingScannerModule,                       // qr-code-scanner module
+  HttpModule,                               // @angular/http
 } from 'angular-libs';
 
 // services
@@ -122,6 +123,7 @@ const moduleConfig = {
     }),
     // ZXing scanner module
     ZXingScannerModule.forRoot(),
+    HttpModule,
   ],
   declarations: [
     BigPictureDialog,

@@ -43,7 +43,7 @@ export class QueueId {
    * use force reload to disable alert when current opened ens address is the
    * same as the currently finished dispatcher
    */
-  constructor(ensAddress: string, dispatcher: string, id: string, forceReload?: boolean) {
+  constructor(ensAddress: string, dispatcher: string, id: string = '*', forceReload?: boolean) {
     this.ensAddress = ensAddress;
     this.dispatcher = dispatcher;
     this.id = id;
@@ -53,7 +53,7 @@ export class QueueId {
   /**
    * return the queue id concadinated to a unique string
    *
-   * @return     {<type>}  The string.
+   * @return     {<type>}  queue id string
    */
   getString() {
     return `${ this.ensAddress }-${ this.dispatcher }-${ this.id }`;
