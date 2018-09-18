@@ -2,6 +2,9 @@
 
 ## Next Version
 ### Features
+- add Wildcard QueueService subscriptions
+  => new QueueId('ensAddress', 'dispatcher', 'id') will trigger queueService.onQueueFinish(new QueueId('ensAddress', '*', '*'), ...)
+
 ### Fixes
 ### Deprecations
 
