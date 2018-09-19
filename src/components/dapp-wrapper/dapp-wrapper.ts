@@ -461,6 +461,6 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
   private openExplorer() {
     const dappToOpen = this.routing.getRouteFromUrl(window.location.hash).split('/').pop();
 
-    this.routing.navigate(`/explorer.${ getDomainName() }/${ dappToOpen }`);
+    this.routing.navigate(`/explorer.${ getDomainName() }/detail/${ dappToOpen }`);
   }
 }

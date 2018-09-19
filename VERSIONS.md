@@ -2,10 +2,13 @@
 
 ## Next Version
 ### Features
-- add Wildcard QueueService subscriptions
-  => new QueueId('ensAddress', 'dispatcher', 'id') will trigger queueService.onQueueFinish(new QueueId('ensAddress', '*', '*'), ...)
+- add Wildcard `QueueService` subscriptions
+  => `new QueueId('ensAddress', 'dispatcher', 'id')` will trigger `queueService.onQueueFinish(new QueueId('ensAddress', '*', '*'), ...)`
+- add `evan-dev-dapps-domain` to utils
 
 ### Fixes
+- move explorer link while dev mode is enabled to a seperated icon (reload was broken)
+
 ### Deprecations
 
 ## Version 1.2.0
