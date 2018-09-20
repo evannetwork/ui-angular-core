@@ -102,8 +102,8 @@ export class EvanAlertService {
   }
 
   /**
-   * Shows an alert with an submit and an cancel and returns an Promise, that is
-   * resolve by clicking on the specific button.
+   * Shows an alert with an submit and an cancel and returns an Promise, that is resolve by clicking
+   * on the specific button.
    * 
    * Usage:
    *   await this
@@ -117,15 +117,15 @@ export class EvanAlertService {
    *       'submit'
    *     );
    *
-   * @param      {string|any}  title       'title'      || { key: '',
-   *                                       translateOptions: { } }
-   * @param      {string|any}  message     'message'    || { key: '',
-   *                                       translateOptions: { } }
-   * @param      {string}      cancelText  'cancelText' || { key: '',
-   *                                       translateOptions: { } }
-   * @param      {string}      submitText  'submitText' || { key: '',
-   *                                       translateOptions: { } }
-   * @param      {Array<any>}  inputs      Inputs that should be displayed
+   * @param      {string|any}  title        'title'      || { key: '', translateOptions: { } }
+   * @param      {string|any}  message      'message'    || { key: '', translateOptions: { } }
+   * @param      {string}      cancelText   'cancelText' || { key: '', translateOptions: { } }
+   * @param      {string}      submitText   'submitText' || { key: '', translateOptions: { } }
+   * @param      {Array<any>}  inputs       Inputs that should be displayed
+   * @param      {string}      cancelClass  custom class for cancel button
+   * @param      {string}      submitClass  custom class for submit button
+   * @param      {<type>}      resolve      The resolve
+   * @param      {<type>}      reject       The reject
    * @return     {Promise}     promise that is deployed on button reject / resolve
    */
   showSubmitAlert(
@@ -133,12 +133,15 @@ export class EvanAlertService {
     message: string | any,
     cancelText = 'cancel',
     submitText?: string | any,
-    inputs = [ ]): Promise<any> {
+    inputs = [ ],
+    cancelClass?: string,
+    submitClass?: string): Promise<any> {
     return new Promise((resolve, reject) => {
       const buttons: Array<any> = [
         {
           text: cancelText,
           role: 'cancel',
+          cssClass: cancelClass || '',
           handler: data => {
             reject(data);
           }
@@ -148,6 +151,7 @@ export class EvanAlertService {
       if (submitText) {
         buttons.push({
           text: submitText,
+          cssClass: submitClass || '',
           handler: data => {
             resolve(data);
           }
