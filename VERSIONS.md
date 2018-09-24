@@ -8,6 +8,8 @@
 
 ### Fixes
 - move explorer link while dev mode is enabled to a seperated icon (reload was broken)
+- add timeout for history stack pushing (empty states will skipped, so goBack is working like expected)
+- fix push notification title / body on android
 
 ### Deprecations
 

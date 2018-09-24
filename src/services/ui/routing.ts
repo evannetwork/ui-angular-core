@@ -69,6 +69,7 @@ const originNavigateByUrl = Router.prototype.navigateByUrl;
  */
 let backbuttonAction;
 let backbuttonTimeout;
+let stackHistoryTimeout;
 
 /**
  * Takes an routeUrl, removes #, /#, #/ and returns the original hash value
@@ -107,9 +108,17 @@ Router.prototype.navigateByUrl = function(url: any, extras: any): Promise<any> {
   let urlTree = url instanceof UrlTree ? url : this.parseUrl(url);
   let mergedTree = this.urlHandlingStrategy.merge(urlTree, this.rawUrlTree);
 
+  // history stack history timeout to prevent pushing of empty routes
+  //   => Angular 5 router provides the functionality to 
+  if (stackHistoryTimeout) {
+    window.clearTimeout(stackHistoryTimeout);
+  }
+  
   // save latest location
-  routing.history.push(getRouteFromUrl(window.location.hash));
-  routing.updateHistory();
+  stackHistoryTimeout = setTimeout(() => {
+    routing.history.push(getRouteFromUrl(window.location.hash));
+    routing.updateHistory();
+  }, 100);
 
   // return this.scheduleNavigation(mergedTree, 'imperative', extras);
   // trigger navigation 

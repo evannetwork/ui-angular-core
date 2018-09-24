@@ -318,8 +318,8 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
 
       // ask the user
       try {
-        let title = '_angularcore.new-notification';
-        let body = '';
+        let title = notification.title || '_angularcore.new-notification';
+        let body = notification.body || '';
 
         // check for the notification text, on ios capsuled within the aps object, on android we use
         // simply the body attribute
