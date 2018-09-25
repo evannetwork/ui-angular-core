@@ -458,9 +458,34 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
   /**
    * Opens an explorer for the current opened DApp.
    */
-  private openExplorer() {
-    const dappToOpen = this.routing.getRouteFromUrl(window.location.hash).split('/').pop();
+  private async openExplorer() {
+    const dappsToOpen = this.routing.getRouteFromUrl(window.location.hash).split('/').reverse();
 
-    this.routing.navigate(`/explorer.${ getDomainName() }/detail/${ dappToOpen }`);
+    for (let dapp of dappsToOpen) {
+      let isValid = false;
+
+      // is it an contract?
+      isValid = isValid || dapp.indexOf('0x') === 0;
+
+      // has it an valid dbcp description
+      isValid = isValid || (await this.definitionService.getDescription(dapp)).status === 'valid';
+
+      // check if underlaying nameresolver contract address exists
+      if (!isValid) {
+        try {
+          const fifsAddress = await this.bccService.nameResolver.getAddress(dapp);
+
+          // if an valid address was set, overwrite the dapp to open
+          if (fifsAddress && fifsAddress !== '0x0000000000000000000000000000000000000000') {
+            dapp = fifsAddress;
+            isValid = true;
+          }
+        } catch (ex) { }
+      }
+
+      if (isValid) {
+        this.routing.navigate(`/explorer.${ getDomainName() }/detail/${ dapp }`);
+      }
+    }
   }
 }

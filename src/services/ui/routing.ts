@@ -115,8 +115,9 @@ Router.prototype.navigateByUrl = function(url: any, extras: any): Promise<any> {
   }
   
   // save latest location
+  const locationHash = window.location.hash;
   stackHistoryTimeout = setTimeout(() => {
-    routing.history.push(getRouteFromUrl(window.location.hash));
+    routing.history.push(getRouteFromUrl(locationHash));
     routing.updateHistory();
   }, 100);
 
