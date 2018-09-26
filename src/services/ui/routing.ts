@@ -462,28 +462,28 @@ export class EvanRoutingService {
    * Navigates to the dappprofile relative to the active dashboard
    */
   goToProfile() {
-    window.location.hash = routing.getActiveRootENS() + `/profile.${ getDomainName() }`
+    this.router.navigate([ `/${ routing.getActiveRootENS() }/profile.${ getDomainName() }` ]);
   }
 
   /**
    * Navigates to the dapp queue relative to the active dashboard
    */
   goToQueue() {
-    window.location.hash = routing.getActiveRootENS() + `/queue.${ getDomainName() }`
+    this.router.navigate([ `/${ routing.getActiveRootENS() }/queue.${ getDomainName() }` ]);
   }
 
   /**
    * Navigates to the dapp mailbox relative to the active dashboard
    */
   goToMails() {
-    window.location.hash = routing.getActiveRootENS() + `/mailbox.${ getDomainName() }`
+    this.router.navigate([ `/${ routing.getActiveRootENS() }/mailbox.${ getDomainName() }` ]);
   }
 
   /**
    * Navigates to the dapp logging relative to the active dashboard
    */
   goToLogging() {
-    window.location.hash = routing.getActiveRootENS() + `/logging.${ getDomainName() }`
+    this.router.navigate([ `/${ routing.getActiveRootENS() }/logging.${ getDomainName() }` ]);
   }
 
   /**
@@ -516,7 +516,6 @@ export class EvanRoutingService {
       config.queryParams = queryParams;
     }
 
-    // window.location.hash = `#${ this.router.createUrlTree([ route ], config) }`;
     this.router.navigate([ route ], config);
   }
 
