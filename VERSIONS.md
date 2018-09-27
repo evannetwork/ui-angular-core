@@ -5,6 +5,10 @@
 ### Fixes
 ### Deprecations
 
+## Version 1.2.2
+### Fixes
+- fix false builded dist folder
+
 ## Version 1.2.1
 ### Features
 - add Wildcard `QueueService` subscriptions
