@@ -368,7 +368,7 @@ export class EvanSplitPaneComponent extends AsyncComponent {
         this.rootDAppOpen(dapp);
       } else {
         if (dapp.dapp.standalone) {
-          window.location.hash = `#/${ dapp.ensAddress }`;
+          this.routing.navigate(`/${ dapp.ensAddress }`);
         } else {
           this.routing.navigate(`./${ dapp.ensAddress }`, true);
         }

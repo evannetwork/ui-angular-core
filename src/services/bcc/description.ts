@@ -151,8 +151,6 @@ export class EvanDescriptionService {
 
       this.descriptions[ensAddress] = description;
     } catch (ex) {
-      console.error(ex);
-
       return this.translate.getTranslatedDescription({
         status: 'invalid',
         name: ensAddress,

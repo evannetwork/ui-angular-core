@@ -55,10 +55,10 @@ export class EvanToastService {
    * require dependencies
    */
   constructor(
-    private toastCtrl: ToastController,
-    private translate: EvanTranslationService,
-    private utils: EvanUtilService,
     private singleton: SingletonService,
+    private toastCtrl: ToastController,
+    private utils: EvanUtilService,
+    public translate: EvanTranslationService,
   ) {
     lastToastService = this;
   }

@@ -586,6 +586,15 @@ export class EvanUtilService implements OnDestroy {
   }
 
   /**
+   * Checks if currently the evan-dapps-domain is enabled.
+   *
+   * @return     {string}  the defined domain.
+   */
+  getDevDomain() {
+    return window.localStorage['evan-dev-dapps-domain'];
+  }
+
+  /**
    * Transforms an Exception into an loggable string format. Returns the string if the exception is
    * only a string.
    *

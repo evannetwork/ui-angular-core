@@ -5,6 +5,18 @@
 ### Fixes
 ### Deprecations
 
+## Version 1.2.1
+### Features
+- add Wildcard `QueueService` subscriptions
+  => `new QueueId('ensAddress', 'dispatcher', 'id')` will trigger `queueService.onQueueFinish(new QueueId('ensAddress', '*', '*'), ...)`
+- add `evan-dev-dapps-domain` to utils
+
+### Fixes
+- move explorer link while dev mode is enabled to a seperated icon (reload was broken)
+- add timeout for history stack pushing (empty states will skipped, so goBack is working like expected)
+- fix goBack history stacking for mailbox, queue and profile navigations
+- fix push notification title / body on android
+
 ## Version 1.2.0
 ### Features
 - file selector for display attached files

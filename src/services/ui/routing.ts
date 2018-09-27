@@ -69,6 +69,7 @@ const originNavigateByUrl = Router.prototype.navigateByUrl;
  */
 let backbuttonAction;
 let backbuttonTimeout;
+let stackHistoryTimeout;
 
 /**
  * Takes an routeUrl, removes #, /#, #/ and returns the original hash value
@@ -107,9 +108,18 @@ Router.prototype.navigateByUrl = function(url: any, extras: any): Promise<any> {
   let urlTree = url instanceof UrlTree ? url : this.parseUrl(url);
   let mergedTree = this.urlHandlingStrategy.merge(urlTree, this.rawUrlTree);
 
+  // history stack history timeout to prevent pushing of empty routes
+  //   => Angular 5 router provides the functionality to 
+  if (stackHistoryTimeout) {
+    window.clearTimeout(stackHistoryTimeout);
+  }
+  
   // save latest location
-  routing.history.push(getRouteFromUrl(window.location.hash));
-  routing.updateHistory();
+  const locationHash = window.location.hash;
+  stackHistoryTimeout = setTimeout(() => {
+    routing.history.push(getRouteFromUrl(locationHash));
+    routing.updateHistory();
+  }, 100);
 
   // return this.scheduleNavigation(mergedTree, 'imperative', extras);
   // trigger navigation 
@@ -452,28 +462,28 @@ export class EvanRoutingService {
    * Navigates to the dappprofile relative to the active dashboard
    */
   goToProfile() {
-    window.location.hash = routing.getActiveRootENS() + `/profile.${ getDomainName() }`
+    this.router.navigate([ `/${ routing.getActiveRootENS() }/profile.${ getDomainName() }` ]);
   }
 
   /**
    * Navigates to the dapp queue relative to the active dashboard
    */
   goToQueue() {
-    window.location.hash = routing.getActiveRootENS() + `/queue.${ getDomainName() }`
+    this.router.navigate([ `/${ routing.getActiveRootENS() }/queue.${ getDomainName() }` ]);
   }
 
   /**
    * Navigates to the dapp mailbox relative to the active dashboard
    */
   goToMails() {
-    window.location.hash = routing.getActiveRootENS() + `/mailbox.${ getDomainName() }`
+    this.router.navigate([ `/${ routing.getActiveRootENS() }/mailbox.${ getDomainName() }` ]);
   }
 
   /**
    * Navigates to the dapp logging relative to the active dashboard
    */
   goToLogging() {
-    window.location.hash = routing.getActiveRootENS() + `/logging.${ getDomainName() }`
+    this.router.navigate([ `/${ routing.getActiveRootENS() }/logging.${ getDomainName() }` ]);
   }
 
   /**
@@ -506,7 +516,6 @@ export class EvanRoutingService {
       config.queryParams = queryParams;
     }
 
-    // window.location.hash = `#${ this.router.createUrlTree([ route ], config) }`;
     this.router.navigate([ route ], config);
   }
 

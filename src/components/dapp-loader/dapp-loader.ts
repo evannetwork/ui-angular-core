@@ -49,6 +49,11 @@ import { AsyncComponent } from '../../classes/AsyncComponent';
 // used for holding only next dapp timeout => look at ngAfterViewInit
 let timeoutForNextDApp;
 
+// check for recursive opened DApps and stop loading them!
+let lastStartedDApp;
+let multipleTimeout;
+let multipleLoadCount = 0;
+
 /**
  * Dynamic DApp loader component. Handles nested Angular DApps and loads the
  * latest ens address within the url.
@@ -175,6 +180,30 @@ export class DAppLoaderComponent extends AsyncComponent  {
    * Start the current detected angular application.
    */
   startDApp() {
+    // if the opened dapp has changed, reset the multiple load count 
+    if (lastStartedDApp !== this.dappToStart) {
+      lastStartedDApp = this.dappToStart;
+      multipleLoadCount = 0;
+
+      if (multipleTimeout) {
+        window.clearTimeout(multipleTimeout);
+      }
+
+      // reset the counter automatically after 3 seconds
+      multipleTimeout = setTimeout(() => {
+        lastStartedDApp = '';
+      }, 2000);
+    } else {
+      // raise the multiple load count
+      multipleLoadCount++;
+    }
+
+    // if 20 recursive dapps were opened within 3 seconds, stop loading!
+    if (multipleLoadCount === 10) {
+      this.utils.log(`Recursive DApp opening detected ${ this.dappToStart }`, 'error');
+      return;
+    }
+
     dapp.dappLoading = true;
 
     // to start a new angular application
