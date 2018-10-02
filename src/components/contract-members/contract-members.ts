@@ -106,6 +106,11 @@ export class ContractMembersComponent extends AsyncComponent {
   @Input() label?: string;
 
   /**
+   * replace input placeholder
+   */
+  @Input() placeholder?: string;
+
+  /**
    * already added user accounts
    */
   @Input() origin?: Array<string>;
@@ -114,6 +119,11 @@ export class ContractMembersComponent extends AsyncComponent {
    * show display or add mode
    */
   @Input() readonly?: boolean;
+
+  /**
+   * max users that can be added
+   */
+  @Input() maxMembers?: number;
 
   /**
    * Event trigger that is called when something has changed (account moved / removed)
@@ -363,7 +373,7 @@ export class ContractMembersComponent extends AsyncComponent {
    * @param      {string}  memberAddress  member address to add
    */
   private addMember(memberAddress?: string) {
-    if (memberAddress) {
+    if (memberAddress && this.canAddMember()) {
       this.members.push(memberAddress);
 
       this.contactSearch = '';
@@ -456,5 +466,14 @@ export class ContractMembersComponent extends AsyncComponent {
     this.touched = true;
     this.onChange.emit();
     this.ref.detectChanges();
+  }
+
+  /**
+   * Can be more members added?
+   *
+   * @return     {boolean}  True if able to add member, False otherwise.
+   */
+  private canAddMember(): boolean {
+    return !this.maxMembers || [ ].concat(this.members, this.origin).length < this.maxMembers;
   }
 }

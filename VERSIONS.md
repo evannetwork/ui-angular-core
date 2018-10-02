@@ -2,7 +2,11 @@
 
 ## Next Version
 ### Features
+- add maxMembers to `contract-members` component
+
 ### Fixes
+- fix wildcard queue onFinish functions to handle all cases of wildcard queue id's
+
 ### Deprecations
 
 ## Version 1.2.2
