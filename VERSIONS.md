@@ -3,6 +3,7 @@
 ## Next Version
 ### Features
 - add maxMembers to `contract-members` component
+- use `ui-dapp-browser` `bccHelper` to get profile instances, signers and password checking
 
 ### Fixes
 - fix wildcard queue onFinish functions to handle all cases of wildcard queue id's

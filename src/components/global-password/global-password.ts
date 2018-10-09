@@ -25,7 +25,12 @@
   https://evan.network/license/
 */
 
-import { lightwallet } from 'dapp-browser';
+import {
+  bccHelper,
+  lightwallet,
+} from 'dapp-browser';
+
+import * as bcc from 'bcc';
 
 import {
   Component, OnInit, OnDestroy, // @angular/core
@@ -157,24 +162,11 @@ export class GlobalPasswordComponent implements OnInit, AfterViewInit {
 
       // get a new Profile and check with the current password, if the private key can be resolved
       const accountId = this.accountId || this.core.activeAccount();
-      const profile = await this.bcc.getProfileForAccount(accountId);
-
-      profile.ipld.keyProvider.setKeysForAccount(
-        accountId,
-        lightwallet.getEncryptionKeyFromPassword(this.password)
-      );
-
-      let targetPrivateKey;
-      try {
-        targetPrivateKey = await profile.getContactKey(
-          accountId,
-          'dataKey'
-        );
-      } catch (ex) { }
+      const isValid = await bccHelper.isAccountPasswordValid(bcc, accountId, this.password);
 
       // if a private key can be solved, we used the correct password
       //  => resolve password
-      if (targetPrivateKey) {
+      if (isValid) {
         // overwrite hide initial loading to imitate the initial screen
         this.core.finishDAppLoading = async () => {
           const backupFinishDAppLoading = this.core.finishDAppLoading;
