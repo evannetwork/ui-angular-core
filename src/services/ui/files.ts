@@ -78,9 +78,9 @@ export class EvanFileService implements OnDestroy {
   public async readFilesAsArrayBuffer(files: Array<any>) {
     files = await Promise.all(
       files.map((file) => new Promise((resolve, reject) => {
-        if(file.file) {
+        if (file.file) {
           return resolve(file);
-        }                
+        }
         const fileReader = new FileReader();
 
         // when the file was loaded successfully, return the uploaded file object

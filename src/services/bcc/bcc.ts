@@ -30,9 +30,7 @@ import * as ProfileBundle from 'bcc';
 import * as SmartContracts from 'smart-contracts';
 import {
   AccountStore,
-  bccHelper,
   config,
-  core,
   getCoreOptions,
   getDomainName,
   getLatestKeyProvider,
@@ -42,6 +40,7 @@ import {
   updateCoreRuntime,
   web3,
   web3Helper,
+  core,
 } from 'dapp-browser';
 
 import {
@@ -186,7 +185,24 @@ export class EvanBCCService {
    * @return     {ProfileBundle.SignerInternal}  The signer.
    */
   getSigner(provider = this.core.getCurrentProvider()): ProfileBundle.SignerInternal {
-    return bccHelper.getSigner(ProfileBundle, provider);
+    let signer;
+    if (provider === 'internal') {
+      signer = new ProfileBundle.SignerInternal({
+        accountStore: new AccountStore(),
+        config: { },
+        contractLoader: CoreBundle.CoreRuntime.contractLoader,
+        web3: CoreBundle.CoreRuntime.web3,
+        logLog: CoreBundle.logLog,
+        logLogLevel: CoreBundle.logLogLevel
+      });
+    } else {
+      signer = new ProfileBundle.SignerExternal({
+        logLog: CoreBundle.logLog,
+        logLogLevel: CoreBundle.logLogLevel
+      })
+    }
+
+    return signer;
   }
 
 
@@ -295,7 +311,79 @@ export class EvanBCCService {
    * @return     {ProfileBundle.Profile}  The profile for account.
    */
   public getProfileForAccount(accountId: string): ProfileBundle.Profile {
-    return bccHelper.getProfileForAccount(ProfileBundle, accountId);
+    const keyProvider = new KeyProvider(
+      this.utils.deepCopy(getLatestKeyProvider().keys),
+      accountId,
+    );
+
+    const cryptoProvider = new CoreBundle.CryptoProvider({
+      unencrypted: new CoreBundle.Unencrypted(),
+      aes: new ProfileBundle.Aes(),
+      aesEcb: new ProfileBundle.AesEcb(),
+      logLog: CoreBundle.logLog,
+      logLogLevel: CoreBundle.logLogLevel
+    });
+
+    // set dummy encryption keys to prevent password dialog
+    // !Attention : Only public key can be get! If you want to get crypted values
+    //              set it by yourself
+    keyProvider.setKeysForAccount(
+      accountId,
+      lightwallet.getEncryptionKeyFromPassword('unencrypted')
+    );
+
+
+    const ipldInstance = new ProfileBundle.Ipld({
+      'ipfs': CoreBundle.CoreRuntime.dfs,
+      'keyProvider': keyProvider,
+      'cryptoProvider': cryptoProvider,
+      defaultCryptoAlgo: 'aes',
+      originator: accountId,
+      logLog: CoreBundle.logLog,
+      logLogLevel: CoreBundle.logLogLevel
+    });
+
+    const sharing = new ProfileBundle.Sharing({
+      contractLoader: this.contractLoader,
+      cryptoProvider: cryptoProvider,
+      description: this.description,
+      executor: this.executor,
+      dfs: CoreBundle.CoreRuntime.dfs,
+      keyProvider: keyProvider,
+      nameResolver: this.nameResolver,
+      defaultCryptoAlgo: 'aes',
+      logLog: CoreBundle.logLog,
+      logLogLevel: CoreBundle.logLogLevel
+    });
+
+    const dataContract = new ProfileBundle.DataContract({
+      cryptoProvider: cryptoProvider,
+      dfs: CoreBundle.CoreRuntime.dfs,
+      executor: this.executor,
+      loader: this.contractLoader,
+      nameResolver: this.nameResolver,
+      sharing: sharing,
+      web3: this.web3,
+      description: this.description,
+      logLog: CoreBundle.logLog,
+      logLogLevel: CoreBundle.logLogLevel
+    });
+
+    const evanProfile = new ProfileBundle.Profile({
+      ipld: ipldInstance,
+      nameResolver: this.nameResolver,
+      defaultCryptoAlgo: 'aes',
+      executor: this.executor,
+      contractLoader: this.contractLoader,
+      accountId: accountId,
+      dataContract,
+      logLog: CoreBundle.logLog,
+      logLogLevel: CoreBundle.logLogLevel
+    });
+
+    keyProvider.profile = evanProfile;
+
+    return evanProfile;
   }
 
   /**
@@ -304,7 +392,15 @@ export class EvanBCCService {
    * @param      {string}  accountId  Account id to set the exchange keys for
    */
   async setExchangeKeys(accountId = this.core.activeAccount()) {
-    await bccHelper.setExchangeKeys(ProfileBundle, accountId);
+    const targetPubKey = await this.profile.getPublicKey();
+    const targetPrivateKey = await this.profile.getContactKey(
+      accountId,
+      'dataKey'
+    );
+
+    if (!!targetPrivateKey) {
+      this.keyExchange.setPublicKey(targetPubKey, targetPrivateKey);
+    }
   }
 
   /**
