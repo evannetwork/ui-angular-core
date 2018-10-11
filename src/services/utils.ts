@@ -631,4 +631,24 @@ export class EvanUtilService implements OnDestroy {
         dif + pad(tzo / 60) +
         ':' + pad(tzo % 60);
   }
+
+  /**
+   * Shows the loading of a ref detached component
+   *
+   * @param      {any}  context  this of the component
+   */
+  public showLoading(context: any) {
+    context.loading = true;
+    context.ref.detectChanges();
+  }
+
+  /**
+   * Hides the loading of a ref detached component.
+   *
+   * @param      {any}  context  this of the component
+   */
+  public hideLoading(context: any) {
+    context.loading = false;
+    context.ref.detectChanges();
+  }
 }
