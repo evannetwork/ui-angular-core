@@ -26,10 +26,11 @@
 */
 
 import {
+  DomSanitizer,
   File,
+  FileOpener,
   Injectable,
   OnDestroy,
-  FileOpener,
 } from 'angular-libs';
 
 import { EvanUtilService } from '../utils';
@@ -65,7 +66,8 @@ export class EvanFileService implements OnDestroy {
     private file: File,
     private toast: EvanToastService,
     private translateService: EvanTranslationService,
-    private fileOpener: FileOpener
+    private fileOpener: FileOpener,
+    private _DomSanitizer: DomSanitizer
   ) { }
 
   /**
@@ -106,6 +108,54 @@ export class EvanFileService implements OnDestroy {
     // overwrite the attachments object with the crypto informations, how the data needs to
     // be decrypted
     return files;
+  }
+
+  /**
+   * Transform an array of files to be valid for display (including file, blob and blobURI)
+   *
+   * @param      {Array<any>}  files   array of files that should be checked
+   * @return     {Array<any>}      array of valid files
+   */
+  public async equalizeFileStructure(files: Array<any>) {
+    const urlCreator = (<any>window).URL || (<any>window).webkitURL;
+
+    const transformed = [ ];
+    for (let originalFile of files) {
+      // copy the file to break original file instance and recursive structures
+      const result: any = { };
+      for (var fileProp in originalFile) {
+        result[fileProp] = originalFile[fileProp];
+      }
+
+      // if a normal file object was applied, transform it!
+      if (!result.file && !result.blob) {
+        result.blob = originalFile;
+      }
+
+      if (result.file) {
+        // check if the file is a JSON.parsed buffer and convert it back
+        if (result.file.type === 'Buffer' && result.file.data) {
+          result.file = new Uint8Array(result.file.data);
+        }
+
+        result.blob = new Blob([ result.file ], { type: result.type });
+      }
+
+      // transform the file into an ArrayBuffer to expect everywhere the same value
+      result.file = await new Promise<any>((resolve, reject) => {
+        const file = new FileReader();
+        file.onload = (result) => resolve((<FileReader>result.target).result);
+        file.readAsArrayBuffer(result.blob);
+      });
+
+      // set blob and blobUri
+      result.blobUri = result.blobURI = this._DomSanitizer.bypassSecurityTrustUrl(
+        urlCreator.createObjectURL(result.blob));
+
+      transformed.push(result);
+    }
+    
+    return transformed;
   }
 
   /**

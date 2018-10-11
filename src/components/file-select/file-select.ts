@@ -54,6 +54,7 @@ import {
   EvanFileService
 } from '../../services/ui/files'
 
+import { AsyncComponent } from '../../classes/AsyncComponent';
 
 /**************************************************************************************************/
 /**
@@ -80,7 +81,7 @@ import {
     }
   ]
 })
-export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
+export class EvanFileSelectComponent extends AsyncComponent implements ControlValueAccessor {
   /***************** inputs & outpus *****************/
   /**
    * this component is displayed like an ionic input, defines property or hides it
@@ -172,15 +173,15 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
 
   /***************** initialization  *****************/
   constructor(
+    private _DomSanitizer: DomSanitizer,
+    private fileService: EvanFileService,
     private ref: ChangeDetectorRef,
     private utils: EvanUtilService,
-    private _DomSanitizer: DomSanitizer,
-    private fileService: EvanFileService
-  ) { }
+  ) {
+    super(ref);
+  }
 
-  ngOnInit() {
-    this.ref.detach();
-
+  async _ngOnInit() {
     this.ngModel = this.ngModel || [ ];
 
     this.setIsValid();
@@ -188,22 +189,10 @@ export class EvanFileSelectComponent implements OnInit, ControlValueAccessor {
     if (this.downloadable) {
       const urlCreator = (<any>window).URL || (<any>window).webkitURL;
 
-      for (let file of this.ngModel) {
-        let blob = file;
-        if (file.file) {
-          // check if the file is a JSON.parsed buffer and convert it back
-          if(file.file.type === 'Buffer' && file.file.data) {
-            file.file = new Uint8Array(file.file.data);
-          }
-          blob = new Blob([file.file], { type: file.type });
-        }
-        const blobUri = urlCreator.createObjectURL(blob);
-        file.blob = blob;
-        file.blobURI = this._DomSanitizer.bypassSecurityTrustUrl(blobUri);
+      for (let i = 0; i < this.ngModel.length; i++) {
+        this.ngModel[i] = (await this.fileService.equalizeFileStructure([ this.ngModel[i] ]))[0];
       }
     }
-
-    this.ref.detectChanges();
   }
 
   /**
