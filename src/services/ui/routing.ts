@@ -347,7 +347,7 @@ export class EvanRoutingService {
    * @return     {string}  dappName
    */
   getDAppNameFromRoutePath(routePath: string): string {
-    return utils.getDAppName(routePath.split('/').pop());
+    return decodeURI(utils.getDAppName(routePath.split('/').pop()));
   }
 
     /**

@@ -8,6 +8,7 @@
 
 ### Fixes
 - fix wildcard queue onFinish functions to handle all cases of wildcard queue id's
+- add `decodeURI` to `getDAppNameFromRoutePath` to handle spaces and special characters
 
 ### Deprecations
 
