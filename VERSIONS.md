@@ -5,6 +5,7 @@
 - add maxMembers to `contract-members` component
 - add `equalizeFileStructure` to `FileService` to be able to load and encrypt files and pictures using the same logic
 - add hide / show loading functions in to the `EvanUtilService` for quick usage in components with detached ref
+- add `sendMail` function to `EvanMailboxService`
 
 ### Fixes
 - fix wildcard queue onFinish functions to handle all cases of wildcard queue id's
