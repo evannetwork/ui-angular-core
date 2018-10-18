@@ -2,6 +2,11 @@
 
 ## Next Version
 ### Features
+### Fixes
+### Deprecations
+
+## Version 1.3.0
+### Features
 - add maxMembers to `contract-members` component
 - add `equalizeFileStructure` to `FileService` to be able to load and encrypt files and pictures using the same logic
 - add hide / show loading functions in to the `EvanUtilService` for quick usage in components with detached ref
@@ -10,8 +15,7 @@
 ### Fixes
 - fix wildcard queue onFinish functions to handle all cases of wildcard queue id's
 - add `decodeURI` to `getDAppNameFromRoutePath` to handle spaces and special characters
-
-### Deprecations
+- reduce total count of mails that could not be decrypted
 
 ## Version 1.2.2
 ### Fixes
