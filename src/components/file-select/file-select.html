@@ -24,7 +24,11 @@
   For more information, please contact evan GmbH at this address:
   https://evan.network/license/
 -->
-<div class="evan-relative" (drop)="filesDropped($event)" (dragover)="allowDrop($event)" (dragleave)="denyDrop($event)">
+<div class="evan-relative"
+  *ngIf="!loading"
+  (drop)="filesDropped($event)"
+  (dragover)="allowDrop($event)"
+  (dragleave)="denyDrop($event)">
   <div *ngIf="allowDropZone" class="dropzone"></div>
   <ion-label class="standalone" *ngIf="label">
     {{ label | translate }}

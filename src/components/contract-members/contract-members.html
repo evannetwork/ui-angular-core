@@ -32,7 +32,7 @@
     </ion-label>
     <ion-input #searchInput class="clickable" readonly
       (click)="openMenu()"
-      [placeholder]="groupedMemberKeys?.length > 0 ? '' : ('_angularcore.contract-members.search-text' | translate)">
+      [placeholder]="groupedMemberKeys?.length > 0 ? '' : ((placeholder || '_angularcore.contract-members.search-text') | translate)">
     </ion-input>
     <button ion-button icon-only round outline item-end class="person-add-button" (click)="openMenu()">
       <ion-icon name="person-add" *ngIf="!readonly"></ion-icon>
@@ -70,7 +70,8 @@
           <div margin-horinzontal *ngIf="suggestions?.length === 0">
             {{ '_angularcore.contract-members.no-suggestions' | translate }}
           </div>
-          <ion-item class="clickable"
+          <ion-item
+            [class.clickable]="canAddMember()"
             *ngFor="let suggestion of suggestions; let i = index"
             (click)="addMember(suggestion)">
             <ion-avatar item-start margin-right>
@@ -83,7 +84,7 @@
             <h2>{{ getContactAlias(suggestion) }}</h2>
             <span>{{ suggestion }}</span>
   
-            <button ion-button item-end icon-only clear>
+            <button ion-button item-end icon-only clear *ngIf="canAddMember()">
               <ion-icon name="add"></ion-icon>
             </button>
           </ion-item>

@@ -70,9 +70,19 @@ export class EvanMailboxService {
   private receivedMailLoadCount = 10;
 
   /**
+   * amount of received mails, that could not be decrypted
+   */
+  private invalidReceivedMailCount = 0;
+
+  /**
    * maximum mails to get for sent mails
    */
   private sentMailLoadCount = 10;
+
+  /**
+   * amount of sent mails, that could not be decrypted
+   */
+  private invalidSentMailCount = 0;
 
   /**
    * profile queue id, for saving sharing keys, ..
@@ -103,6 +113,12 @@ export class EvanMailboxService {
    * queue id to handle mail sending
    */
   public sendMailQueueId: QueueId;
+
+  /**
+   * queue id to handle mail sending
+   */
+  public answerMailQueueId: QueueId;
+
 
   /**
    * send mail cache
@@ -137,6 +153,11 @@ export class EvanMailboxService {
         definitionService.getEvanENSAddress('mailbox'),
         'SendMailDispatcher',
         'sendMail'
+      );
+      this.answerMailQueueId = new QueueId(
+        definitionService.getEvanENSAddress('mailbox'),
+        'AnswerMailDispatcher',
+        'answerMail'
       );
       this.receivedMails = [ ];
       this.sentMails = [ ];
@@ -291,6 +312,8 @@ export class EvanMailboxService {
   async resetMails() {
     this.receivedMailLoadCount = 0;
     this.sentMailLoadCount = 0;
+    this.invalidReceivedMailCount = 0;
+    this.invalidSentMailCount = 0;
     this.receivedMails = [ ];
     this.sentMails = [ ];
 
@@ -319,6 +342,7 @@ export class EvanMailboxService {
         id: key
       };
       if (!receivedMails.mails[key] || !receivedMails.mails[key].content) {
+        this.invalidReceivedMailCount++;
         return null;
       }
       Object.assign(ret, receivedMails.mails[key]);
@@ -333,6 +357,7 @@ export class EvanMailboxService {
         id: key
       };
       if (sentMails.mails[key] == null) {
+        this.invalidSentMailCount++;
         return null;
       }
       Object.assign(ret, sentMails.mails[key]);
@@ -390,6 +415,21 @@ export class EvanMailboxService {
   }
 
   /**
+   * Send an mail, using the queue.
+   *
+   * @param      {string}  mail    mail object
+   * @param      {string}  from    account id from
+   * @param      {string}  to      to account id
+   */
+  async sendMail(mail: any, from: string, to: string) {
+    this.queueService.addQueueData(this.sendMailQueueId, {
+      mail,
+      from,
+      to,
+    });
+  }
+
+  /**
    * Send an mail answer, using the queue.
    *
    * @param      {string}  mail    mail object
@@ -397,7 +437,7 @@ export class EvanMailboxService {
    * @param      {string}  to      to account id
    */
   async sendAnswer(mail: any, from: string, to: string) {
-    this.queueService.addQueueData(this.sendMailQueueId, {
+    this.queueService.addQueueData(this.answerMailQueueId, {
       mail,
       from,
       to,

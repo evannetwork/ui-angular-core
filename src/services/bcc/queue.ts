@@ -276,9 +276,9 @@ export class EvanQueue implements OnDestroy {
    */
   public getQueueEntry(id: QueueId, fillEmpty = false): any {
     for (let i = 0; i < this.queue.entries.length; i++) {
-      if (this.queue.entries[i].queueId.ensAddress === id.ensAddress &&
-          this.queue.entries[i].queueId.dispatcher === id.dispatcher &&
-          this.queue.entries[i].queueId.id === id.id) {
+      if ((id.ensAddress === '*' || this.queue.entries[i].queueId.ensAddress === id.ensAddress) &&
+          (id.dispatcher === '*' || this.queue.entries[i].queueId.dispatcher === id.dispatcher) &&
+          (id.id === '*' || this.queue.entries[i].queueId.id === id.id)) {
         return this.queue.entries[i];
       }
     }
@@ -486,27 +486,24 @@ export class EvanQueue implements OnDestroy {
         // get the queue id string to check, if listeners are available
         const queueIdString = queueId.getString();
         const splitQueueIdString = queueIdString.split('-');
-        const idsToCheck = [
-          queueIdString,
-          `splitQueueIdString[0]-splitQueueIdString[1]-*`,
-          `splitQueueIdString[0]-*-*`
-        ];
 
         // iterate through all finish funcs and check if the queueId (ens-dispatcher-id) or the
         // queueGeneralString is available (ens-dispatcher-*)
         const onFinishKeys = Object.keys(EvanQueue.onFinishFuncs);
         for (let i = 0; i < onFinishKeys.length; i++) {
-          // check all generalized queue id's
-          for (let x = 0; x < idsToCheck.length; x++) {
-            if (onFinishKeys[i] === idsToCheck[x] ) {
-              const finishFuncIds = Object.keys(EvanQueue.onFinishFuncs[idsToCheck[x]]);
+          const splitFinishKeys = onFinishKeys[i].split('-');
 
-              // call all watching functions
-              for (let i = 0; i < finishFuncIds.length; i++) {
-                EvanQueue.onFinishFuncs[idsToCheck[x]][finishFuncIds[i]](
-                  queueEntry.results
-                );
-              }
+          // check all generalized queue id's
+          if ((splitFinishKeys[0] === '*' || splitFinishKeys[0] === splitQueueIdString[0]) &&
+              (splitFinishKeys[1] === '*' || splitFinishKeys[1] === splitQueueIdString[1]) &&
+              (splitFinishKeys[2] === '*' || splitFinishKeys[2] === splitQueueIdString[2])) {
+            const finishFuncIds = Object.keys(EvanQueue.onFinishFuncs[onFinishKeys[i]]);
+
+            // call all watching functions
+            for (let x = 0; x < finishFuncIds.length; x++) {
+              EvanQueue.onFinishFuncs[onFinishKeys[i]][finishFuncIds[x]](
+                queueEntry.results
+              );
             }
           }
         }
