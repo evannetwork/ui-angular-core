@@ -72,12 +72,14 @@
       </table>
     </div>
     <div text-center margin-top>
-      <button ion-button icon-left color="medium-gray"
+      <button ion-button icon-left color="medium-gray" outline round
         (click)="rejectDialog()">
         <ion-icon name="close" color="light"></ion-icon>
         <span color="light">{{ '_angularcore.form-alert.cancel' | translate }}</span>
       </button>
-      <button ion-button icon-left [disabled]="loading" (click)="finish()">
+      <button ion-button icon-left outline round
+        [disabled]="loading"
+        (click)="finish()">
         <ion-icon *ngIf="!loading" name="send" color="light"></ion-icon>
         <ion-spinner *ngIf="loading" color="light"></ion-spinner>
         <span>{{ '_angularcore.form-alert.submit' | translate }}</span>
