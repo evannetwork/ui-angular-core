@@ -156,3 +156,22 @@ ion-menu.member-add-menu {
     }
   }
 }
+
+.evan-light {
+  contract-members {
+    .person-add-button {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+
+      margin: auto 10px !important;
+    }
+
+    .evan-tag-container {
+      margin-top: -45px;
+      margin-right: 28px;
+      margin-left: 10px;
+    }
+  }
+}

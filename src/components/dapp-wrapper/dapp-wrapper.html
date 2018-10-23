@@ -158,7 +158,7 @@
           </button>
         </ng-container>
 
-        <button ion-button icon-left 
+        <button ion-button icon-left outline round
           *ngIf="!evanQueue.exception"
           (click)="evanQueue.startSyncAll()" menuClose="queueMenu">
           <span>{{ '_angularcorequeue.startsync' | translate }}</span>

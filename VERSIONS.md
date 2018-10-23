@@ -2,6 +2,8 @@
 
 ## Next Version
 ### Features
+- support light theme
+
 ### Fixes
 ### Deprecations
 

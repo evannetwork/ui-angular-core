@@ -25,8 +25,6 @@
   https://evan.network/license/
 */
 
-@import 'ui-angular-sass/src/variables/colors';
-
 dapp-wrapper {
   & > ion-content {
     & > .scroll-content {
@@ -49,8 +47,6 @@ dapp-wrapper {
       .toolbar-title {
         &:hover {
           text-decoration: underline;
-
-          color: $primary;
         }
       }
     }
@@ -68,7 +64,6 @@ dapp-wrapper {
         padding: 4px;
 
         border-radius: 50%;
-        background-color: $red;
       }
 
       ion-buttons[start] {
@@ -90,8 +85,6 @@ dapp-wrapper {
         padding-right: 20px;
 
         vertical-align: middle;
-
-        border-right: 1px solid #1d616a;
 
         &, img {
           height: 40px;
@@ -121,24 +114,6 @@ dapp-wrapper {
         width: 30px;
         height: 30px;
       }
-
-      @media(min-width: 768px) {
-        background-color: rgba($medium-blue, 0.3);
-
-        &.error {
-          background-color: rgba($red, 0.3);
-        }
-      }
-
-      @media(max-width: 768px) {
-        background-color: transparent !important;
-
-        &.error {
-          ion-icon {
-            color: $red;
-          }
-        }
-      }
     }
   }
 
@@ -146,8 +121,6 @@ dapp-wrapper {
     h4 {
       margin: 0;
       padding: 12px;
-
-      color: $light;
     }
 
     .scroll-content {
@@ -161,11 +134,6 @@ dapp-wrapper {
         vertical-align: middle;
 
         border-radius: 50%;
-
-        &[color='danger'] {
-          color: $light;
-          background-color: $red;
-        }
       }
 
       & > ion-spinner {
@@ -190,21 +158,102 @@ dapp-wrapper {
 
       margin: 25px;
       padding: 25px;
-
-      color: $light;
-      background-color: $red;
-    }
-
-    ion-footer {
-      ion-toolbar {
-        .toolbar-background {
-          background-color: $background-color-2;
-        }
-      }
     }
   }
 }
 
 .queue-ion-nav {
   display: none;
+}
+
+@mixin colorTheme($colors, $theme) {
+  dapp-wrapper {
+    ion-header {
+      ion-title.clickable {
+        .toolbar-title {
+          &:hover {
+            color: map-get($colors, primary);
+          }
+        }
+      }
+
+      ion-navbar {
+        .notification-count {
+          background-color: map-get($colors, red);
+        }
+      }
+
+      ion-buttons.header-img-wrapper {
+        & > div {
+          border-right: 1px solid #1d616a;
+        }
+      }
+    }
+
+    .evan-queue-status {
+      button {
+        @media(min-width: 768px) {
+          background-color: rgba(map-get($colors, light-gray), 0.3);
+
+          &.error {
+            background-color: rgba(map-get($colors, danger), 0.3);
+          }
+        }
+
+        @media(max-width: 768px) {
+          background-color: transparent !important;
+
+          &.error {
+            ion-icon {
+              color: map-get($colors, danger);
+            }
+          }
+        }
+      }
+    }
+
+    ion-menu#queueMenu {
+      h4 {
+        color: map-get($theme, text-color);
+      }
+
+      .scroll-content {
+        & > ion-icon {
+          &[color='danger'] {
+            color: map-get($colors, light);
+            background-color: map-get($colors, danger);
+          }
+        }
+      }
+
+      .queue-exception {
+        color: map-get($colors, light);
+        background-color: map-get($colors, danger);
+      }
+
+      ion-footer {
+        ion-toolbar {
+          .toolbar-background {
+            background-color: map-get($theme, background-color-2);
+          }
+
+          button {
+            ion-icon, span {
+              color: map-get($theme, text-color);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/* color theme dark */
+@import 'ui-angular-sass/src/variables/colors';
+@include colorTheme($colors, $evan-styles);
+
+/* color theme light */
+.evan-light {
+  @import 'ui-angular-sass/src/variables/colors-light';
+  @include colorTheme($colors, $evan-styles);
 }
