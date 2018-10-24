@@ -25,7 +25,7 @@
   https://evan.network/license/
 */
 
-@import 'ui-angular-sass/src/variables/colors';
+@import 'ui-angular-sass/src/variables/positions';
 
 evan-split-pane, .evan-split-pane {
   ion-split-pane {
@@ -117,10 +117,6 @@ evan-split-pane, .evan-split-pane {
 
           margin: auto !important;
         }
-      }
-
-      h4 {
-        color: $light;
       }
 
       ion-content {
@@ -221,7 +217,7 @@ evan-split-pane, .evan-split-pane {
   }
 }
 
-@mixin colorTheme($colors, $theme) {
+@mixin customTheme($colors, $theme) {
   evan-split-pane, .evan-split-pane {
     ion-split-pane {
       ion-menu {
@@ -294,21 +290,23 @@ evan-split-pane, .evan-split-pane {
   }
 }
 
-/* color theme dark */
-@import 'ui-angular-sass/src/variables/colors';
-@include colorTheme($colors, $evan-styles);
+// apply custom styles for all themes
+@import 'ui-angular-sass/src/theme';
+@each $theme, $definition in $evanThemes {
+  @if $theme == 'evan' {
+    @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
+  } @else {
+    .evan-#{$theme} {
+      @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
 
-/* color theme light */
-.evan-light {
-  @import 'ui-angular-sass/src/variables/colors-light';
-  @include colorTheme($colors, $evan-styles);
+      ion-footer {
+        ion-item.item-md.item-block.item-select {
+          margin-top: 0 !important;
+          padding: 0 !important;
 
-  ion-footer {
-    ion-item.item-md.item-block.item-select {
-      margin-top: 0 !important;
-      padding: 0 !important;
-
-      background-color: transparent !important;
+          background-color: transparent !important;
+        }
+      }
     }
   }
 }
