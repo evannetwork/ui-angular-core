@@ -684,10 +684,20 @@ export class EvanRoutingService {
    *
    * @return     {<type>}  The stand alone contract identifier.
    */
-  getStandAloneContractId(): string {
-    let roothash: any = window.location.hash.replace(/\#\//g, '').split('/');
-    roothash = roothash[roothash.length - 1];
+  getContractAddress(): string {
+    let splitHash: any = window.location.hash.replace(/\#\//g, '').split('/');
+    let contractAddress = '';
 
-    return this.getHashParam('address') || roothash;
+    // search for latest contract address within the url
+    while (contractAddress.indexOf('0x') !== 0 && splitHash.length > 0) {
+      contractAddress = splitHash.pop();
+    }
+
+    // if no contract address was found, reset it
+    if (contractAddress.indexOf('0x') !== 0) {
+      contractAddress = undefined;
+    }
+
+    return this.getHashParam('address') || contractAddress;
   }
 }

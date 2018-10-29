@@ -3,6 +3,7 @@
 ## Next Version
 ### Features
 - support light theme
+- use correct routing service getContractAddress logic
 
 ### Fixes
 ### Deprecations
