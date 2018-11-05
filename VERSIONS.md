@@ -4,6 +4,7 @@
 ### Features
 - support light theme
 - use correct routing service getContractAddress logic
+- alerts for eve low warnings
 
 ### Fixes
 ### Deprecations

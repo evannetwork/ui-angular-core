@@ -171,6 +171,16 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
   private notificationWatcher: Function;
 
   /**
+   * watch for warnings
+   */
+  private warningWatcher: Function;
+
+  /**
+   * is currently a warning shown?
+   */
+  private warningDisplayed: Promise<any> = Promise.resolve();
+
+  /**
    * handle log errors
    */
   private logErrors: Array<any>;
@@ -277,6 +287,56 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
       // create an new watcher to handle incoming notifications
       this.notificationWatcher = this.utilService.onEvent('evan-notification',
         (notification) => this.handleNotification());
+
+
+      // watch for queue changes and try to sync everything
+      this.warningWatcher = this.utilService.onEvent('evan-warning', async (data) => {
+        this.warningDisplayed = this.warningDisplayed
+          .then(async () => {
+            let dontShowAgain = window.localStorage['evan-warnings-disabled'] || '{ }';
+
+            try {
+              dontShowAgain = JSON.parse(dontShowAgain);
+            } catch (ex) {
+              dontShowAgain = { };
+            }
+
+            if (!dontShowAgain[data.detail.type]) {
+              await new Promise((resolve, reject) => {
+                const buttons: Array<any> = [
+                  {
+                    text: this.translateService.instant('_angularcore.warnings.dont-show-again'),
+                    handler: () => {
+                      dontShowAgain[data.detail.type] = true;
+                      window.localStorage['evan-warnings-disabled'] = JSON.stringify(dontShowAgain);
+
+                      resolve();
+                    }
+                  },
+                  {
+                    role: 'cancel',
+                    cssClass: 'display-none',
+                    handler: data => resolve()
+                  },
+                  {
+                    text: 'ok',
+                    handler: () => resolve(data)
+                  }
+                ];
+
+                this.alertService.showAlert(
+                  this.translateService.instant(
+                    `_angularcore.warnings.${ data.detail.type }.title`, data.detail),
+                  this.translateService.instant(
+                    `_angularcore.warnings.${ data.detail.type }.body`, data.detail),
+                  buttons
+                );
+              });
+            }
+          });
+
+        await this.warningDisplayed;
+      });
 
       // watch for developer mode is changing
       this.isDeveloperMode = window.localStorage['evan-developer-mode'] === 'true';
