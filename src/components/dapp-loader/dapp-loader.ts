@@ -51,8 +51,11 @@ let timeoutForNextDApp;
 
 // check for recursive opened DApps and stop loading them!
 let lastStartedDApp;
-let multipleTimeout;
 let multipleLoadCount = 0;
+let multipleTimeout;
+let startDAppPromise = Promise.resolve();
+
+window['dappLoaderElements'] = [ ];
 
 /**
  * Dynamic DApp loader component. Handles nested Angular DApps and loads the
@@ -82,7 +85,7 @@ let multipleLoadCount = 0;
   selector: 'evan-dapp-loader',
   templateUrl: 'dapp-loader.html'
 })
-export class DAppLoaderComponent extends AsyncComponent  {
+export class DAppLoaderComponent  {
   /*****************    variables    *****************/
   /**
    * dapp that should be started (detected from url)
@@ -99,6 +102,12 @@ export class DAppLoaderComponent extends AsyncComponent  {
    */
   private ionicAppElement: Element;
 
+  /**
+   * was the component destroyed directly within a previous opened DApp was started? Could be
+   * possible, if two dapp-lower components are runned directly after another
+   */
+  private destroyed: boolean;
+
   /***************** initialization  *****************/
   constructor(
     private _ngZone: NgZone,
@@ -107,16 +116,16 @@ export class DAppLoaderComponent extends AsyncComponent  {
     private ref: ChangeDetectorRef,
     private routingService: EvanRoutingService,
     private utils: EvanUtilService,
-  ) {
-    super(ref);
-  }
+  ) {  }
 
   /**
    * Apply the DApp that should be started from window.location. Waits for other
    * DApps that are within the opening process, wait for them and show the new
    * DApp.
    */
-  async _ngAfterViewInit() {
+  async ngAfterViewInit() {
+    window['dappLoaderElements'].push(this.elementRef.nativeElement);
+
     const windowHash = decodeURIComponent(window.location.hash);
 
     // parse current route by replacing all #/ and /# to handle incorrect navigations
@@ -170,7 +179,9 @@ export class DAppLoaderComponent extends AsyncComponent  {
   /**
    * stop the angular application that is laoded dynamically
    */
-  async _ngOnDestroy() {
+  async ngOnDestroy() {
+    this.destroyed = true;
+
     stopAngularApplication();
     this.finishDAppLoading();
   }
@@ -204,23 +215,29 @@ export class DAppLoaderComponent extends AsyncComponent  {
       return;
     }
 
-    dapp.dappLoading = true;
-
     // to start a new angular application
     this._ngZone.runOutsideAngular(async () => {
-      try {
-        await dapp.startDApp(this.dappToStart, this.elementRef.nativeElement);
+      // wait for previous DApp to be started (they can kill each other, if they was started
+      // directly after another)
+      startDAppPromise = startDAppPromise.then(async () => {
+        try {
+          // if the component wasnt destroy before, start it!
+          if (!this.destroyed) {
+            await dapp.startDApp(this.dappToStart, this.elementRef.nativeElement);
 
-        this.elementRef.nativeElement.removeChild(
-          this.elementRef.nativeElement.querySelectorAll('evan-loading')[0]
-        );
+            this.elementRef.nativeElement.removeChild(
+              this.elementRef.nativeElement.querySelectorAll('evan-loading')[0]
+            );
 
-      } catch (ex) {
-        console.error(ex);
-      }
+            this.finishDAppLoading();
+          }
+        } catch (ex) {
+          console.error(ex);
+        }
+      });
 
-      this.finishDAppLoading();
-    })
+      await startDAppPromise;
+    });
   }
 
   /**
