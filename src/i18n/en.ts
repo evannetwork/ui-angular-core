@@ -113,6 +113,21 @@ export const en = {
       "eve-low": {
         "body": "You have almost used up your complete condingent of Eve's ({{ value }} Eve's). It's possible that special actions (contract creation, storage transactions) will fail if the Eve value is too low.",
         "title": "Eve's are almost used up"
+      },
+      "indexdb-not-available": {
+        "body": "The browser you are using does not support local caching of data, which can lead to runtime problems. Please use one of the following browsers: <b>Chrome, Firefox Safari, Edge</b>.<br><br><b>Hint</b>: Some browsers have limited memory in a private mode.",
+        "title": "Local data memory not available"
+      },
+      "quota-exceeded": {
+        "body": "The evan.network can no longer cache loaded data, which can lead to runtime problems.<br><br>Please clear the evan.network specific data.",
+        "clear-ipfs-cache": "Clear Data",
+        "title": "Browser memory full"
+      },
+      "quota-reload": {
+        "cancel": "cancel",
+        "description": "In order for these changes to take effect, please reload the application",
+        "ok": "Reload",
+        "title": "Data successfully emptied"
       }
     }
   },

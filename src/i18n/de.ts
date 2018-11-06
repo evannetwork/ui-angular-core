@@ -113,6 +113,21 @@ export const de = {
       "eve-low": {
         "body": "Sie haben fast ihr vollständiges Kondingent an Eve's aufgebraucht ({{ value }} Eves). Es ist möglich, dass spezielle Aktionen (Vertragserstellungen, Speichertransaktionen) bei einem zu geringen Eve Wert fehlschlagen.",
         "title": "Eve's sind fast aufgebraucht"
+      },
+      "indexdb-not-available": {
+        "body": "Der von Ihnen genutzte Browser unterstützt nicht das lokale zwischenspeichern von Daten, was zu Laufzeitproblemen führen kann.Bitte benutzen Sie einen der folgenden Browsern: <b>Chrome, Firefox Safari, Edge</b>.<br><br><b>Hinweis</b>: Einige Browser besitzen in einem privaten Modus eingeschränkte Speicherkapazitäten.",
+        "title": "Lokaler Datenspeicher nicht verfügbar"
+      },
+      "quota-exceeded": {
+        "body": "Das evan.network kann keine geladenen Daten mehr zwischenspeichern, was zu Laufzeitproblemen führen kann.<br><br>Bitte leeren Sie die evan.network spezifischen Daten.",
+        "clear-ipfs-cache": "Daten leeren",
+        "title": "Browserspeicher voll"
+      },
+      "quota-reload": {
+        "cancel": "abbrechen",
+        "description": "Damit diese Änderungen wirksam wird, laden Sie bitte die Anwendung neu.",
+        "ok": "neuladen",
+        "title": "Daten erfolgreich geleert"
       }
     }
   },

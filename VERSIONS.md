@@ -5,6 +5,7 @@
 - support light theme
 - use correct routing service getContractAddress logic
 - alerts for eve low warnings
+- add warning for quota limit exceeded and for index db not available
 
 ### Fixes
 - `DAppLoaderComponent`: wait for previous DApp to be started by another `DAppLoaderComponent` (they can kill each other, if they was started directly at the same time)

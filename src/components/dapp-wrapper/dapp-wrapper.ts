@@ -59,6 +59,9 @@ import { AsyncComponent } from '../../classes/AsyncComponent';
 
 /**************************************************************************************************/
 
+// show all types warning only each 30 seconds
+let warningTimeout = { };
+
 /**
  * top-bar wrapper for DApps that enables:
  *   - back navigation
@@ -301,8 +304,10 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
               dontShowAgain = { };
             }
 
-            if (!dontShowAgain[data.detail.type]) {
+            // if the popup should be shown, show it!
+            if (!dontShowAgain[data.detail.type] && !warningTimeout[data.detail.type]) {
               await new Promise((resolve, reject) => {
+                // add all basic buttons (cance, ok, dont show again)
                 const buttons: Array<any> = [
                   {
                     text: this.translateService.instant('_angularcore.warnings.dont-show-again'),
@@ -324,6 +329,37 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
                   }
                 ];
 
+                // if the quota exceeded warning was received, add the clear ipfs cache data button
+                if (data.detail.type === 'quota-exceeded') {
+                  buttons.unshift({
+                    text: this.translateService.instant(
+                      '_angularcore.warnings.quota-exceeded.clear-ipfs-cache'),
+                    handler: async () => {
+                      await new Promise((quotaClearResolve) => {
+                        let deleteRequest = indexedDB.deleteDatabase('ipfs-cache');
+                        
+                        deleteRequest.onsuccess = () => quotaClearResolve();
+                        deleteRequest.onerror = () => quotaClearResolve();
+                        deleteRequest.onblocked = () => quotaClearResolve();
+                      });
+
+                      // ask the user to reload the application
+                      try {
+                        await this.alertService.showSubmitAlert(
+                          '_angularcore.warnings.quota-reload.title',
+                          '_angularcore.warnings.quota-reload.description',
+                          '_angularcore.warnings.quota-reload.cancel',
+                          '_angularcore.warnings.quota-reload.ok',
+                        );
+
+                        window.location.reload();
+                      } catch (ex) { }
+
+                      resolve();
+                    }
+                  });
+                }
+
                 this.alertService.showAlert(
                   this.translateService.instant(
                     `_angularcore.warnings.${ data.detail.type }.title`, data.detail),
@@ -332,6 +368,11 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
                   buttons
                 );
               });
+
+              // show all types warning only each 30 seconds
+              warningTimeout[data.detail.type] = setTimeout(() => {
+                delete warningTimeout[data.detail.type];
+              }, 30 * 1000);
             }
           });
 
