@@ -4,15 +4,15 @@
     "dapp": {
       "dependencies": {
         "angular-libs": "^1.1.0",
-        "bcc": "^1.3.0",
-        "smart-contracts": "^1.1.2"
+        "bcc": "^1.3.1",
+        "smart-contracts": "^1.1.3"
       },
       "entrypoint": "angularcore.js",
       "files": [
         "angularcore.js",
         "angularcore.css"
       ],
-      "origin": "QmPwgNy5ta2zEFxRxDUfXdzmXhk3V24pcc5CBfdD4uXPqd",
+      "origin": "QmVu6giEGArsz5Hsf4JYP9rsQ6W1ZyQ5f8wxBYpkcQXBnZ",
       "type": "library"
     },
     "dbcpVersion": 1,
@@ -22,7 +22,7 @@
       "contractus",
       "library"
     ],
-    "version": "1.3.0",
+    "version": "1.4.0",
     "versions": {
       "0.1.0": "QmbWyV5nby2Sy1oTQ8yJFy3gMmCH8Knz4u94JPrChEqYUT",
       "0.9.0": "QmYAWXwey3t8i9YM3LJ5vjkd7t7TyY8FTyuZGsafMzW9vt",
@@ -32,7 +32,8 @@
       "1.1.0": "QmPvxh39hqLQzjoYVW1jFNv7TfyqYt3eGQG3tY2mukgb4f",
       "1.1.1": "QmPpzSPdYCg8sNbHtu7vnkqode2NvKxU15Xufx8advUt2q",
       "1.2.0": "QmcpH6WhfCRnUKPfHKkhE2BiFAkFGEJd9DRDszWvxfgKgE",
-      "1.3.0": "QmNQo8jE33VWyNpPT71q3gBs3tUeH8iwah6ypNaDW7UMUh"
+      "1.3.0": "QmNQo8jE33VWyNpPT71q3gBs3tUeH8iwah6ypNaDW7UMUh",
+      "1.4.0": "QmRBeVPqdCmKx8LLe3jkwwqFmYZHL49eCjjWf2u4KUZzyq"
     }
   }
 }
