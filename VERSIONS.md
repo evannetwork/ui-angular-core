@@ -5,6 +5,17 @@
 ### Fixes
 ### Deprecations
 
+## Version 1.4.0
+### Features
+- support light theme
+- use correct routing service getContractAddress logic
+- alerts for eve low warnings
+- add warning for quota limit exceeded and for index db not available
+
+### Fixes
+- `DAppLoaderComponent`: wait for previous DApp to be started by another `DAppLoaderComponent` (they can kill each other, if they was started directly at the same time)
+- `ionicAppElement`: if two DApps are started directly at the same time, only allow to initialize one AppModule.ngFactory at the same time, the second one will wait for finishing
+
 ## Version 1.3.0
 ### Features
 - add maxMembers to `contract-members` component

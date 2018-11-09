@@ -25,14 +25,12 @@
   https://evan.network/license/
 */
 
-@import 'ui-angular-sass/src/variables/colors';
+@import 'ui-angular-sass/src/variables/positions';
 
 evan-split-pane, .evan-split-pane {
   ion-split-pane {
     ion-menu {
       z-index: 10;
-
-      box-shadow: 1px 0 20px rgba(0, 0, 0, 0.15) !important;
 
       &.small {
         min-width: 56px !important;
@@ -61,10 +59,6 @@ evan-split-pane, .evan-split-pane {
 
         @media (min-width: 769px) {
           cursor: pointer;
-
-          &:hover {
-            background-color: $hover;
-          }
         }
 
         & > * {
@@ -125,10 +119,6 @@ evan-split-pane, .evan-split-pane {
         }
       }
 
-      h4 {
-        color: $light;
-      }
-
       ion-content {
         ion-list {
           button {
@@ -138,7 +128,6 @@ evan-split-pane, .evan-split-pane {
               padding: 2px;
 
               border-radius: 50%;
-              background-color: $light;
             }
           }
 
@@ -155,9 +144,7 @@ evan-split-pane, .evan-split-pane {
 
             text-align: center;
 
-            color: $light;
             border-radius: 50%;
-            background-color: $red;
           }
         }
       }
@@ -178,7 +165,6 @@ evan-split-pane, .evan-split-pane {
             padding: 4px;
 
             border-radius: 50%;
-            background-color: $red;
           }
         }
       }
@@ -199,28 +185,6 @@ evan-split-pane, .evan-split-pane {
           ion-spinner {
             width: 30px;
             height: 30px;
-          }
-
-          @media(min-width: 768px) {
-            background-color: $medium-blue;
-
-            &.error {
-              background-color: $red;
-            }
-
-            &.both-active {
-              border-left: 1px solid #699fbd;
-            }
-          }
-
-          @media(max-width: 768px) {
-            background-color: $dark-blue;
-
-            &.error {
-              ion-icon {
-                color: $red;
-              }
-            }
           }
         }
       }
@@ -249,6 +213,100 @@ evan-split-pane, .evan-split-pane {
 
     button.display-none {
       display: none;
+    }
+  }
+}
+
+@mixin customTheme($colors, $theme) {
+  evan-split-pane, .evan-split-pane {
+    ion-split-pane {
+      ion-menu {
+        box-shadow: 1px 0 20px rgba(0, 0, 0, 0.15) !important;
+
+        ion-header {
+          @media (min-width: 769px) {
+            &:hover {
+              background-color: map-get($theme, hover);
+            }
+          }
+        }
+
+        h4 {
+          color: map-get($theme, text-color);
+        }
+
+        ion-content {
+          ion-list {
+            button {
+              img {
+                background-color: map-get($colors, light);
+              }
+            }
+
+            .left-panel-notification {
+              color: map-get($colors, light);
+              background-color: map-get($colors, danger);
+            }
+          }
+        }
+      }
+
+      ion-content {
+        ion-header {
+          ion-navbar {
+            .notification-count {
+              background-color: map-get($colors, danger);
+            }
+          }
+        }
+
+        .evan-queue-status {
+          button {
+            @media(min-width: 768px) {
+              background-color: medium-blue;
+
+              &.error {
+                background-color: map-get($theme, danger);
+              }
+
+              &.both-active {
+                border-left: 1px solid #699fbd;
+              }
+            }
+
+            @media(max-width: 768px) {
+              background-color: map-get($theme, background-color);
+
+              &.error {
+                ion-icon {
+                  color: map-get($colors, danger);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// apply custom styles for all themes
+@import 'ui-angular-sass/src/theme';
+@each $theme, $definition in $evanThemes {
+  @if $theme == 'evan' {
+    @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
+  } @else {
+    .evan-#{$theme} {
+      @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
+
+      ion-footer {
+        ion-item.item-md.item-block.item-select {
+          margin-top: 0 !important;
+          padding: 0 !important;
+
+          background-color: transparent !important;
+        }
+      }
     }
   }
 }

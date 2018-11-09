@@ -56,12 +56,14 @@
       </form>
   
       <div margin-top text-center>
-        <button ion-button icon-left color="medium-gray"
+        <button ion-button icon-left color="medium-gray" round outline
           (click)="rejectDialog()">
           <ion-icon name="close" color="light"></ion-icon>
           <span color="light">{{ '_angularcore.form-alert.cancel' | translate }}</span>
         </button>
-        <button ion-button icon-left [disabled]="!mailForm.valid" (click)="resolveDialog(mailForm.value)">
+        <button ion-button icon-left round outline
+          [disabled]="!mailForm.valid"
+          (click)="resolveDialog(mailForm.value)">
           <ion-icon name="send" color="light"></ion-icon>
           <span>{{ '_angularcore.form-alert.submit' | translate }}</span>
         </button>

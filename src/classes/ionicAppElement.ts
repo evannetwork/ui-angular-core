@@ -168,27 +168,37 @@ function ensureAngularRuntimes() {
 export async function startAngularApplication(AppModule: any, routes: Routes): Promise<any> {
   let moduleFactory;
 
+  // wait for finishing factory intialization
+  await AppModule.ngFactoryInitializing;
+
+  // if factory exists, use the existing one
   if (AppModule.ngFactory) {
     moduleFactory = AppModule.ngFactory;
   } else {
-    try {
-      if (!compiler) {
-        const compilerFactory = platformBrowser.injector.get(CompilerFactory);
-        compiler = compilerFactory.createCompiler();
+    // create an global promise, so all start angular application calls will not create multiple
+    // ngFactories
+    AppModule.ngFactoryInitializing = new Promise(async (resolve) => {
+      try {
+        if (!compiler) {
+          const compilerFactory = platformBrowser.injector.get(CompilerFactory);
+          compiler = compilerFactory.createCompiler();
 
-        compiler._metadataResolver._addTypeToModule = function(type, moduleType) {
-          this._ngModuleOfTypes.set(type, moduleType);
+          compiler._metadataResolver._addTypeToModule = function(type, moduleType) {
+            this._ngModuleOfTypes.set(type, moduleType);
+          }
         }
+
+        moduleFactory = AppModule.ngFactory = await compiler.compileModuleAsync(AppModule);
+
+        compiler._metadataResolver.clearCacheFor(AppModule);
+      } catch (ex) {
+        console.error(ex);
       }
 
-      moduleFactory = AppModule.ngFactory = await compiler.compileModuleAsync(AppModule);
+      resolve();
+    });
 
-      compiler._metadataResolver.clearCacheFor(AppModule);
-    } catch (ex) {
-      console.error(ex);
-
-      throw ex;
-    }
+    await AppModule.ngFactoryInitializing;
   }
 
   return await platformBrowser.bootstrapModuleFactory(moduleFactory, [

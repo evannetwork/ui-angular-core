@@ -59,6 +59,9 @@ import { AsyncComponent } from '../../classes/AsyncComponent';
 
 /**************************************************************************************************/
 
+// show all types warning only each 30 seconds
+let warningTimeout = { };
+
 /**
  * top-bar wrapper for DApps that enables:
  *   - back navigation
@@ -171,6 +174,16 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
   private notificationWatcher: Function;
 
   /**
+   * watch for warnings
+   */
+  private warningWatcher: Function;
+
+  /**
+   * is currently a warning shown?
+   */
+  private warningDisplayed: Promise<any> = Promise.resolve();
+
+  /**
    * handle log errors
    */
   private logErrors: Array<any>;
@@ -277,6 +290,94 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
       // create an new watcher to handle incoming notifications
       this.notificationWatcher = this.utilService.onEvent('evan-notification',
         (notification) => this.handleNotification());
+
+
+      // watch for queue changes and try to sync everything
+      this.warningWatcher = this.utilService.onEvent('evan-warning', async (data) => {
+        this.warningDisplayed = this.warningDisplayed
+          .then(async () => {
+            let dontShowAgain = window.localStorage['evan-warnings-disabled'] || '{ }';
+
+            try {
+              dontShowAgain = JSON.parse(dontShowAgain);
+            } catch (ex) {
+              dontShowAgain = { };
+            }
+
+            // if the popup should be shown, show it!
+            if (!dontShowAgain[data.detail.type] && !warningTimeout[data.detail.type]) {
+              await new Promise((resolve, reject) => {
+                // add all basic buttons (cance, ok, dont show again)
+                const buttons: Array<any> = [
+                  {
+                    text: this.translateService.instant('_angularcore.warnings.dont-show-again'),
+                    handler: () => {
+                      dontShowAgain[data.detail.type] = true;
+                      window.localStorage['evan-warnings-disabled'] = JSON.stringify(dontShowAgain);
+
+                      resolve();
+                    }
+                  },
+                  {
+                    role: 'cancel',
+                    cssClass: 'display-none',
+                    handler: data => resolve()
+                  },
+                  {
+                    text: 'ok',
+                    handler: () => resolve(data)
+                  }
+                ];
+
+                // if the quota exceeded warning was received, add the clear ipfs cache data button
+                if (data.detail.type === 'quota-exceeded') {
+                  buttons.unshift({
+                    text: this.translateService.instant(
+                      '_angularcore.warnings.quota-exceeded.clear-ipfs-cache'),
+                    handler: async () => {
+                      await new Promise((quotaClearResolve) => {
+                        let deleteRequest = indexedDB.deleteDatabase('ipfs-cache');
+                        
+                        deleteRequest.onsuccess = () => quotaClearResolve();
+                        deleteRequest.onerror = () => quotaClearResolve();
+                        deleteRequest.onblocked = () => quotaClearResolve();
+                      });
+
+                      // ask the user to reload the application
+                      try {
+                        await this.alertService.showSubmitAlert(
+                          '_angularcore.warnings.quota-reload.title',
+                          '_angularcore.warnings.quota-reload.description',
+                          '_angularcore.warnings.quota-reload.cancel',
+                          '_angularcore.warnings.quota-reload.ok',
+                        );
+
+                        window.location.reload();
+                      } catch (ex) { }
+
+                      resolve();
+                    }
+                  });
+                }
+
+                this.alertService.showAlert(
+                  this.translateService.instant(
+                    `_angularcore.warnings.${ data.detail.type }.title`, data.detail),
+                  this.translateService.instant(
+                    `_angularcore.warnings.${ data.detail.type }.body`, data.detail),
+                  buttons
+                );
+              });
+
+              // show all types warning only each 30 seconds
+              warningTimeout[data.detail.type] = setTimeout(() => {
+                delete warningTimeout[data.detail.type];
+              }, 30 * 1000);
+            }
+          });
+
+        await this.warningDisplayed;
+      });
 
       // watch for developer mode is changing
       this.isDeveloperMode = window.localStorage['evan-developer-mode'] === 'true';

@@ -651,4 +651,22 @@ export class EvanUtilService implements OnDestroy {
     context.loading = false;
     context.ref.detectChanges();
   }
+
+  /**
+   * Gets the color theme.
+   *
+   * @return     {string}  the current color theme
+   */
+  public getColorTheme() {
+    return utils.getColorTheme();
+  }
+
+  /**
+   * Adds the current color theme class to the body.
+   *
+   * @param      {string}  colorTheme  the color theme name (e.g. light)
+   */
+  public activateColorTheme(colorTheme: string) {
+    utils.activateColorTheme(colorTheme);
+  }
 }
