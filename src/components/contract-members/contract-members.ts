@@ -121,6 +121,11 @@ export class ContractMembersComponent extends AsyncComponent {
   @Input() readonly?: boolean;
 
   /**
+   * Should the select component be disabled?
+   */
+  @Input() disabled?: boolean;
+
+  /**
    * max users that can be added
    */
   @Input() maxMembers?: number;
@@ -324,6 +329,10 @@ export class ContractMembersComponent extends AsyncComponent {
    * Open the right panel.
    */
   private async openMenu() {
+    if (this.disabled) {
+      return;
+    }
+
     if (!this.ionMenu) {
       await this._ngAfterViewInit();
     }

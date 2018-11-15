@@ -87,13 +87,13 @@ export class EvanBCCService {
    * blockchain-core original properties. Mapped from e.g
    * BCC.coreInstance.executor => this.executor
    */
+  public claims: ProfileBundle.Claims;
   public config: any;
   public contractLoader: any;
   public contracts: any;
   public CoreBundle: any;
   public cryptoProvider: any;
   public dataContract: ProfileBundle.DataContract;
-  public serviceContract: ProfileBundle.ServiceContract;
   public description: any;
   public dfs: any;
   public executor: any;
@@ -105,6 +105,7 @@ export class EvanBCCService {
   public profile: any;
   public ProfileBundle: any;
   public rightsAndRoles: CoreBundle.RightsAndRoles;
+  public serviceContract: ProfileBundle.ServiceContract;
   public sharing: ProfileBundle.Sharing;
   public uiEvents: any;
   public web3: any;
@@ -175,6 +176,7 @@ export class EvanBCCService {
     this.ProfileBundle = ProfileBundle;
     this.serviceContract = ProfileBundle.ProfileRuntime.serviceContract;
     this.sharing = ProfileBundle.ProfileRuntime.sharing;
+    this.claims = ProfileBundle.ProfileRuntime.claims;
   }
 
   /**

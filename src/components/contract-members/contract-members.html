@@ -30,11 +30,15 @@
     <ion-label stacked>
       <ng-content select="[label]"></ng-content>
     </ion-label>
-    <ion-input #searchInput class="clickable" readonly
+    <ion-input #searchInput readonly
+      [class.clickable]="!disabled"
+      [disabled]="disabled"
       (click)="openMenu()"
       [placeholder]="groupedMemberKeys?.length > 0 ? '' : ((placeholder || '_angularcore.contract-members.search-text') | translate)">
     </ion-input>
-    <button ion-button icon-only round outline item-end class="person-add-button" (click)="openMenu()">
+    <button ion-button icon-only round outline item-end class="person-add-button"
+      (click)="openMenu()"
+      [disabled]="disabled">
       <ion-icon name="person-add" *ngIf="!readonly"></ion-icon>
       <ion-icon name="people" *ngIf="readonly"></ion-icon>
     </button>

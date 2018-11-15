@@ -34,6 +34,7 @@ export * from './services/bcc/address-book';
 export * from './services/bcc/bc';
 export * from './services/bcc/bcc';
 export * from './services/bcc/bookmark';
+export * from './services/bcc/claims';
 export * from './services/bcc/core';
 export * from './services/bcc/description';
 export * from './services/bcc/mailbox';
