@@ -25,22 +25,61 @@
   https://evan.network/license/
 -->
 
-<div [class]="'evan-claim loading ' + mode"
-  *ngIf="loadingClaims">
-  <ion-spinner></ion-spinner>
-</div>
+<ng-template #claimDisplay let-claim="claim">
+  <div [class]="'evan-claim mode-' + mode + ' status-' + claim.status">
+    <div class="claim-icon">
+      <ion-spinner *ngIf="loadingClaims"></ion-spinner>
+      <ng-container *ngIf="!loadingClaims">
+        <svg *ngIf="!claim.icon" version="1.0" xmlns="http://www.w3.org/2000/svg"
+           width="512.000000pt" height="512.000000pt" viewBox="0 0 512.000000 512.000000"
+           preserveAspectRatio="xMidYMid meet">
+            <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" stroke="none">
+            <path d="M2510 4994 c-135 -140 -432 -395 -635 -547 -502 -375 -990 -618
+            -1444 -719 l-104 -23 7 -107 c14 -233 92 -597 192 -894 311 -930 933 -1793
+            1784 -2475 164 -131 188 -149 198 -149 20 0 283 183 420 293 594 475 1057
+            1046 1388 1712 233 468 377 929 453 1450 12 77 21 147 21 156 0 11 -34 29
+            -112 58 -335 126 -816 354 -1103 522 -374 219 -660 429 -906 667 -59 56 -108
+            102 -111 102 -2 0 -24 -21 -48 -46z m143 -406 c392 -340 1056 -731 1682 -988
+            72 -30 133 -56 137 -59 9 -7 -39 -250 -82 -421 -141 -556 -410 -1114 -770
+            -1595 -149 -199 -270 -337 -474 -540 -200 -200 -320 -306 -491 -434 -144 -108
+            -115 -109 -248 2 -422 354 -786 755 -1063 1172 -301 452 -517 931 -632 1405
+            -33 135 -74 361 -67 368 2 3 69 26 147 52 466 156 946 432 1439 826 63 51 163
+            135 223 188 59 53 109 96 112 96 2 0 41 -32 87 -72z"/>
+            <path d="M2555 4460 c-11 -17 -256 -219 -395 -324 -411 -312 -848 -557 -1240
+            -697 l-105 -37 2 -45 c2 -66 66 -317 127 -501 258 -773 756 -1489 1469 -2114
+            l118 -104 37 28 c209 159 518 451 698 659 421 487 719 1003 908 1577 53 162
+            126 451 129 509 l2 41 -110 47 c-609 263 -1145 578 -1582 930 -29 24 -54 37
+            -58 31z"/>
+          </g>
+        </svg>
 
-<ng-container *ngIf="!loadingClaims">
-  <div [class]="'evan-claim ' + mode"
-    *ngFor="let claim of claims">
-    <ng-container *ngIf="mode === 'minimal'">
-      {{ claim | json }}
-    </ng-container>
-    <ng-container *ngIf="mode === 'detail'">
-      {{ claim | json }}
-    </ng-container>
-    <ng-container *ngIf="mode === 'full'">
-      {{ claim | json }}
+        <img *ngIf="claim.icon" [src]="_DomSanitizer.bypassSecurityTrustUrl(claim.icon)">
+      </ng-container>
+    </div>
+    <ng-container *ngIf="!loadingClaims">
+      <div class="claim-label" *ngIf="mode != 'icon'">
+        <b *ngIf="claim.creationDate === null">
+          {{ claim.displayName }}
+        </b>
+        <div *ngIf="claim.creationDate !== null">
+          <b>{{ claim.displayName }}</b>
+          <p>{{ claim.creationDate | date:'mediumDate':'':translate.translate.currentLang }}</p>
+        </div>
+      </div>
+      <div class="claim-count" *ngIf="claim.claimCount && claim.claimCount > 1">
+        {{ claim.claimCount }} <ion-icon name="people"></ion-icon>
+      </div>
     </ng-container>
   </div>
+</ng-template>
+
+<ng-container *ngIf="!loading">
+  <ng-container *ngIf="compute">
+    <ng-container *ngTemplateOutlet="claimDisplay;context:{ claim: computed }"></ng-container>
+  </ng-container>
+  <ng-container *ngIf="!compute">
+    <ng-container *ngFor="let claim of claims">
+      <ng-container *ngTemplateOutlet="claimDisplay;context:{ claim: claim }"></ng-container>
+    </ng-container>
+  </ng-container>
 </ng-container>

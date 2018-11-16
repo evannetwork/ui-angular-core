@@ -73,9 +73,9 @@ export class EvanClaimService {
    *     issuer: '0x1813587e095cDdfd174DdB595372Cb738AA2753A',
    *     // topic of the claim
    *     name: '/company/b-s-s/employee/swo',
+   *     // -1: Not issued => no claim was issued
    *     // 0: Issued => issued by a non-issuer parent claim holder, self issued state is 0
    *     // 1: Confirmed => issued by both, self issued state is 2, values match
-   *     // 2: Not issued => no claim was issued
    *     status: 2,
    *     // claim for account id / contract id
    *     subject: address,
@@ -85,28 +85,16 @@ export class EvanClaimService {
    *     uri: '',
    *     // ???
    *     signature: ''
+   *     // icon for cards display
+   *     icon: 'icon to display',
    *     
-   *     // =========> computed
-   *     // claim.status === 0
-   *     issued: false,
-   *     
-   *     // claim.status === 1
-   *     confirmed: true,
-   *     
-   *     // 0: issued (yellow)
-   *     // 1: confirmed (green)
-   *     // 2: not existing (red)
-   *     color: 2,
-   *
-   *     // not existing
-   *     existing: false,
-   *     
-   *     // is the claim expired?
-   *     expired: false,
-   *     
-   *     // issuer === subject 
-   *     selfIssued: false
-   *     
+   *     // warnings
+   *     [
+   *       'issued', // claim.status === 0
+   *       'missing', // no claim exists
+   *       'expired', // is the claim expired?
+   *       'selfIssued' // issuer === subject
+   *     ]
    *     // parent claims not valid
    *     treeValid: false,
    *   }
@@ -120,55 +108,66 @@ export class EvanClaimService {
         const splitName = claim.name.split('/');
 
         claim.displayName = splitName.pop();
-
+        claim.parent = splitName.join('/');
+        claim.warnings = [ ];
         // set initial color status, will be overruled by computed states
         claim.color = claim.status;
-        claim.issued = claim.status === 0;
-        claim.confirmed = claim.status === 1;
-        claim.parent = splitName.slice(0, splitName.length).join('/');
+
+        if (claim.status === 0) {
+          claim.warnings.push('issued');
+        }
 
         // if signature is not valid
         if (!claim.valid) {
-          claim.color = 0;
+          claim.warnings.push('invalid');
         }
 
         // if isser === subject, 
         if (claim.issuer === claim.subject) {
-          claim.selfIssued = true;
-          claim.color = 0;
-        }
-
-        if (claim.name !== '/') {
-          claim.claims = await this.getClaims(claim.issuer, claim.parent);
-        } else {
-          claim.claims = [ ];
-
-          // simulate evan
-          claim.treeValid = true;
-          claim.displayName = 'evan';
-          claim.color = 1;
-          claim.issued = false;
-          claim.confirmed = true;
-          claim.creationDate = (new Date(0)).getTime();
+          claim.warnings.push('selfIssued');
         }
 
         // TODO: expiration date
         claim.expired = false;
+
+        // load all sub claims
+        claim.parents = await this.getClaims(claim.issuer, claim.parent);
+
+        // load the computed status of all parent claims, to check if the parent tree is valid
+        const computed = this.getComputedClaim(claim.parent, claim.parents);
+        if (computed.status === -1) {
+          claim.warnings.push('parentMissing');
+        } else if (computed.status === 0) {
+          claim.warnings.push('parentUntrusted');
+        }
+
+        // set computed status
+        claim.status = claim.warnings.length > 0 ? 0 : 1;
       }));
     }
 
     // if no claims are available the status would be "no claim issued"
     if (claims.length === 0) {
       claims.push({
-        claims: [ ],
-        color: 2,
-        existing: false,
+        displayName: topic.split('/').pop(),
         name: topic,
+        parents: [ ],
+        status: -1,
         subject: '0x1637Fa43D44a1Fb415D858a3cf4F7F8596A4048F',
-        treeValid: false,
-        valid: false,
+        warnings: [ 'missing' ],
       });
+
+      // TODO: enable evan tree checking, if root evan claim was issued
+      if (topic === '') {
+        // simulate evan
+        claims[0].creationDate = (new Date(0)).getTime();
+        claims[0].displayName = 'evan';
+        claims[0].status = 1;
+        claims[0].warnings = [ ];
+      }
     }
+
+    claims[0].icon = 'https://upload.wikimedia.org/wikipedia/de/6/63/T%C3%9CV_S%C3%BCd_logo.svg'
 
     return claims;
   }
@@ -176,13 +175,42 @@ export class EvanClaimService {
   /**
    * Takes an array of claims and combines all the states for one quick view.
    *
-   * @return     {any}  computed claim including latest creationDate, combined color, displayName
+   * @param      {string}      topic   topic of all the claims
+   * @param      {Array<any>}  claims  all claims of a specific topic
+   * @return     {any}         computed claim including latest creationDate, combined color,
+   *                           displayName
    */
-  private getComputedClaim(claims: Array<any>) {
-    const computed = { };
+  public getComputedClaim(topic: string, claims: Array<any>) {
+    const computed:any = {
+      claimCount: claims.length,
+      creationDate: null,
+      displayName: topic.split('/').pop(),
+      name: topic,
+      status: -1,
+      warnings: [ ],
+    };
 
+    // keep creationDates of all claims, so we can check after the final combined status was set,
+    // which creation date should be used
+    const creationDates = { '-1': [ ], '0': [ ], '1': [ ]}
+
+    // iterate through all claims and check for warnings and the latest creation date of an claim
     for (let claim of claims) {
-     
+      // concadinate all warnings
+      computed.warnings = computed.warnings.concat(claim.warnings);
+
+      // use the highest status (-1 missing, 0 issued, 1 valid)
+      computed.status = computed.status < claim.status ? claim.status : computed.status;
+      
+      // save all creation dates for later usage
+      if (typeof claim.creationDate !== 'undefined') {
+        creationDates[claim.status].push(claim.creationDate);
+      }
+    }
+
+    // use the latest creationDate for the specific status
+    if (creationDates[computed.status].length > 0) {
+      computed.creationDate = creationDates[computed.status].sort().pop();
     }
 
     return computed;

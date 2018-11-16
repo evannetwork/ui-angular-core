@@ -30,6 +30,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  DomSanitizer,
   ElementRef,
   EventEmitter,
   Input,
@@ -44,6 +45,7 @@ import { AsyncComponent } from '../../classes/AsyncComponent';
 import { EvanBCCService } from '../../services/bcc/bcc';
 import { EvanCoreService } from '../../services/bcc/core';
 import { EvanClaimService } from '../../services/bcc/claims';
+import { EvanTranslationService } from '../../services/ui/translate';
 
 /**************************************************************************************************/
 
@@ -80,29 +82,36 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   @Input() mode: string;
 
+  /**
+   * use computed view and only one claim instead of all possible ones (will display a small claim
+   * count at the right of the card)
+   */
+  @Input() compute: boolean = true;
+
+  /**
+   * do not use computed view and display all of the claims directly
+   */
+  @Input() expand: boolean = false;
+
   /*****************    variables    *****************/
   /**
    * available display modes
    */
   private availableModes = [
-     // one card showing claim name, issuer, subject
-    'detail',
-    // shows all 
-    'full',
-    // only one card that displays the combined status (full detail using popup by click on the
-    // card)
-    'minimal',
+    'icon', // only circle that displays the icon
+    'normal', // icon, displayname, creation date, sub claim count
+    'detail', // normal + from / to, issued + valid until + status
   ];
 
   /**
    * All available claims for the given topic
    */
-  private claims: Array<any>;
+  private claims: Array<any> = [ { loading: true } ];
   
   /**
    * concadinated claim including computed status
    */
-  private claim: any;
+  private computed: any = { loading: true };
 
   /**
    * Are currently the claims loading?
@@ -111,11 +120,13 @@ export class EvanClaimComponent extends AsyncComponent {
 
   /***************** initialization  *****************/
   constructor(
+    private _DomSanitizer: DomSanitizer,
     private bcc: EvanBCCService,
     private claimService: EvanClaimService,
     private core: EvanCoreService,
     private element: ElementRef,
     private menuController: MenuController,
+    private translate: EvanTranslationService,
     public ref: ChangeDetectorRef,
   ) {
     super(ref);
@@ -128,7 +139,7 @@ export class EvanClaimComponent extends AsyncComponent {
     // await this.bcc.claims.setClaim(this.core.activeAccount(), this.address, this.topic);
     if (this.availableModes.indexOf(this.mode) === -1) {
       console.error(`EvanClaimComponent: ${ this.mode } is not a valid display mode.`);
-      this.mode = 'detail';
+      this.mode = 'normal';
     }
 
     this.loadClaims();
@@ -150,7 +161,10 @@ export class EvanClaimComponent extends AsyncComponent {
     this.loadingClaims = true;
     this.ref.detectChanges();
 
+    // load claims and the computed status to be able to display a combined view for all claims of a
+    // specific topic
     this.claims = await this.claimService.getClaims(this.address, this.topic);
+    this.computed = this.claimService.getComputedClaim(this.topic, this.claims);
 
     this.loadingClaims = false;
     this.ref.detectChanges();
