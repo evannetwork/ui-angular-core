@@ -31,6 +31,11 @@ export const de = {
     "account-changed-description": "Sie haben Ihren aktiven Account geändert.<br> Die Seite / Applikation muss <b>neu geladen werden</b>.",
     "camera": "Kamera",
     "cancel": "Abbrechen",
+    "claims": {
+      "accept": "Zertifikat bestätigen",
+      "delete": "Zertifikat ablehnen",
+      "issue": "Zertifikat ausstellen",
+    },
     "contract-members": {
       "add-members": "Mitglieder hinzufügen",
       "i": "Mein Account",

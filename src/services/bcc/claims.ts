@@ -30,6 +30,10 @@ import {
 } from 'bcc';
 
 import {
+  getDomainName
+} from 'dapp-browser';
+
+import {
   OnInit, Injectable, // '@angular/core';
 } from 'angular-libs';
 
@@ -37,7 +41,8 @@ import { SingletonService } from '../singleton-service';
 import { EvanCoreService } from './core';
 import { EvanBCCService } from './bcc';
 import { EvanUtilService } from '../utils';
-
+import { EvanQueue } from './queue';
+import { QueueId } from './queue-utilities';
 
 /**************************************************************************************************/
 
@@ -54,12 +59,49 @@ export class EvanClaimService {
   constructor(
     private bcc: EvanBCCService,
     private core: EvanCoreService,
+    private queue: EvanQueue,
     private singleton: SingletonService,
     private utils: EvanUtilService,
   ) {
     return singleton.create(EvanClaimService, this, () => {
 
     }, true);
+  }
+
+  /**
+   * Return the queue id to watch for any action for a demo.
+   *
+   * @param      {string}   dispatcher  optional name of the dispatcher (default is * = watch
+   *                                    everythign)
+   * @return     {QueueId}  The handling queue identifier.
+   */
+  public getQueueId(dispatcher: string = '*', id: string = '*'): QueueId {
+    return new QueueId(`claims.${ getDomainName() }`, dispatcher, id);
+  }
+
+  /**
+   * Checks if a claim is current loading (issuing, accepting, deleting).
+   *
+   * @param      {<type>}   claim   The claim
+   * @return     {boolean}  True if claimn loading, False otherwise.
+   */
+  public isClaimLoading(claim: any) {
+    const activeAccount = this.core.activeAccount();
+    const issueData = this.queue.getQueueEntry(this.getQueueId('issueDispatcher'), true).data;
+    const acceptData = this.queue.getQueueEntry(this.getQueueId('acceptDispatcher'), true).data;
+    const deleteData = this.queue.getQueueEntry(this.getQueueId('deleteDispatcher'), true).data;
+
+    // check if the current logged in user, accepts or deletes a claim
+    const acceptOrDelete = [ ].concat(acceptData, deleteData).filter(entry => {
+      return activeAccount === claim.subject && entry.topic === claim.name;
+    }).length > 0;
+
+    // check if the current logged in user issues a new claim
+    const issue = issueData.filter(entry => {
+      return entry.topic === claim.name;
+    }).length > 0;
+
+    return acceptOrDelete || issue;
   }
 
   /**
@@ -102,6 +144,7 @@ export class EvanClaimService {
   public async getClaims(address: string, topic: string) {
     const claims = await this.bcc.claims.getClaims(topic, address);
 
+
     if (claims.length > 0) {
       // build display name for claims and apply computed states for ui status
       await prottle(10, claims.map(claim => async () => {
@@ -110,6 +153,10 @@ export class EvanClaimService {
         claim.displayName = splitName.pop();
         claim.parent = splitName.join('/');
         claim.warnings = [ ];
+
+        // check if anything is loading for the claim (accept, issue, delete)
+        claim.loading = this.isClaimLoading(claim);
+
         // set initial color status, will be overruled by computed states
         claim.color = claim.status;
 
@@ -150,6 +197,7 @@ export class EvanClaimService {
     if (claims.length === 0) {
       claims.push({
         displayName: topic.split('/').pop(),
+        loading: this.isClaimLoading({ address, topic }),
         name: topic,
         parents: [ ],
         status: -1,
@@ -185,6 +233,7 @@ export class EvanClaimService {
       claimCount: claims.length,
       creationDate: null,
       displayName: topic.split('/').pop(),
+      loading: claims.filter(claim => claim.loading).length > 0,
       name: topic,
       status: -1,
       warnings: [ ],

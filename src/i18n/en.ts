@@ -31,6 +31,11 @@ export const en = {
     "account-changed-description": "You changed or locked your current account.<br> The page / application needs to be <b>refreshed</b>.",
     "camera": "Camera",
     "cancel": "Cancel",
+    "claims": {
+      "accept": "accept claim",
+      "delete": "decline claim",
+      "issue": "issue claim"
+    },
     "contract-members": {
       "add-members": "Add members",
       "i": "My Account",

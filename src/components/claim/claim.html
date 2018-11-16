@@ -68,6 +68,7 @@
       </div>
       <div class="claim-count" *ngIf="claim.claimCount && claim.claimCount > 1">
         {{ claim.claimCount }} <ion-icon name="people"></ion-icon>
+        <ion-spinner *ngIf="claim.loading"></ion-spinner>
       </div>
     </ng-container>
   </div>
@@ -81,5 +82,33 @@
     <ng-container *ngFor="let claim of claims">
       <ng-container *ngTemplateOutlet="claimDisplay;context:{ claim: claim }"></ng-container>
     </ng-container>
+  </ng-container>
+
+  <button ion-button outline round margin-top icon-left
+    class="issue-claim"
+    *ngIf="!loadingClaims && enableIssue && canIssueClaim"
+    [disabled]="computed.loading"
+    (click)="triggerDispatcher('issueDispatcher')">
+    <ion-spinner *ngIf="computed.loading"></ion-spinner>
+    {{ '_angularcore.claims.issue' | translate }}
+  </button>
+
+  <ng-container *ngIf="core.activeAccount() === address">
+    <button ion-button outline round margin-top icon-left color="danger"
+      class="issue-claim"
+      *ngIf="!loadingClaims"
+      [disabled]="computed.loading"
+      (click)="triggerDispatcher('deleteDispatcher')">
+      <ion-spinner *ngIf="computed.loading"></ion-spinner>
+      {{ '_angularcore.claims.delete' | translate }}
+    </button>
+    <button ion-button outline round margin-top icon-left color="success"
+      class="issue-claim"
+      *ngIf="!loadingClaims"
+      [disabled]="computed.loading"
+      (click)="triggerDispatcher('acceptDispatcher')">
+      <ion-spinner *ngIf="computed.loading"></ion-spinner>
+      {{ '_angularcore.claims.accept' | translate }}
+    </button>
   </ng-container>
 </ng-container>

@@ -45,6 +45,7 @@ import { AsyncComponent } from '../../classes/AsyncComponent';
 import { EvanBCCService } from '../../services/bcc/bcc';
 import { EvanCoreService } from '../../services/bcc/core';
 import { EvanClaimService } from '../../services/bcc/claims';
+import { EvanQueue } from '../../services/bcc/queue';
 import { EvanTranslationService } from '../../services/ui/translate';
 
 /**************************************************************************************************/
@@ -53,11 +54,6 @@ import { EvanTranslationService } from '../../services/ui/translate';
  * { function_description }
  *
  * @class      Component EvanClaimComponent
- * @param      {<type>}  selector         The selector
- * @param      {<type>}  templateUrl      The template url
- * @param      {<type>}  animations       The animations
- * @param      {<type>}  changeDetection  The change detection
- * @return     {<type>}  { description_of_the_return_value }
  */
 @Component({
   selector: 'evan-claim',
@@ -93,6 +89,11 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   @Input() expand: boolean = false;
 
+  /**
+   * Are issue buttons are available? Not avaialble for icon mode
+   */
+  @Input() enableIssue: boolean;
+
   /*****************    variables    *****************/
   /**
    * available display modes
@@ -118,6 +119,17 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   private loadingClaims: boolean;
 
+  /**
+   * can a user issue a new claim (when no claim was issued before by the logged in user for the
+   * selected topic and account)
+   */
+  private canIssueClaim: boolean;
+
+  /**
+   * Function to unsubscribe from queue results.
+   */
+  private queueWatcher: Function;
+
   /***************** initialization  *****************/
   constructor(
     private _DomSanitizer: DomSanitizer,
@@ -126,6 +138,7 @@ export class EvanClaimComponent extends AsyncComponent {
     private core: EvanCoreService,
     private element: ElementRef,
     private menuController: MenuController,
+    private queue: EvanQueue,
     private translate: EvanTranslationService,
     public ref: ChangeDetectorRef,
   ) {
@@ -136,13 +149,23 @@ export class EvanClaimComponent extends AsyncComponent {
    * 
    */
   async _ngOnInit() {
-    // await this.bcc.claims.setClaim(this.core.activeAccount(), this.address, this.topic);
     if (this.availableModes.indexOf(this.mode) === -1) {
       console.error(`EvanClaimComponent: ${ this.mode } is not a valid display mode.`);
       this.mode = 'normal';
     }
 
-    this.loadClaims();
+    // enable issue buttons when no values was provided and the display mode is not icon
+    if (typeof this.enableIssue === 'undefined' && this.mode !== 'icon') {
+      this.enableIssue = true;
+    }
+
+    // watch for any claim updates
+    this.queueWatcher = await this.queue.onQueueFinish(
+      this.claimService.getQueueId(),
+      async (reload, results) => {
+        this.loadClaims();
+      }
+    );
   }
 
   /**
@@ -158,6 +181,8 @@ export class EvanClaimComponent extends AsyncComponent {
    * @return     {Promise<void>}  resolved when done
    */
   private async loadClaims() {
+    const activeAccount = this.core.activeAccount();
+
     this.loadingClaims = true;
     this.ref.detectChanges();
 
@@ -165,8 +190,29 @@ export class EvanClaimComponent extends AsyncComponent {
     // specific topic
     this.claims = await this.claimService.getClaims(this.address, this.topic);
     this.computed = this.claimService.getComputedClaim(this.topic, this.claims);
+    this.canIssueClaim = this.claims.filter(claim => claim.issuer === activeAccount).length === 0;
 
     this.loadingClaims = false;
+    this.ref.detectChanges();
+  }
+
+  /**
+   * Issue a new claim the current opened topic and the subject.
+   *
+   * @param      {string}  type    type of the dispatcher (issueDispatcher, acceptDispatcher,
+   *                               deleteDispatcher)
+   */
+  private triggerDispatcher(type: string) {
+    this.queue.addQueueData(
+      this.claimService.getQueueId(type),
+      {
+        address: this.address,
+        issuer: this.claims.map(claim => claim.issuer).pop(),
+        topic: this.topic,
+      }
+    );
+
+    this.computed.loading = true;
     this.ref.detectChanges();
   }
 }
