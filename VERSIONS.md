@@ -2,6 +2,8 @@
 
 ## Next Version
 ### Features
+- add `includeActiveAccount` to `contract-members` component
+
 ### Fixes
 ### Deprecations
 

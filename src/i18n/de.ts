@@ -33,8 +33,23 @@ export const de = {
     "cancel": "Abbrechen",
     "claims": {
       "accept": "Zertifikat bestätigen",
+      "close-details": "schließen",
+      "creation-date": "Erstelldatum",
       "delete": "Zertifikat ablehnen",
+      "details": "Zertifikatsdetails",
+      "expiration-date": "Ablaufdatum",
       "issue": "Zertifikat ausstellen",
+      "issuer": "Aussteller",
+      "subject": "Zugewiesener",
+      "warnings": {
+        "invalid": "manipuliert",
+        "issued": "nicht bestätigt",
+        "missing": "nicht erstellt",
+        "parentMissing": "Pfad nicht existent",
+        "parentUntrusted": "Pfad nicht bestätigt",
+        "selfIssued": "selbst erstellt",
+        "title": "Warnungen"
+      }
     },
     "contract-members": {
       "add-members": "Mitglieder hinzufügen",

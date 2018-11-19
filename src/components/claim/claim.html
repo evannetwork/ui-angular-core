@@ -25,8 +25,15 @@
   https://evan.network/license/
 -->
 
-<ng-template #claimDisplay let-claim="claim">
-  <div [class]="'evan-claim mode-' + mode + ' status-' + claim.status">
+<ng-template #userAlias let-address="address">
+  <ng-container *ngIf="address">
+    {{ (addressbook[address]?.alias || addressbook[address]?.email) ? (addressbook[address]?.alias || addressbook[address]?.email) + ' (' + address + ')' : address }}
+  </ng-container>
+</ng-template>
+
+<ng-template #claimDisplay let-claim="claim" let-mode="mode">
+  <div [class]="'evan-claim mode-' + mode + ' status-' + claim.status"
+    (click)="activateClaim(claim)">
     <div class="claim-icon">
       <ion-spinner *ngIf="loadingClaims"></ion-spinner>
       <ng-container *ngIf="!loadingClaims">
@@ -74,41 +81,118 @@
   </div>
 </ng-template>
 
+<ng-template #claimDetailDisplay let-claim="claim">
+  <div [class]="'evan-detailed-claim status-' + claim.status">
+    <ng-container *ngTemplateOutlet="claimDisplay;context:{ claim: claim, mode: 'normal' }"></ng-container>
+    <div class="metadata">
+      <ion-row *ngIf="!loadingClaims">
+        <ion-col col-12 col-md-9>
+          <div *ngIf="claim.issuerAccount">
+            <b>{{ '_angularcore.claims.issuer' | translate }}</b>:
+            <span>
+              <ng-container *ngTemplateOutlet="userAlias;context:{ address:claim.issuerAccount  }"></ng-container>
+            </span>
+          </div>
+          <div *ngIf="claim.subject">
+            <b>{{ '_angularcore.claims.subject' | translate }}</b>:
+            <span>
+              <ng-container *ngTemplateOutlet="userAlias;context:{ address:claim.subject  }"></ng-container>
+            </span>
+          </div>
+          <div *ngIf="claim.creationDate">
+            <b>{{ '_angularcore.claims.creation-date' | translate }}</b>:
+            <span>{{ claim.creationDate | date:'mediumDate':'':translate.translate.currentLang }}</span>
+          </div>
+          <div *ngIf="claim.expirationDate">
+            <b>{{ '_angularcore.claims.expiration-date' | translate }}</b>:
+            <span>{{ claim.expirationDate | date:'mediumDate':'':translate.translate.currentLang }}</span>
+          </div>
+          <div *ngIf="claim.warnings && claim.warnings.length > 0">
+            <b>{{ '_angularcore.claims.warnings.title' | translate }}</b>:
+            <span>
+              <ng-container *ngFor="let warning of claim.warnings; let i = index">
+                {{ i !== 0 ? ', ' : '' }}{{ '_angularcore.claims.warnings.' + warning | translate }}
+              </ng-container>
+            </span>
+          </div>
+        </ion-col>
+
+        <ion-col col-12 col-md-3 class="evan-claim-tree" *ngIf="claim.tree.length > 0">
+          <div class="sub-claim-connector"></div>
+          <ion-icon name="arrow-up"></ion-icon>
+          <ng-container *ngFor="let claim of claim.tree">
+            <ng-container *ngTemplateOutlet="claimDisplay;context:{ claim: claim, mode: 'normal' }"></ng-container>
+          </ng-container>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <div text-center margin-top *ngIf="!loadingClaims">
+      <button ion-button outline round icon-left
+        *ngIf="enableIssue && canIssueClaim"
+        [disabled]="computed.loading"
+        (click)="triggerDispatcher(claim, 'issueDispatcher')">
+        <ion-spinner *ngIf="computed.loading"></ion-spinner>
+        {{ '_angularcore.claims.issue' | translate }}
+      </button>
+      <ng-container *ngIf="core.activeAccount() === address && claim.warnings.indexOf('selfIssued') === -1 && claim.warnings.indexOf('issued') !== -1">
+        <button ion-button outline round icon-left color="danger"
+          [disabled]="computed.loading"
+          (click)="triggerDispatcher(claim, 'deleteDispatcher')">
+          <ion-spinner *ngIf="computed.loading"></ion-spinner>
+          {{ '_angularcore.claims.delete' | translate }}
+        </button>
+        <button ion-button outline round icon-left color="success"
+          [disabled]="computed.loading"
+          (click)="triggerDispatcher(claim, 'acceptDispatcher')">
+          <ion-spinner *ngIf="computed.loading"></ion-spinner>
+          {{ '_angularcore.claims.accept' | translate }}
+        </button>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
 <ng-container *ngIf="!loading">
-  <ng-container *ngIf="compute">
-    <ng-container *ngTemplateOutlet="claimDisplay;context:{ claim: computed }"></ng-container>
-  </ng-container>
-  <ng-container *ngIf="!compute">
-    <ng-container *ngFor="let claim of claims">
-      <ng-container *ngTemplateOutlet="claimDisplay;context:{ claim: claim }"></ng-container>
+  <ng-container *ngIf="mode !== 'detail'">
+    <ng-container *ngIf="compute">
+      <ng-container *ngTemplateOutlet="claimDisplay;context:{ claim: computed, mode: mode }"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="!compute">
+      <ng-container *ngFor="let claim of claims">
+        <ng-container *ngTemplateOutlet="claimDisplay;context:{ claim: claim, mode: mode }"></ng-container>
+      </ng-container>
     </ng-container>
   </ng-container>
 
-  <button ion-button outline round margin-top icon-left
-    class="issue-claim"
-    *ngIf="!loadingClaims && enableIssue && canIssueClaim"
-    [disabled]="computed.loading"
-    (click)="triggerDispatcher('issueDispatcher')">
-    <ion-spinner *ngIf="computed.loading"></ion-spinner>
-    {{ '_angularcore.claims.issue' | translate }}
-  </button>
+  <ion-row *ngIf="mode === 'detail'">
+    <ion-col col-12 col-md-6 *ngIf="loadingClaims">
+      <ng-container *ngTemplateOutlet="claimDetailDisplay;context:{ claim: computed, mode: mode }"></ng-container>
+    </ion-col>
+    <ng-container *ngIf="!loadingClaims">
+      <ion-col col-12 col-md-6 *ngFor="let claim of claims">
+        <ng-container *ngTemplateOutlet="claimDetailDisplay;context:{ claim: claim, mode: mode }"></ng-container>
+      </ion-col>
+    </ng-container>
+  </ion-row>
 
-  <ng-container *ngIf="core.activeAccount() === address">
-    <button ion-button outline round margin-top icon-left color="danger"
-      class="issue-claim"
-      *ngIf="!loadingClaims"
-      [disabled]="computed.loading"
-      (click)="triggerDispatcher('deleteDispatcher')">
-      <ion-spinner *ngIf="computed.loading"></ion-spinner>
-      {{ '_angularcore.claims.delete' | translate }}
-    </button>
-    <button ion-button outline round margin-top icon-left color="success"
-      class="issue-claim"
-      *ngIf="!loadingClaims"
-      [disabled]="computed.loading"
-      (click)="triggerDispatcher('acceptDispatcher')">
-      <ion-spinner *ngIf="computed.loading"></ion-spinner>
-      {{ '_angularcore.claims.accept' | translate }}
-    </button>
-  </ng-container>
+  <div class="evan-modal" [class.show-modal]="!!activeClaims">
+    <div class="backdrop" (click)="this.activeClaims = null; ref.detectChanges()"></div>
+
+    <div class="evan-content evan-small-content" *ngIf="activeClaims">
+      <h2 class="content-header">{{ '_angularcore.claims.details' | translate }}</h2>
+
+      <div margin-vertical *ngFor="let claim of activeClaims">
+        <ng-container *ngTemplateOutlet="claimDetailDisplay;context:{ claim: claim }"></ng-container>
+      </div>
+
+      <div margin-top text-center>
+        <button ion-button icon-left color="medium-gray" round outline
+          (click)="this.activeClaims = null; ref.detectChanges()">
+          <ion-icon name="close" color="light"></ion-icon>
+          <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
 </ng-container>

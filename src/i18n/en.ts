@@ -33,8 +33,23 @@ export const en = {
     "cancel": "Cancel",
     "claims": {
       "accept": "accept claim",
+      "close-details": "close",
+      "creation-date": "Creation date",
       "delete": "decline claim",
-      "issue": "issue claim"
+      "details": "Claim detail",
+      "expiration-date": "Expiration date",
+      "issue": "issue claim",
+      "issuer": "Issuer",
+      "subject": "Subject",
+      "warnings": {
+        "invalid": "manipulated",
+        "issued": "not confirmed",
+        "missing": "not created",
+        "parentMissing": "path does not exist",
+        "parentUntrusted": "path not confirmed",
+        "selfIssued": "self-created",
+        "title": "Warnings"
+      }
     },
     "contract-members": {
       "add-members": "Add members",

@@ -131,6 +131,11 @@ export class ContractMembersComponent extends AsyncComponent {
   @Input() maxMembers?: number;
 
   /**
+   * include the current active account into the list
+   */
+  @Input() includeActiveAccount: boolean;
+
+  /**
    * Event trigger that is called when something has changed (account moved / removed)
    */
   @Output() public onChange: EventEmitter<any> = new EventEmitter();
@@ -219,9 +224,12 @@ export class ContractMembersComponent extends AsyncComponent {
     this.contactKeys = Object
       .keys(this.contacts)
       .filter(contactKey => {
-        return contactKey !== this.activeAccount &&
-               this.contacts[contactKey] &&
-               contactKey.indexOf('0x') === 0;
+        const isValid = this.contacts[contactKey] && contactKey.indexOf('0x') === 0;
+        if (this.includeActiveAccount) {
+          return isValid;
+        } else {
+          return isValid && contactKey !== this.activeAccount; 
+        }
       });
 
     this.contactSearchChanged();

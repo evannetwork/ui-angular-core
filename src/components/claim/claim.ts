@@ -42,9 +42,10 @@ import {
 } from 'angular-libs';
 
 import { AsyncComponent } from '../../classes/AsyncComponent';
+import { EvanAddressBookService } from '../../services/bcc/address-book';
 import { EvanBCCService } from '../../services/bcc/bcc';
-import { EvanCoreService } from '../../services/bcc/core';
 import { EvanClaimService } from '../../services/bcc/claims';
+import { EvanCoreService } from '../../services/bcc/core';
 import { EvanQueue } from '../../services/bcc/queue';
 import { EvanTranslationService } from '../../services/ui/translate';
 
@@ -83,11 +84,6 @@ export class EvanClaimComponent extends AsyncComponent {
    * count at the right of the card)
    */
   @Input() compute: boolean = true;
-
-  /**
-   * do not use computed view and display all of the claims directly
-   */
-  @Input() expand: boolean = false;
 
   /**
    * Are issue buttons are available? Not avaialble for icon mode
@@ -130,9 +126,25 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   private queueWatcher: Function;
 
+  /**
+   * identity contract address of the current user
+   */
+  private activeIdentity: any;
+
+  /**
+   * activate the detail popup when a claim was clicked 
+   */
+  private activeClaims: any;
+
+  /**
+   * current addressbook contact
+   */
+  private addressbook: any;
+
   /***************** initialization  *****************/
   constructor(
     private _DomSanitizer: DomSanitizer,
+    private addressBookService: EvanAddressBookService,
     private bcc: EvanBCCService,
     private claimService: EvanClaimService,
     private core: EvanCoreService,
@@ -172,7 +184,7 @@ export class EvanClaimComponent extends AsyncComponent {
    * 
    */
   async _ngOnDestroy() {
-
+    this.queueWatcher();
   }
 
   /**
@@ -186,11 +198,21 @@ export class EvanClaimComponent extends AsyncComponent {
     this.loadingClaims = true;
     this.ref.detectChanges();
 
+    // if identity could be loaded, extract the contract address
+    this.activeIdentity = await this.bcc.claims.getIdentityForAccount(activeAccount);
+    if (this.activeIdentity && this.activeIdentity.options) {
+      this.activeIdentity = this.activeIdentity.options.address;
+    } else {
+      this.activeIdentity = null;
+    }
+
     // load claims and the computed status to be able to display a combined view for all claims of a
     // specific topic
     this.claims = await this.claimService.getClaims(this.address, this.topic);
+    this.addressbook = await this.addressBookService.loadAccounts();
     this.computed = this.claimService.getComputedClaim(this.topic, this.claims);
-    this.canIssueClaim = this.claims.filter(claim => claim.issuer === activeAccount).length === 0;
+    this.canIssueClaim = this.claims.filter(claim => claim.issuer === this.activeIdentity)
+      .length === 0;
 
     this.loadingClaims = false;
     this.ref.detectChanges();
@@ -199,20 +221,39 @@ export class EvanClaimComponent extends AsyncComponent {
   /**
    * Issue a new claim the current opened topic and the subject.
    *
+   * @param      {any}     claim   the claim for that the action should be triggerd
    * @param      {string}  type    type of the dispatcher (issueDispatcher, acceptDispatcher,
    *                               deleteDispatcher)
    */
-  private triggerDispatcher(type: string) {
+  private triggerDispatcher(claim, type: string) {
     this.queue.addQueueData(
       this.claimService.getQueueId(type),
       {
         address: this.address,
-        issuer: this.claims.map(claim => claim.issuer).pop(),
-        topic: this.topic,
+        issuer: claim.issuerAccount,
+        topic: claim.name,
       }
     );
 
     this.computed.loading = true;
     this.ref.detectChanges();
+  }
+
+  /**
+   * Gets a claim
+   *
+   * @return     {<type>}  { description_of_the_return_value }
+   */
+  private activateClaim(claimToActivate: any) {
+    this.activeClaims = [ ];
+
+    // if no sub claims exists, it's only a single claim and we do not need solve the computed
+    // one, else, we need to show multiple claims
+    this.activeClaims = [ claimToActivate ];
+    if (claimToActivate.claims) {
+      this.activeClaims = claimToActivate.claims;
+    }
+
+    this.ref.detectChanges()
   }
 }

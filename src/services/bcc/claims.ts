@@ -105,10 +105,108 @@ export class EvanClaimService {
   }
 
   /**
+   * Use this function when you want to implement the full tree view! Currently we will concadinate
+   * all parents to one.
+   *
+   * Picks up a claim and it's origin parents tree structure and traces all claims into a flat
+   * structure for displaying it easily.
+   *
+   * @param      {any}                claim       the claim including parents
+   * @param      {Array<Array<any>>}  flatClaims  The final flatted claims, Array of arrays from the
+   *                                              lowest to the highest claim
+   * @param      {Array<any>}         origin      the flatted claim Array for one parent that will
+   *                                              be pushed into the flatClaims array
+   */
+  private flatClaimsTree (claim, flatClaims, origin = [ ]) {
+    origin.unshift(claim);
+
+    if (claim.parents && claim.parents.length > 0) {
+      for (let parent of claim.parents) {
+        this.flatClaimsTree(parent, flatClaims, [ ].concat(origin));
+      }
+    } else {
+      flatClaims.push(origin);
+    }
+  }
+
+  /**
+   * Iterates recursivly through all parents of a claim and splits them into specific levels.
+   * 
+   * a = {
+   *   name: '/company/b-s-s/department',
+   *   parent: '/company/b-s-s',
+   *   parents: [
+   *     {
+   *       name: '/company/b-s-s',
+   *       parent: '/company',
+   *       parents: [
+   *         { name: 'company', },
+   *         { name: 'company', },
+   *         { name: 'company', }
+   *       ]
+   *     },
+   *     {
+   *       name: '/company/b-s-s',
+   *       parent: '/company',
+   *       parents: [
+   *         { name: 'company' },
+   *         {
+   *           name: 'company'
+   *           parent: '/',
+   *           parents: [
+   *             { name: '/', },
+   *             { name: '/', }
+   *           ]
+   *         }
+   *       ]
+   *     }
+   *   ]  
+   * }
+   * 
+   * => 
+   *   [
+   *     [
+   *       { name: '/company/b-s-s', parent: '/company' },
+   *       { name: '/company/b-s-s', parent: '/company' }
+   *     ],
+   *     [
+   *       { name: '/company', },
+   *       { name: '/company', }
+   *       { name: '/company', }
+   *       { name: '/company', }
+   *       { name: '/company', parent: '/company' }
+   *     ]
+   *     [
+   *       { name: '/', }
+   *       { name: '/', }
+   *     ]
+   *   ],
+   *
+   * @param      {any}         claim   the claim to parse
+   * @param      {Array<any>}  levels  all parent levels including the name and all claims of this
+   *                                   level
+   * @param      {number}      index   current level index
+   * @return     {Array<any>}  combined parents splitted into levels
+   */
+  flatClaimsToLevels(claim, levels = [ ], index = 0) {
+    if (claim.parents && claim.parents.length > 0) {
+      levels[index] = levels[index] || { name: claim.parent, claims: [ ] };
+      levels[index].claims = levels[index].claims.concat(claim.parents);
+
+      for (let parent of claim.parents) {
+        this.flatClaimsToLevels(parent, levels, index + 1)
+      }
+    }
+
+    return levels;
+  }
+
+  /**
    * Get all the claims for a specific address.
    *
-   * @param      {string}      address  address to load the claims for.
-   * @param      {string}      topic    topic to load the claims for.
+   * @param      {string}      address     address to load the claims for.
+   * @param      {string}      topic       topic to load the claims for.
+   * @param      {boolean}     isIdentity  optional indicates if the subject is already a identity
    * @return     {Array<any>}  all the claims with the following properties.
    *   {
    *     // creator of the claim
@@ -141,9 +239,8 @@ export class EvanClaimService {
    *     treeValid: false,
    *   }
    */
-  public async getClaims(address: string, topic: string) {
-    const claims = await this.bcc.claims.getClaims(topic, address);
-
+  public async getClaims(address: string, topic: string, isIdentity?: boolean) {
+    const claims = await this.bcc.claims.getClaims(topic, address, isIdentity);
 
     if (claims.length > 0) {
       // build display name for claims and apply computed states for ui status
@@ -153,12 +250,18 @@ export class EvanClaimService {
         claim.displayName = splitName.pop();
         claim.parent = splitName.join('/');
         claim.warnings = [ ];
+        claim.creationDate = claim.creationDate * 1000;
+
+        // recover the original account id for the identity issuer
+        claim.subjectIdentity = await this.bcc.executor.executeContractCall(
+          this.bcc.claims.contracts.storage, 'users', claim.subject);
+        const dataHash = this.bcc.nameResolver
+          .soliditySha3(claim.subjectIdentity, claim.topic, claim.data).replace('0x', '');
+        claim.issuerAccount = this.bcc.executor.web3.eth.accounts
+          .recover(dataHash, claim.signature);
 
         // check if anything is loading for the claim (accept, issue, delete)
         claim.loading = this.isClaimLoading(claim);
-
-        // set initial color status, will be overruled by computed states
-        claim.color = claim.status;
 
         if (claim.status === 0) {
           claim.warnings.push('issued');
@@ -170,7 +273,7 @@ export class EvanClaimService {
         }
 
         // if isser === subject, 
-        if (claim.issuer === claim.subject) {
+        if (claim.issuerAccount === claim.subject) {
           claim.warnings.push('selfIssued');
         }
 
@@ -178,13 +281,18 @@ export class EvanClaimService {
         claim.expired = false;
 
         // load all sub claims
-        claim.parents = await this.getClaims(claim.issuer, claim.parent);
+        claim.parents = await this.getClaims(claim.issuer, claim.parent, true);
+
+        // use all the parents and create a viewable computed tree
+        claim.tree = this
+          .flatClaimsToLevels(claim)
+          .map(level => this.getComputedClaim(level.name, level.claims));
 
         // load the computed status of all parent claims, to check if the parent tree is valid
-        const computed = this.getComputedClaim(claim.parent, claim.parents);
-        if (computed.status === -1) {
+        claim.parentComputed = this.getComputedClaim(claim.parent, claim.parents);
+        if (claim.parentComputed.status === -1) {
           claim.warnings.push('parentMissing');
-        } else if (computed.status === 0) {
+        } else if (claim.parentComputed.status === 0) {
           claim.warnings.push('parentUntrusted');
         }
 
@@ -202,6 +310,7 @@ export class EvanClaimService {
         parents: [ ],
         status: -1,
         subject: '0x1637Fa43D44a1Fb415D858a3cf4F7F8596A4048F',
+        tree: [ ],
         warnings: [ 'missing' ],
       });
 
@@ -230,9 +339,9 @@ export class EvanClaimService {
    */
   public getComputedClaim(topic: string, claims: Array<any>) {
     const computed:any = {
-      claimCount: claims.length,
+      claims: claims,
       creationDate: null,
-      displayName: topic.split('/').pop(),
+      displayName: topic.split('/').pop() || 'evan',
       loading: claims.filter(claim => claim.loading).length > 0,
       name: topic,
       status: -1,
