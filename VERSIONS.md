@@ -3,6 +3,8 @@
 ## Next Version
 ### Features
 - add `includeActiveAccount` to `contract-members` component
+- add `evan-claim` component for displaying claims using and topic and several display modes (icon, normal, detail)
+- add `EvanClaimsService` to handle `api-blockchain-core` claims api
 
 ### Fixes
 ### Deprecations

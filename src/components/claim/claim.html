@@ -27,7 +27,12 @@
 
 <ng-template #userAlias let-address="address">
   <ng-container *ngIf="address">
-    {{ (addressbook[address]?.alias || addressbook[address]?.email) ? (addressbook[address]?.alias || addressbook[address]?.email) + ' (' + address + ')' : address }}
+    <ng-container *ngIf="address === claimService.ensRootOwner">
+      evan ({{ claimService.ensRootOwner }})
+    </ng-container>
+    <ng-container *ngIf="address !== claimService.ensRootOwner">
+      {{ (addressbook[address]?.alias || addressbook[address]?.email) ? (addressbook[address]?.alias || addressbook[address]?.email) + ' (' + address + ')' : address }}
+    </ng-container>
   </ng-container>
 </ng-template>
 
@@ -86,7 +91,7 @@
     <ng-container *ngTemplateOutlet="claimDisplay;context:{ claim: claim, mode: 'normal' }"></ng-container>
     <div class="metadata">
       <ion-row *ngIf="!loadingClaims">
-        <ion-col col-12 col-md-9>
+        <ion-col col-12 col-md-8>
           <div *ngIf="claim.issuerAccount">
             <b>{{ '_angularcore.claims.issuer' | translate }}</b>:
             <span>
@@ -99,13 +104,15 @@
               <ng-container *ngTemplateOutlet="userAlias;context:{ address:claim.subject  }"></ng-container>
             </span>
           </div>
-          <div *ngIf="claim.creationDate">
-            <b>{{ '_angularcore.claims.creation-date' | translate }}</b>:
-            <span>{{ claim.creationDate | date:'mediumDate':'':translate.translate.currentLang }}</span>
-          </div>
-          <div *ngIf="claim.expirationDate">
-            <b>{{ '_angularcore.claims.expiration-date' | translate }}</b>:
-            <span>{{ claim.expirationDate | date:'mediumDate':'':translate.translate.currentLang }}</span>
+          <div class="display-flex" *ngIf="claim.creationDate || claim.expirationDate">
+            <div margin-right *ngIf="claim.creationDate">
+              <b>{{ '_angularcore.claims.creation-date' | translate }}</b>:
+              <span>{{ claim.creationDate | date:'mediumDate':'':translate.translate.currentLang }}</span>
+            </div>
+            <div margin-left *ngIf="claim.expirationDate">
+              <b>{{ '_angularcore.claims.expiration-date' | translate }}</b>:
+              <span>{{ claim.expirationDate | date:'mediumDate':'':translate.translate.currentLang }}</span>
+            </div>
           </div>
           <div *ngIf="claim.warnings && claim.warnings.length > 0">
             <b>{{ '_angularcore.claims.warnings.title' | translate }}</b>:
@@ -117,7 +124,7 @@
           </div>
         </ion-col>
 
-        <ion-col col-12 col-md-3 class="evan-claim-tree" *ngIf="claim.tree.length > 0">
+        <ion-col col-12 col-md-4 class="evan-claim-tree" *ngIf="claim.tree.length > 0">
           <div class="sub-claim-connector"></div>
           <ion-icon name="arrow-up"></ion-icon>
           <ng-container *ngFor="let claim of claim.tree">
@@ -127,11 +134,11 @@
       </ion-row>
     </div>
 
-    <div text-center margin-top *ngIf="!loadingClaims">
+    <div text-center margin-top *ngIf="true || (!loadingClaims && topic !== '/' && topic !== '')">
       <button ion-button outline round icon-left
         *ngIf="enableIssue && canIssueClaim"
         [disabled]="computed.loading"
-        (click)="triggerDispatcher(claim, 'issueDispatcher')">
+        (click)="this.issueClaim = claim; ref.detectChanges();">
         <ion-spinner *ngIf="computed.loading"></ion-spinner>
         {{ '_angularcore.claims.issue' | translate }}
       </button>
@@ -166,20 +173,23 @@
   </ng-container>
 
   <ion-row *ngIf="mode === 'detail'">
-    <ion-col col-12 col-md-6 *ngIf="loadingClaims">
+    <ion-col col-12 col-lg-6 *ngIf="loadingClaims">
       <ng-container *ngTemplateOutlet="claimDetailDisplay;context:{ claim: computed, mode: mode }"></ng-container>
     </ion-col>
     <ng-container *ngIf="!loadingClaims">
-      <ion-col col-12 col-md-6 *ngFor="let claim of claims">
+      <ion-col col-12 col-lg-6 *ngFor="let claim of claims">
         <ng-container *ngTemplateOutlet="claimDetailDisplay;context:{ claim: claim, mode: mode }"></ng-container>
       </ion-col>
     </ng-container>
   </ion-row>
 
-  <div class="evan-modal" [class.show-modal]="!!activeClaims">
+  <div class="evan-modal"
+    [class.show-modal]="!!activeClaims"
+    [class.disable-scrolling]="disableScrolling">
     <div class="backdrop" (click)="this.activeClaims = null; ref.detectChanges()"></div>
 
-    <div class="evan-content evan-small-content" *ngIf="activeClaims">
+    <div class="evan-content evan-small-content"
+      *ngIf="activeClaims">
       <h2 class="content-header">{{ '_angularcore.claims.details' | translate }}</h2>
 
       <div margin-vertical *ngFor="let claim of activeClaims">
@@ -191,6 +201,59 @@
           (click)="this.activeClaims = null; ref.detectChanges()">
           <ion-icon name="close" color="light"></ion-icon>
           <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="evan-modal"
+    [class.show-modal]="!!issueClaim"
+    [class.disable-scrolling]="disableScrolling">
+    <div class="backdrop" (click)="this.issueClaim = null; ref.detectChanges()"></div>
+
+    <div class="evan-content evan-small-content" *ngIf="issueClaim">
+      <h2 class="content-header">{{ '_angularcore.claims.issue-claim' | translate }}</h2>
+
+      <div class="display-flex-justify">
+        <ion-checkbox margin-right
+          [(ngModel)]="issueClaim.enableExpirationDate"
+          (ionChange)="ref.detectChanges()"
+          (focusout)="ref.detectChanges()">
+        </ion-checkbox>
+        <ion-item>
+          <ion-label stacked>
+            {{ '_angularcore.claims.expiration-date' | translate }}*
+          </ion-label>
+          <ion-datetime
+            [disabled]="!issueClaim.enableExpirationDate"
+            displayFormat="DD-MM-YYYY H:mm"
+            pickerFormat="DD-MMM-YYYY HH:mm"
+            [(ngModel)]="issueClaim.expirationDate"
+            [placeholder]="'_angularcore.claims.expiration-date' | translate"
+            [cancelText]="'_angularcore.claims.cancel' | translate"
+            [doneText]="'_angularcore.claims.done' | translate"
+            minuteValues="0,15,30,45"
+            [min]="now"
+            [max]="maxDate"
+            [monthShortNames]="translate.monthShortNames"
+            (ionChange)="ref.detectChanges()"
+            (focusout)="ref.detectChanges()">
+          </ion-datetime>
+        </ion-item>
+      </div>
+
+      <div margin-top text-center>
+        <button ion-button icon-left color="medium-gray" round outline
+          (click)="this.issueClaim = null; ref.detectChanges()">
+          <ion-icon name="close" color="light"></ion-icon>
+          <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
+        </button>
+
+        <button ion-button outline round icon-left
+          [disabled]="computed.loading || (issueClaim.enableExpirationDate ? !issueClaim.expirationDate : false)"
+          (click)="triggerDispatcher(issueClaim, 'issueDispatcher')">
+          <ion-spinner *ngIf="computed.loading"></ion-spinner>
+          {{ '_angularcore.claims.issue' | translate }}
         </button>
       </div>
     </div>

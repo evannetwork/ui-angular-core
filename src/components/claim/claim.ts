@@ -141,6 +141,27 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   private addressbook: any;
 
+  /**
+   * fix for modal scrolling => sometimes, modal does not scroll, change simply the size with an
+   * delay, so the scrolling will be enabled
+   */
+  private disableScrolling: boolean;
+
+  /**
+   * generate a iso string from the current date for the date input fields
+   */
+  private now;
+
+  /**
+   * max date for the date input picker
+   */
+  private maxDate = new Date().getFullYear() + 5;
+
+  /**
+   * new claim that should be issued
+   */
+  private issueClaim: any;
+
   /***************** initialization  *****************/
   constructor(
     private _DomSanitizer: DomSanitizer,
@@ -158,9 +179,13 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /**
-   * 
+   * Set initial, bind queue watchers and load the claims.
    */
   async _ngOnInit() {
+    // set now date for expiration date selection
+    this.now = this.core.utils.toIsoString(new Date());
+
+    // check for a valid and available mode 
     if (this.availableModes.indexOf(this.mode) === -1) {
       console.error(`EvanClaimComponent: ${ this.mode } is not a valid display mode.`);
       this.mode = 'normal';
@@ -181,7 +206,7 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /**
-   * 
+   * Clear watchers
    */
   async _ngOnDestroy() {
     this.queueWatcher();
@@ -225,11 +250,12 @@ export class EvanClaimComponent extends AsyncComponent {
    * @param      {string}  type    type of the dispatcher (issueDispatcher, acceptDispatcher,
    *                               deleteDispatcher)
    */
-  private triggerDispatcher(claim, type: string) {
+  private triggerDispatcher(claim: any, type: string) {
     this.queue.addQueueData(
       this.claimService.getQueueId(type),
       {
         address: this.address,
+        expirationDate: claim.enableExpirationDate ? claim.expirationDate : null,
         issuer: claim.issuerAccount,
         topic: claim.name,
       }
@@ -240,12 +266,13 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /**
-   * Gets a claim
+   * Show details for a claim or computed one.
    *
-   * @return     {<type>}  { description_of_the_return_value }
+   * @param      {any}     claimToActivate  computed / normal claim
    */
   private activateClaim(claimToActivate: any) {
     this.activeClaims = [ ];
+    this.disableScrolling = true;
 
     // if no sub claims exists, it's only a single claim and we do not need solve the computed
     // one, else, we need to show multiple claims
@@ -254,6 +281,10 @@ export class EvanClaimComponent extends AsyncComponent {
       this.activeClaims = claimToActivate.claims;
     }
 
-    this.ref.detectChanges()
+    this.ref.detectChanges();
+    setTimeout(() => {
+      this.disableScrolling = false;
+      this.ref.detectChanges()
+    }, 500);
   }
 }

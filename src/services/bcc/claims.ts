@@ -54,6 +54,11 @@ import { QueueId } from './queue-utilities';
 @Injectable()
 export class EvanClaimService {
   /**
+   * owner of the evan root claim domain
+   */
+  public ensRootOwner: string = '0x4a6723fC5a926FA150bAeAf04bfD673B056Ba83D';
+
+  /**
    * make it standalone and load dependency services
    */
   constructor(
@@ -252,6 +257,11 @@ export class EvanClaimService {
         claim.warnings = [ ];
         claim.creationDate = claim.creationDate * 1000;
 
+        // if expiration date is given, format the unix timestamp
+        if (claim.expirationDate) {
+          claim.expirationDate = claim.expirationDate * 1000;
+        }
+
         // recover the original account id for the identity issuer
         claim.subjectIdentity = await this.bcc.executor.executeContractCall(
           this.bcc.claims.contracts.storage, 'users', claim.subject);
@@ -277,23 +287,38 @@ export class EvanClaimService {
           claim.warnings.push('selfIssued');
         }
 
-        // TODO: expiration date
-        claim.expired = false;
+        if (claim.expirationDate && claim.expirationDate < Date.now()) {
+          claim.warnings.push('expired');
+        }
 
-        // load all sub claims
-        claim.parents = await this.getClaims(claim.issuerAccount, claim.parent, false);
+        // if the current topic is '/' (evan root) do not load parents, it's the highest
+        if (topic !== '/' && topic !== '') {
+          // load all sub claims
+          claim.parents = await this.getClaims(claim.issuerAccount, claim.parent || '/', false);
 
-        // use all the parents and create a viewable computed tree
-        claim.tree = this
-          .flatClaimsToLevels(claim)
-          .map(level => this.getComputedClaim(level.name, level.claims));
+          // use all the parents and create a viewable computed tree
+          claim.tree = this
+            .flatClaimsToLevels(claim)
+            .map(level => this.getComputedClaim(level.name, level.claims));
 
-        // load the computed status of all parent claims, to check if the parent tree is valid
-        claim.parentComputed = this.getComputedClaim(claim.parent, claim.parents);
-        if (claim.parentComputed.status === -1) {
-          claim.warnings.push('parentMissing');
-        } else if (claim.parentComputed.status === 0) {
-          claim.warnings.push('parentUntrusted');
+          // load the computed status of all parent claims, to check if the parent tree is valid
+          claim.parentComputed = this.getComputedClaim(claim.parent, claim.parents);
+          if (claim.parentComputed.status === -1) {
+            claim.warnings.push('parentMissing');
+          } else if (claim.parentComputed.status === 0) {
+            claim.warnings.push('parentUntrusted');
+          }
+        } else {
+          claim.parents = '';
+          claim.tree = '';
+          claim.displayName = 'evan';
+
+          if (claim.issuerAccount !== this.ensRootOwner || claim.subject !== this.ensRootOwner) {
+            claim.warnings = [ 'notEnsRootOwner' ];
+          } else {
+            claim.status = 1;
+            claim.warnings = [ ];
+          }
         }
 
         // set computed status
@@ -304,7 +329,7 @@ export class EvanClaimService {
     // if no claims are available the status would be "no claim issued"
     if (claims.length === 0) {
       claims.push({
-        displayName: topic.split('/').pop(),
+        displayName: topic.split('/').pop() || 'evan',
         loading: this.isClaimLoading({ address, topic }),
         name: topic,
         parents: [ ],
@@ -313,18 +338,10 @@ export class EvanClaimService {
         tree: [ ],
         warnings: [ 'missing' ],
       });
-
-      // TODO: enable evan tree checking, if root evan claim was issued
-      if (topic === '') {
-        // simulate evan
-        claims[0].creationDate = (new Date(0)).getTime();
-        claims[0].displayName = 'evan';
-        claims[0].status = 1;
-        claims[0].warnings = [ ];
-      }
     }
 
-    claims[0].icon = 'https://upload.wikimedia.org/wikipedia/de/6/63/T%C3%9CV_S%C3%BCd_logo.svg'
+    // TODO: implement claims image loading
+    // claims[0].icon = 'https://upload.wikimedia.org/wikipedia/de/6/63/T%C3%9CV_S%C3%BCd_logo.svg'
 
     return claims;
   }
