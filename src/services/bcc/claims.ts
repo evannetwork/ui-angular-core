@@ -281,7 +281,7 @@ export class EvanClaimService {
         claim.expired = false;
 
         // load all sub claims
-        claim.parents = await this.getClaims(claim.issuer, claim.parent, true);
+        claim.parents = await this.getClaims(claim.issuerAccount, claim.parent, false);
 
         // use all the parents and create a viewable computed tree
         claim.tree = this
