@@ -74,24 +74,26 @@
           <div margin-horinzontal *ngIf="suggestions?.length === 0">
             {{ '_angularcore.contract-members.no-suggestions' | translate }}
           </div>
-          <ion-item
-            [class.clickable]="canAddMember()"
-            *ngFor="let suggestion of suggestions; let i = index"
-            (click)="addMember(suggestion)">
-            <ion-avatar item-start margin-right>
-              <blockie-component class="small-blockie"
-                [address]="suggestion"
-                [size]="8"
-                [scale]="15">
-              </blockie-component>
-            </ion-avatar>
-            <h2>{{ getContactAlias(suggestion) }}</h2>
-            <span>{{ suggestion }}</span>
-  
-            <button ion-button item-end icon-only clear *ngIf="canAddMember()">
-              <ion-icon name="add"></ion-icon>
-            </button>
-          </ion-item>
+          <div *ngFor="let suggestion of suggestions; let i = index">
+            <ion-item
+              [class.clickable]="canAddMember()"
+              (click)="addMember(suggestion)">
+              <h2>{{ getContactAlias(suggestion) }}</h2>
+              <span>{{ suggestion }}</span>
+              <div class="display-flex-justify" item-end>
+                <evan-claim
+                  *ngFor="let claim of claims"
+                  [topic]="claim"
+                  [address]="suggestion"
+                  [mode]="'icon'"
+                  [compute]="true">
+                </evan-claim>
+                <button ion-button item-end icon-only clear *ngIf="canAddMember()">
+                  <ion-icon name="add"></ion-icon>
+                </button>
+              </div>
+            </ion-item>
+          </div>
         </ion-list>
       </ng-container>
       <ion-list *ngIf="groupedMemberKeys?.length > 0">
@@ -100,24 +102,30 @@
             {{ '_angularcore.contract-members.states.' + stateKey | translate }}
           </h3>
           <ion-item *ngFor="let member of groupedMembers[stateKey]">
-            <ion-avatar item-start margin-right>
-              <blockie-component class="small-blockie" [address]="member" [size]="8" [scale]="15">
-              </blockie-component>
-            </ion-avatar>
             <h2 *ngIf="isMyAccount(member)">{{  '_angularcore.contract-members.i' | translate }}</h2>
             <h2 *ngIf="!isMyAccount(member)">{{ getContactAlias(member) }}</h2>
 
             <span> {{ member }} </span>
+
+            <div class="display-flex-justify" item-end>
+              <evan-claim
+                *ngFor="let claim of claims"
+                [topic]="claim"
+                [address]="member"
+                [mode]="'icon'"
+                [compute]="true">
+              </evan-claim>
           
-            <button ion-button item-end icon-only clear
-              (click)="removeMember(member)"
-              *ngIf="origin.indexOf(member) === -1 && stateKey !== 'loading'">
-              <ion-icon name="close"></ion-icon>
-            </button>
-    
-            <ion-spinner name="close" color="primary"
-              *ngIf="stateKey === 'loading'">
-            </ion-spinner>
+              <button ion-button item-end icon-only clear
+                (click)="removeMember(member)"
+                *ngIf="origin.indexOf(member) === -1 && stateKey !== 'loading'">
+                <ion-icon name="close"></ion-icon>
+              </button>
+      
+              <ion-spinner name="close" color="primary"
+                *ngIf="stateKey === 'loading'">
+              </ion-spinner>
+            </div>
           </ion-item>
         </ng-container>
       </ion-list>

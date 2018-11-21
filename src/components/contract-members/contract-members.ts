@@ -26,17 +26,31 @@
 */
 
 import {
-  Component, OnInit,     // @angular/core
-  Input, ViewChild, ElementRef, OnDestroy,
-  Output, EventEmitter,
-  ChangeDetectionStrategy, ChangeDetectorRef,
-  MenuController, AfterViewInit
+  getDomainName
+} from 'dapp-browser';
+
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  MenuController,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild,
 } from 'angular-libs';
 
-import { createOpacityTransition } from '../../animations/opacity';
 import { AsyncComponent } from '../../classes/AsyncComponent';
-import { EvanCoreService } from '../../services/bcc/core';
+import { createOpacityTransition } from '../../animations/opacity';
 import { EvanAddressBookService } from '../../services/bcc/address-book';
+import { EvanClaimService } from '../../services/bcc/claims';
+import { EvanCoreService } from '../../services/bcc/core';
+import { EvanQueue, } from '../../services/bcc/queue';
+import { QueueId, } from '../../services/bcc/queue-utilities';
 
 /**************************************************************************************************/
 
@@ -134,7 +148,6 @@ export class ContractMembersComponent extends AsyncComponent {
    * include the current active account into the list
    */
   @Input() includeActiveAccount: boolean;
-
   /**
    * Event trigger that is called when something has changed (account moved / removed)
    */
@@ -198,12 +211,25 @@ export class ContractMembersComponent extends AsyncComponent {
    */
   public touched: boolean;
 
+  /**
+   * for the current profile activated claims
+   */
+  private claims: Array<string> = [ ];
+
+  /**
+   * Function to unsubscribe from profile claims watcher queue results.
+   */
+  private profileClaimsWatcher: Function;
+
+
   /***************** initialization  *****************/
   constructor(
     private addressBook: EvanAddressBookService,
+    private claimsService: EvanClaimService,
     private core: EvanCoreService,
     private element: ElementRef,
     private menuController: MenuController,
+    private queueService: EvanQueue,
     public ref: ChangeDetectorRef,
   ) {
     super(ref);
@@ -232,6 +258,16 @@ export class ContractMembersComponent extends AsyncComponent {
         }
       });
 
+    // load profile active claims
+    this.profileClaimsWatcher = await this.queueService.onQueueFinish(
+      new QueueId(`profile.${ getDomainName() }`, '*'),
+      async (reload, results) => {
+        reload && await this.core.utils.timeout(0);
+        this.claims = await this.claimsService.getProfileActiveClaims();
+        this.ref.detectChanges();
+      }
+    );
+
     this.contactSearchChanged();
     this.groupMembers();
   }
@@ -250,6 +286,8 @@ export class ContractMembersComponent extends AsyncComponent {
    * remove the right menu on element destroy
    */
   async _ngOnDestroy() {
+    this.profileClaimsWatcher();
+
     try {
       document.querySelector('body > ion-app dapp-wrapper').removeChild(this.ionMenu);
     } catch (ex) { }

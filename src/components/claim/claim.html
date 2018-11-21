@@ -38,7 +38,7 @@
 
 <ng-template #claimDisplay let-claim="claim" let-mode="mode">
   <div [class]="'evan-claim mode-' + mode + ' status-' + claim.status"
-    (click)="activateClaim(claim)">
+    (click)="activateClaim(claim, $event)">
     <div class="claim-icon">
       <ion-spinner *ngIf="loadingClaims"></ion-spinner>
       <ng-container *ngIf="!loadingClaims">
@@ -186,7 +186,7 @@
   <div class="evan-modal"
     [class.show-modal]="!!activeClaims"
     [class.disable-scrolling]="disableScrolling">
-    <div class="backdrop" (click)="this.activeClaims = null; ref.detectChanges()"></div>
+    <div class="backdrop" (click)="closeActiveClaim($event)"></div>
 
     <div class="evan-content evan-small-content"
       *ngIf="activeClaims">
@@ -198,7 +198,7 @@
 
       <div margin-top text-center>
         <button ion-button icon-left color="medium-gray" round outline
-          (click)="this.activeClaims = null; ref.detectChanges()">
+          (click)="closeActiveClaim($event)">
           <ion-icon name="close" color="light"></ion-icon>
           <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
         </button>
@@ -244,7 +244,7 @@
 
       <div margin-top text-center>
         <button ion-button icon-left color="medium-gray" round outline
-          (click)="this.issueClaim = null; ref.detectChanges()">
+          (click)="closeActiveClaim($event)">
           <ion-icon name="close" color="light"></ion-icon>
           <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
         </button>

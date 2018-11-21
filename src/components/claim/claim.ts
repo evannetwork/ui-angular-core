@@ -162,6 +162,16 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   private issueClaim: any;
 
+  /**
+   * all modals that are used by the claims component to handle correct scoped and sized modal dialogs
+   */
+  private modals: Array<any>;
+
+  /**
+   * parent containing ion app contaioner
+   */
+  private closestIonApp: any;
+
   /***************** initialization  *****************/
   constructor(
     private _DomSanitizer: DomSanitizer,
@@ -206,10 +216,27 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /**
+   * Copy the modal views into the closest ion-app menu.
+   */
+  async _ngAfterViewInit() {
+    this.modals = this.element.nativeElement.querySelectorAll('.evan-modal');
+    this.closestIonApp = this.core.utils.getParentByClassName(this.element.nativeElement,
+      'evan-dapp');
+
+    for (let i = 0; i < this.modals.length; i++) {
+      this.closestIonApp.appendChild(this.modals[i]);
+    }
+  }
+
+  /**
    * Clear watchers
    */
   async _ngOnDestroy() {
     this.queueWatcher();
+
+    for (let i = 0; i < this.modals.length; i++) {
+      this.closestIonApp.removeChild(this.modals[i]);
+    }
   }
 
   /**
@@ -270,7 +297,7 @@ export class EvanClaimComponent extends AsyncComponent {
    *
    * @param      {any}     claimToActivate  computed / normal claim
    */
-  private activateClaim(claimToActivate: any) {
+  private activateClaim(claimToActivate: any, $event: any) {
     this.activeClaims = [ ];
     this.disableScrolling = true;
 
@@ -285,6 +312,24 @@ export class EvanClaimComponent extends AsyncComponent {
     setTimeout(() => {
       this.disableScrolling = false;
       this.ref.detectChanges()
-    }, 500);
+    }, 100);
+
+    // prevent any other event when this button was clicked
+    $event.preventDefault();
+    $event.stopPropagation();
+    return false;
+  }
+
+  /**
+   * Remove the active claim and close the modal dialog.
+   */
+  private closeActiveClaim($event: any) {
+    this.activeClaims = null;
+    this.ref.detectChanges();
+
+    // prevent any other event when this button was clicked
+    $event.preventDefault();
+    $event.stopPropagation();
+    return false;
   }
 }

@@ -390,4 +390,30 @@ export class EvanClaimService {
 
     return computed;
   }
+
+  /**
+   * Load the list of claim topics, that are configured as active for the current profile
+   *
+   * @param      {boolean}  includeSaving  should the saving flag returned?
+   * @return     {any}      Array of topics or object including claims array and saving property
+   */
+  public async getProfileActiveClaims(includeSaving?: boolean) {
+    const queueData = this.queue.getQueueEntry(
+      new QueueId(`profile.${ getDomainName() }`,
+      'profileClaimsDispatcher'), true
+    ).data;
+
+    // use queue data or load latest claims from profile
+    let claims = queueData.length > 0 ? queueData[0].claims :
+      (await this.bcc.profile.loadActiveClaims());
+
+    if (includeSaving) {
+      return {
+        saving: queueData.length > 0,
+        claims: claims || [ ],
+      }
+    } else {
+      return claims;
+    }
+  }
 }

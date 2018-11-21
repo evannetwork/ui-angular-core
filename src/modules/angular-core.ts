@@ -72,7 +72,6 @@ import { EvanUtilService } from '../services/utils';
 import { SingletonService } from '../services/singleton-service';
 
 // components
-import { EvanClaimComponent } from '../components/claim/claim';
 import { BigPictureDialog } from '../components/big-picture/big-picture';
 import { BlockieComponent } from '../components/blockie/blockie';
 import { ContractListEntriesComponent } from '../components/contract-listentries/contract-listentries';
@@ -80,9 +79,11 @@ import { ContractMembersComponent } from '../components/contract-members/contrac
 import { DAppLoaderComponent } from '../components/dapp-loader/dapp-loader';
 import { DashboardTopButtons } from '../components/dashboard-top-buttons/dashboard-top-buttons';
 import { EmptyDAppDisplayComponent } from '../components/empty-dapp-display/empty-dapp-display';
+import { EvanClaimComponent } from '../components/claim/claim';
 import { EvanDAppWrapperComponent } from '../components/dapp-wrapper/dapp-wrapper';
 import { EvanFileSelectComponent } from '../components/file-select/file-select';
 import { EvanLoadingComponent } from '../components/evan-loading/evan-loading';
+import { EvanProfileClaimsComponent } from '../components/profile-claims/profile-claims';
 import { EvanReloadComponent } from '../components/reload-route/reload-route';
 import { EvanSplitPaneComponent } from '../components/split-pane/split-pane';
 import { GlobalPasswordComponent } from '../components/global-password/global-password';
@@ -139,6 +140,7 @@ const moduleConfig = {
     EvanDAppWrapperComponent,
     EvanFileSelectComponent,
     EvanLoadingComponent,
+    EvanProfileClaimsComponent,
     EvanReloadComponent,
     EvanSplitPaneComponent,
     GlobalPasswordComponent,
@@ -209,6 +211,7 @@ const moduleConfig = {
     EvanDAppWrapperComponent,
     EvanFileSelectComponent,
     EvanLoadingComponent,
+    EvanProfileClaimsComponent,
     EvanReloadComponent,
     EvanSplitPaneComponent,
     GlobalPasswordComponent,
