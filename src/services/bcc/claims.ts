@@ -362,6 +362,7 @@ export class EvanClaimService {
       loading: claims.filter(claim => claim.loading).length > 0,
       name: topic,
       status: -1,
+      subjects: [ ],
       warnings: [ ],
     };
 
@@ -376,6 +377,11 @@ export class EvanClaimService {
 
       // use the highest status (-1 missing, 0 issued, 1 valid)
       computed.status = computed.status < claim.status ? claim.status : computed.status;
+
+      // search one subject of all
+      if (computed.subjects.indexOf(claim.subject) === -1) {
+        computed.subjects.push(claim.subject);
+      }
       
       // save all creation dates for later usage
       if (typeof claim.creationDate !== 'undefined') {

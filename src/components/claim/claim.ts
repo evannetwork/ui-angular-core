@@ -26,6 +26,10 @@
 */
 
 import {
+  getDomainName
+} from 'dapp-browser';
+
+import {
   AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -48,6 +52,7 @@ import { EvanClaimService } from '../../services/bcc/claims';
 import { EvanCoreService } from '../../services/bcc/core';
 import { EvanQueue } from '../../services/bcc/queue';
 import { EvanTranslationService } from '../../services/ui/translate';
+import { QueueId, } from '../../services/bcc/queue-utilities';
 
 /**************************************************************************************************/
 
@@ -134,7 +139,7 @@ export class EvanClaimComponent extends AsyncComponent {
   /**
    * activate the detail popup when a claim was clicked 
    */
-  private activeClaims: any;
+  private activeClaim: any;
 
   /**
    * current addressbook contact
@@ -172,6 +177,16 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   private closestIonApp: any;
 
+  /**
+   * for the current profile activated claims
+   */
+  private profileClaims: Array<string> = [ ];
+
+  /**
+   * Function to unsubscribe from profile claims watcher queue results.
+   */
+  private profileClaimsWatcher: Function;
+
   /***************** initialization  *****************/
   constructor(
     private _DomSanitizer: DomSanitizer,
@@ -205,6 +220,15 @@ export class EvanClaimComponent extends AsyncComponent {
     if (typeof this.enableIssue === 'undefined' && this.mode !== 'icon') {
       this.enableIssue = true;
     }
+    // load profile active claims
+    this.profileClaimsWatcher = await this.queue.onQueueFinish(
+      new QueueId(`profile.${ getDomainName() }`, '*'),
+      async (reload, results) => {
+        reload && await this.core.utils.timeout(0);
+        this.profileClaims = await this.claimService.getProfileActiveClaims();
+        this.ref.detectChanges();
+      }
+    );
 
     // watch for any claim updates
     this.queueWatcher = await this.queue.onQueueFinish(
@@ -288,6 +312,10 @@ export class EvanClaimComponent extends AsyncComponent {
       }
     );
 
+    if (type === 'issueDispatcher') {
+      delete this.issueClaim;
+    }
+
     this.computed.loading = true;
     this.ref.detectChanges();
   }
@@ -298,21 +326,16 @@ export class EvanClaimComponent extends AsyncComponent {
    * @param      {any}     claimToActivate  computed / normal claim
    */
   private activateClaim(claimToActivate: any, $event: any) {
-    this.activeClaims = [ ];
-    this.disableScrolling = true;
+    if (!this.activeClaim) {
+      this.activeClaim = claimToActivate;
+      this.disableScrolling = true;
 
-    // if no sub claims exists, it's only a single claim and we do not need solve the computed
-    // one, else, we need to show multiple claims
-    this.activeClaims = [ claimToActivate ];
-    if (claimToActivate.claims) {
-      this.activeClaims = claimToActivate.claims;
+      this.ref.detectChanges();
+      setTimeout(() => {
+        this.disableScrolling = false;
+        this.ref.detectChanges()
+      }, 100);
     }
-
-    this.ref.detectChanges();
-    setTimeout(() => {
-      this.disableScrolling = false;
-      this.ref.detectChanges()
-    }, 100);
 
     // prevent any other event when this button was clicked
     $event.preventDefault();
@@ -324,12 +347,23 @@ export class EvanClaimComponent extends AsyncComponent {
    * Remove the active claim and close the modal dialog.
    */
   private closeActiveClaim($event: any) {
-    this.activeClaims = null;
+    this.activeClaim = null;
     this.ref.detectChanges();
 
     // prevent any other event when this button was clicked
     $event.preventDefault();
     $event.stopPropagation();
     return false;
+  }
+
+  /**
+   * Check if a warning for a claim exists
+   *
+   * @param      {any}      claim    the claim that should be checked
+   * @param      {any}      warning  the name of the warning that should be checked
+   * @return     {boolean}  True if warning exists, False otherwise
+   */
+  private isWarning(claim: any, warning: string) {
+    return claim.warnings.indexOf(warning) !== -1;
   }
 }
