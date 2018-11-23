@@ -51,11 +51,13 @@ import { EvanAlertService } from '../services/ui/alert';
 import { EvanBCCService } from '../services/bcc/bcc';
 import { EvanBcService } from '../services/bcc/bc';
 import { EvanBookmarkService } from '../services/bcc/bookmark';
+import { EvanClaimService } from '../services/bcc/claims';
 import { EvanCoreService } from '../services/bcc/core';
 import { EvanDescriptionService } from '../services/bcc/description';
 import { EvanExceptionHandler } from '../services/ui/exception-handler';
 import { EvanFileService } from '../services/ui/files';
 import { EvanInputService } from '../services/ui/inputs';
+import { EvanLoggingService } from '../services/ui/logging';
 import { EvanMailboxService } from '../services/bcc/mailbox';
 import { EvanModalService } from '../services/ui/modal';
 import { EvanOnboardingService } from '../services/bcc/onboarding';
@@ -68,7 +70,6 @@ import { EvanToastService } from '../services/ui/toast';
 import { EvanTranslationService } from '../services/ui/translate';
 import { EvanUtilService } from '../services/utils';
 import { SingletonService } from '../services/singleton-service';
-import { EvanLoggingService } from '../services/ui/logging';
 
 // components
 import { BigPictureDialog } from '../components/big-picture/big-picture';
@@ -78,9 +79,11 @@ import { ContractMembersComponent } from '../components/contract-members/contrac
 import { DAppLoaderComponent } from '../components/dapp-loader/dapp-loader';
 import { DashboardTopButtons } from '../components/dashboard-top-buttons/dashboard-top-buttons';
 import { EmptyDAppDisplayComponent } from '../components/empty-dapp-display/empty-dapp-display';
+import { EvanClaimComponent } from '../components/claim/claim';
 import { EvanDAppWrapperComponent } from '../components/dapp-wrapper/dapp-wrapper';
 import { EvanFileSelectComponent } from '../components/file-select/file-select';
 import { EvanLoadingComponent } from '../components/evan-loading/evan-loading';
+import { EvanProfileClaimsComponent } from '../components/profile-claims/profile-claims';
 import { EvanReloadComponent } from '../components/reload-route/reload-route';
 import { EvanSplitPaneComponent } from '../components/split-pane/split-pane';
 import { GlobalPasswordComponent } from '../components/global-password/global-password';
@@ -133,9 +136,11 @@ const moduleConfig = {
     DAppLoaderComponent,
     DashboardTopButtons,
     EmptyDAppDisplayComponent,
+    EvanClaimComponent,
     EvanDAppWrapperComponent,
     EvanFileSelectComponent,
     EvanLoadingComponent,
+    EvanProfileClaimsComponent,
     EvanReloadComponent,
     EvanSplitPaneComponent,
     GlobalPasswordComponent,
@@ -158,6 +163,7 @@ const moduleConfig = {
     EvanBCCService,
     EvanBcService,
     EvanBookmarkService,
+    EvanClaimService,
     EvanCoreService,
     EvanDescriptionService,
     EvanExceptionHandler,
@@ -201,9 +207,11 @@ const moduleConfig = {
     DAppLoaderComponent,
     DashboardTopButtons,
     EmptyDAppDisplayComponent,
+    EvanClaimComponent,
     EvanDAppWrapperComponent,
     EvanFileSelectComponent,
     EvanLoadingComponent,
+    EvanProfileClaimsComponent,
     EvanReloadComponent,
     EvanSplitPaneComponent,
     GlobalPasswordComponent,

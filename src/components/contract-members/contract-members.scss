@@ -130,6 +130,33 @@ ion-menu.member-add-menu {
         }
       }
     }
+
+    .member-claims {
+      text-align: center;
+    }
+
+    ion-list {
+      ion-item {
+        padding: 0 !important;
+
+        .item-inner {
+          margin: 0 !important;
+          padding: 0 !important;
+
+          & > div[item-end] {
+            margin-right: 0;
+
+            & > button[icon-only] {
+              margin-right: 0;
+            }
+
+            & > evan-claim {
+              margin-right: 2px;
+            }
+          }
+        }
+      }
+    }
   }
 
   ion-list {

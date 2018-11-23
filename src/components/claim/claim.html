@@ -1,0 +1,375 @@
+<!--
+  Copyright (C) 2018-present evan GmbH.
+
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3,
+  as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see http://www.gnu.org/licenses/ or
+  write to the Free Software Foundation, Inc., 51 Franklin Street,
+  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
+  the following URL: https://evan.network/license/
+
+  You can be released from the requirements of the GNU Affero General Public
+  License by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts
+  of it on other blockchains than evan.network.
+
+  For more information, please contact evan GmbH at this address:
+  https://evan.network/license/
+-->
+
+<ng-template #userAlias let-address="address">
+  <ng-container *ngIf="address">
+    <ng-container *ngIf="address === claimService.ensRootOwner">
+      evan ({{ claimService.ensRootOwner }})
+    </ng-container>
+    <ng-container *ngIf="address !== claimService.ensRootOwner">
+      {{ (addressbook[address]?.alias || addressbook[address]?.email) ? (addressbook[address]?.alias || addressbook[address]?.email) + ' (' + address + ')' : address }}
+    </ng-container>
+  </ng-container>
+</ng-template>
+
+<ng-template #userAliasMulti let-address="address">
+  <ng-container *ngIf="address">
+    <ng-container *ngIf="address === claimService.ensRootOwner">
+      <b>evan</b>
+      <p>{{ claimService.ensRootOwner }}</p>
+    </ng-container>
+    <ng-container *ngIf="address !== claimService.ensRootOwner">
+      <b *ngIf="addressbook[address]?.alias || addressbook[address]?.email">
+        {{ addressbook[address]?.alias || addressbook[address]?.email }}
+      </b>
+      <p>
+        {{ address }}
+      </p>
+    </ng-container>
+  </ng-container>
+</ng-template>
+
+<ng-template #claimIcon let-claim="claim" let-mode="mode">
+  <div class="claim-icon">
+    <ion-spinner *ngIf="loadingClaims"></ion-spinner>
+    <ng-container *ngIf="!loadingClaims">
+      <svg *ngIf="!claim.icon" version="1.0" xmlns="http://www.w3.org/2000/svg"
+         width="512.000000pt" height="512.000000pt" viewBox="0 0 512.000000 512.000000"
+         preserveAspectRatio="xMidYMid meet">
+          <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" stroke="none">
+          <path d="M2510 4994 c-135 -140 -432 -395 -635 -547 -502 -375 -990 -618
+          -1444 -719 l-104 -23 7 -107 c14 -233 92 -597 192 -894 311 -930 933 -1793
+          1784 -2475 164 -131 188 -149 198 -149 20 0 283 183 420 293 594 475 1057
+          1046 1388 1712 233 468 377 929 453 1450 12 77 21 147 21 156 0 11 -34 29
+          -112 58 -335 126 -816 354 -1103 522 -374 219 -660 429 -906 667 -59 56 -108
+          102 -111 102 -2 0 -24 -21 -48 -46z m143 -406 c392 -340 1056 -731 1682 -988
+          72 -30 133 -56 137 -59 9 -7 -39 -250 -82 -421 -141 -556 -410 -1114 -770
+          -1595 -149 -199 -270 -337 -474 -540 -200 -200 -320 -306 -491 -434 -144 -108
+          -115 -109 -248 2 -422 354 -786 755 -1063 1172 -301 452 -517 931 -632 1405
+          -33 135 -74 361 -67 368 2 3 69 26 147 52 466 156 946 432 1439 826 63 51 163
+          135 223 188 59 53 109 96 112 96 2 0 41 -32 87 -72z"/>
+          <path d="M2555 4460 c-11 -17 -256 -219 -395 -324 -411 -312 -848 -557 -1240
+          -697 l-105 -37 2 -45 c2 -66 66 -317 127 -501 258 -773 756 -1489 1469 -2114
+          l118 -104 37 28 c209 159 518 451 698 659 421 487 719 1003 908 1577 53 162
+          126 451 129 509 l2 41 -110 47 c-609 263 -1145 578 -1582 930 -29 24 -54 37
+          -58 31z"/>
+        </g>
+      </svg>
+
+      <img *ngIf="claim.icon" [src]="_DomSanitizer.bypassSecurityTrustUrl(claim.icon)">
+    </ng-container>
+  </div>
+</ng-template>
+
+<ng-template #claimDisplay let-claim="claim" let-mode="mode">
+  <div [class]="'evan-claim mode-' + mode + ' status-' + claim.status"
+    (click)="activateClaim(claim, $event)">
+    <ng-container *ngTemplateOutlet="claimIcon;context:{ claim: claim, mode: mode }"></ng-container>
+    <ng-container *ngIf="!loadingClaims">
+      <div class="claim-label" *ngIf="mode != 'icon'">
+        <b *ngIf="!claim.creationDate">
+          {{ claim.displayName }}
+        </b>
+        <div *ngIf="claim.creationDate">
+          <b>{{ claim.displayName }}</b>
+          <p>
+            {{ claim.creationDate | date:'mediumDate':'':translate.translate.currentLang }}
+          </p>
+        </div>
+      </div>
+      <div class="claim-count" *ngIf="claim.claimCount && claim.claimCount > 1">
+        {{ claim.claimCount }} <ion-icon name="people"></ion-icon>
+        <ion-spinner *ngIf="claim.loading"></ion-spinner>
+      </div>
+    </ng-container>
+  </div>
+</ng-template>
+
+<ng-template #claimDetailDisplay let-claim="claim">
+  <div [class]="'evan-detailed-claim status-' + claim.status">
+    <ng-container *ngTemplateOutlet="claimDisplay;context:{ claim: claim, mode: 'normal' }"></ng-container>
+    <div class="metadata">
+      <ng-container *ngIf="!loadingClaims">
+        <ng-container *ngIf="!isWarning(claim, 'missing')">
+          <div class="subject-container" text-right>
+            <ng-container *ngTemplateOutlet="userAliasMulti;context:{ address:claim.subject }"></ng-container>
+          </div>
+          <div class="origin-container display-flex-justify" text-center>
+            <div>
+              <p><b>{{ '_angularcore.claims.issued-by' | translate }}</b></p>
+              <ng-container *ngTemplateOutlet="userAliasMulti;context:{ address:claim.issuerAccount }"></ng-container>
+              <evan-claim
+                *ngFor="let profileClaim of profileClaims"
+                [topic]="profileClaim"
+                [address]="claim.issuerAccount"
+                [mode]="'icon'"
+                [compute]="true">
+              </evan-claim>
+            </div>
+          </div>
+        </ng-container>
+        <div class="status-container">
+          <div *ngIf="isWarning(claim, 'missing'); else claimExists">
+            <ion-icon class="status-icon" name="close" color="danger"></ion-icon>
+            <span>{{ '_angularcore.claims.warnings.missing' | translate }}</span>
+          </div>
+
+          <ng-template #claimExists>
+            <div *ngIf="isWarning(claim, 'invalid'); else claimValid">
+              <ion-icon class="status-icon" name="close" color="danger"></ion-icon>
+              <span>{{ '_angularcore.claims.warnings.invalid' | translate }}</span>
+            </div>
+            <ng-template #claimValid>
+              <div>
+                <ion-icon class="status-icon" name="checkmark" color="success"></ion-icon>
+                <span>{{ '_angularcore.claims.okays.valid' | translate }}</span>
+              </div>
+            </ng-template>
+
+            <div *ngIf="isWarning(claim, 'issued'); else claimConfirmed">
+              <ion-icon class="status-icon" name="close" color="danger"></ion-icon>
+              <span>{{ '_angularcore.claims.warnings.issued' | translate }}</span>
+            </div>
+            <ng-template #claimConfirmed>
+              <div>
+                <ion-icon class="status-icon" name="checkmark" color="success"></ion-icon>
+                <span>{{ '_angularcore.claims.okays.confirmed' | translate }}</span>
+              </div>
+            </ng-template>
+
+            <div *ngIf="isWarning(claim, 'selfIssued')">
+              <ion-icon class="status-icon" name="information" color="alert"></ion-icon>
+              <span>{{ '_angularcore.claims.warnings.selfIssued' | translate }}</span>
+            </div>
+
+            <ng-container *ngIf="claim.expirationDate">
+              <div *ngIf="isWarning(claim, 'expired'); else claimNotExpired">
+                <ion-icon class="status-icon" name="close" color="danger"></ion-icon>
+                <span>{{ '_angularcore.claims.warnings.expired' | translate }} ({{ '_angularcore.claims.since' }}: {{ claim.expirationDate | date:'mediumDate':'':translate.translate.currentLang }})</span>
+              </div>
+              <ng-template #claimNotExpired>
+                <div>
+                  <ion-icon class="status-icon" name="checkmark" color="success"></ion-icon>
+                  <span>{{ '_angularcore.claims.okays.notExpired' | translate }} ({{ '_angularcore.claims.until' }}: {{ claim.expirationDate | date:'mediumDate':'':translate.translate.currentLang }})</span>
+                </div>
+              </ng-template>
+            </ng-container>
+
+            <div>
+              <ng-container *ngIf="isWarning(claim, 'notEnsRootOwner') || isWarning(claim, 'parentMissing') || isWarning(claim, 'parentUntrusted'); else pathValid">
+                <ion-icon class="status-icon" name="close" color="danger"></ion-icon>
+                <span>{{ '_angularcore.claims.warnings.invalidPath' | translate }}</span>
+              </ng-container>
+
+              <ng-template #pathValid>
+                <ion-icon class="status-icon" name="checkmark" color="success"></ion-icon>
+                <span>{{ '_angularcore.claims.okays.validPath' | translate }} </span>
+              </ng-template>
+              <div class="claim-chain">
+                <span>(</span>
+                <ng-container *ngFor="let treeClaim of claim.tree.reverse(); let i = index">
+                  <span *ngIf="i !== 0"> / </span>
+                  <span>
+                    <ion-icon *ngIf="treeClaim.status === 1" name="checkmark" color="success"></ion-icon>
+                    <ion-icon *ngIf="treeClaim.status === 0" name="close" color="danger"></ion-icon>
+                    {{ treeClaim.displayName }}
+                  </span>
+                </ng-container>
+                <span>)</span>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </ng-container>
+    </div>
+
+    <div text-center margin-top *ngIf="true || (!loadingClaims && topic !== '/' && topic !== '')">
+      <button ion-button outline round icon-left
+        *ngIf="enableIssue && canIssueClaim"
+        [disabled]="computed.loading"
+        (click)="this.issueClaim = claim; ref.detectChanges();">
+        <ion-spinner *ngIf="computed.loading"></ion-spinner>
+        {{ '_angularcore.claims.issue' | translate }}
+      </button>
+      <ng-container *ngIf="core.activeAccount() === address && claim.warnings && claim.warnings.indexOf('selfIssued') === -1 && claim.warnings.indexOf('issued') !== -1">
+        <button ion-button outline round icon-left color="danger"
+          [disabled]="computed.loading"
+          (click)="triggerDispatcher(claim, 'deleteDispatcher')">
+          <ion-spinner *ngIf="computed.loading"></ion-spinner>
+          {{ '_angularcore.claims.delete' | translate }}
+        </button>
+        <button ion-button outline round icon-left color="success"
+          [disabled]="computed.loading"
+          (click)="triggerDispatcher(claim, 'acceptDispatcher')">
+          <ion-spinner *ngIf="computed.loading"></ion-spinner>
+          {{ '_angularcore.claims.accept' | translate }}
+        </button>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<ng-container *ngIf="!loading">
+  <ng-container *ngIf="mode !== 'detail'">
+    <ng-container *ngIf="compute">
+      <ng-container *ngTemplateOutlet="claimDisplay;context:{ claim: computed, mode: mode }"></ng-container>
+    </ng-container>
+    <ng-container *ngIf="!compute">
+      <ng-container *ngFor="let claim of claims">
+        <ng-container *ngTemplateOutlet="claimDisplay;context:{ claim: claim, mode: mode }"></ng-container>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+
+  <ion-row *ngIf="mode === 'detail'">
+    <ion-col col-12 col-xl-6 *ngIf="loadingClaims">
+      <ng-container *ngTemplateOutlet="claimDetailDisplay;context:{ claim: computed, mode: mode }"></ng-container>
+    </ion-col>
+    <ng-container *ngIf="!loadingClaims">
+      <ion-col col-12 col-xl-6 *ngFor="let claim of claims">
+        <ng-container *ngTemplateOutlet="claimDetailDisplay;context:{ claim: claim, mode: mode }"></ng-container>
+      </ion-col>
+    </ng-container>
+  </ion-row>
+
+  <div class="evan-modal"
+    [class.show-modal]="!!activeClaim"
+    [class.disable-scrolling]="disableScrolling">
+    <div class="backdrop" (click)="closeActiveClaim($event)"></div>
+
+    <div class="evan-content evan-small-content"
+      *ngIf="activeClaim">
+      <h3 class="content-header m-b-0 m-t-0">
+        {{ '_angularcore.claims.details' | translate }}
+      </h3>
+      <p ion-text class="m-b-0 m-t-0" *ngIf="!showAddressSelect">
+        {{ '_angularcore.claims.details-desc' | translate }}
+      </p>
+
+      <ion-row>
+        <ion-col margin-top col-12 col-md-6>
+          <b>{{ '_angularcore.claims.topic' | translate }}</b>
+          <p class="m-b-0 m-t-0">{{ activeClaim.name }}</p>
+        </ion-col>
+        <ion-col margin-top col-12 col-md-6>
+          <b>{{ '_angularcore.claims.subject' | translate }}</b>
+          <p class="m-b-0 m-t-0">
+            <ng-container *ngIf="activeClaim.subjects">
+              <ng-container *ngFor="let subject of activeClaim.subjects; let i = index">
+                <span *ngIf="i !== 0">, </span>
+                <ng-container *ngTemplateOutlet="userAlias;context:{ address:subject }"></ng-container>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="!activeClaim.subjects">
+              <ng-container *ngTemplateOutlet="userAlias;context:{ address:activeClaim.subject }"></ng-container>
+            </ng-container>
+          </p>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col margin-top col-6 *ngIf="core.utils.isMD"></ion-col>
+        <ion-col margin-top col-12 col-md-6>
+          <b>{{ '_angularcore.claims.issuer' | translate }}</b>
+          <p class="m-b-0 m-t-0">
+            <ng-container *ngIf="activeClaim.claims">
+              {{ '_angularcore.claims.all-issuers' | translate }}
+            </ng-container>
+            <ng-container *ngIf="!activeClaim.claims">
+              <ng-container *ngTemplateOutlet="userAlias;context:{ address:activeClaim.issuerAccount }"></ng-container>
+            </ng-container>
+          </p>
+        </ion-col>
+      </ion-row>
+
+      <div margin-vertical *ngFor="let claim of (activeClaim.claims ? activeClaim.claims : [ activeClaim ])">
+        <ng-container *ngTemplateOutlet="claimDetailDisplay;context:{ claim: claim }"></ng-container>
+      </div>
+
+      <div margin-top text-center>
+        <button ion-button icon-left color="medium-gray" round outline
+          (click)="closeActiveClaim($event)">
+          <ion-icon name="close" color="light"></ion-icon>
+          <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="evan-modal"
+    [class.show-modal]="!!issueClaim"
+    [class.disable-scrolling]="disableScrolling">
+    <div class="backdrop" (click)="this.issueClaim = null; ref.detectChanges()"></div>
+
+    <div class="evan-content evan-small-content" *ngIf="issueClaim">
+      <h2 class="content-header">{{ '_angularcore.claims.issue-claim' | translate }}</h2>
+
+      <div class="display-flex-justify">
+        <ion-checkbox margin-right
+          [(ngModel)]="issueClaim.enableExpirationDate"
+          (ionChange)="ref.detectChanges()"
+          (focusout)="ref.detectChanges()">
+        </ion-checkbox>
+        <ion-item>
+          <ion-label stacked>
+            {{ '_angularcore.claims.expiration-date' | translate }}*
+          </ion-label>
+          <ion-datetime
+            [disabled]="!issueClaim.enableExpirationDate"
+            displayFormat="DD-MM-YYYY H:mm"
+            pickerFormat="DD-MMM-YYYY HH:mm"
+            [(ngModel)]="issueClaim.expirationDate"
+            [placeholder]="'_angularcore.claims.expiration-date' | translate"
+            [cancelText]="'_angularcore.claims.cancel' | translate"
+            [doneText]="'_angularcore.claims.done' | translate"
+            minuteValues="0,15,30,45"
+            [min]="now"
+            [max]="maxDate"
+            [monthShortNames]="translate.monthShortNames"
+            (ionChange)="ref.detectChanges()"
+            (focusout)="ref.detectChanges()">
+          </ion-datetime>
+        </ion-item>
+      </div>
+
+      <div margin-top text-center>
+        <button ion-button icon-left color="medium-gray" round outline
+          (click)="closeActiveClaim($event)">
+          <ion-icon name="close" color="light"></ion-icon>
+          <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
+        </button>
+
+        <button ion-button outline round icon-left
+          [disabled]="computed.loading || (issueClaim.enableExpirationDate ? !issueClaim.expirationDate : false)"
+          (click)="triggerDispatcher(issueClaim, 'issueDispatcher')">
+          <ion-spinner *ngIf="computed.loading"></ion-spinner>
+          {{ '_angularcore.claims.issue' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-container>

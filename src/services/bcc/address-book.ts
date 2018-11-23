@@ -127,7 +127,6 @@ export class EvanAddressBookService {
     }
 
     const queueEntry = this.queue.getQueueEntry(this.queueId, true);
-
     queueEntry.data.forEach(dataEntry => {
       if (dataEntry.type === 'add') {
         addressBook[dataEntry.accountId] = Object.assign({}, addressBook[dataEntry.accountId], dataEntry, dataEntry.profile);
