@@ -48,6 +48,9 @@ import { QueueId, } from '../../services/bcc/queue-utilities';
 
 /**************************************************************************************************/
 
+/**
+ * Display all for the user configured active claims for a specific topic.
+ */
 @Component({
   selector: 'evan-profile-claims',
   templateUrl: 'profile-claims.html',
@@ -55,16 +58,7 @@ import { QueueId, } from '../../services/bcc/queue-utilities';
 })
 
 export class EvanProfileClaimsComponent extends AsyncComponent {
-  /**
-   * for the current profile activated claims
-   */
-  private claims: Array<string> = [ ];
-
-  /**
-   * Function to unsubscribe from profile claims watcher queue results.
-   */
-  private profileClaimsWatcher: Function;
-
+  /***************** inputs & outpus *****************/
   /**
    * address that for that the claims should be checked
    */
@@ -75,10 +69,16 @@ export class EvanProfileClaimsComponent extends AsyncComponent {
    */
   @Input() mode: any;
 
+  /*****************    variables    *****************/
   /**
-   * current formular
+   * for the current profile activated claims
    */
-  @ViewChild('answerForm') answerForm: any;
+  private claims: Array<string> = [ ];
+
+  /**
+   * Function to unsubscribe from profile claims watcher queue results.
+   */
+  private profileClaimsWatcher: Function;
 
   constructor(
     private claimsService: EvanClaimService,

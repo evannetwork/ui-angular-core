@@ -57,7 +57,7 @@ import { QueueId, } from '../../services/bcc/queue-utilities';
 /**************************************************************************************************/
 
 /**
- * { function_description }
+ * Display a all claims for a specific topic using the api-blockchain-core claims service.
  *
  * @class      Component EvanClaimComponent
  */

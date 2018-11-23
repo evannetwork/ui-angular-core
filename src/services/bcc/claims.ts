@@ -77,7 +77,8 @@ export class EvanClaimService {
    * Return the queue id to watch for any action for a demo.
    *
    * @param      {string}   dispatcher  optional name of the dispatcher (default is * = watch
-   *                                    everythign)
+   *                                    everything)
+   * @param      {string}   id          optional id for the queue id
    * @return     {QueueId}  The handling queue identifier.
    */
   public getQueueId(dispatcher: string = '*', id: string = '*'): QueueId {
@@ -87,7 +88,7 @@ export class EvanClaimService {
   /**
    * Checks if a claim is current loading (issuing, accepting, deleting).
    *
-   * @param      {<type>}   claim   The claim
+   * @param      {any}   claim   the claim object that should be checked (loaded vom api-blockchain-core / getClaims function)
    * @return     {boolean}  True if claimn loading, False otherwise.
    */
   public isClaimLoading(claim: any) {
@@ -122,7 +123,7 @@ export class EvanClaimService {
    * @param      {Array<any>}         origin      the flatted claim Array for one parent that will
    *                                              be pushed into the flatClaims array
    */
-  private flatClaimsTree (claim, flatClaims, origin = [ ]) {
+  private flatClaimsTree (claim: any, flatClaims: Array<Array<any>>, origin: Array<any> = [ ]) {
     origin.unshift(claim);
 
     if (claim.parents && claim.parents.length > 0) {
@@ -212,7 +213,7 @@ export class EvanClaimService {
    * @param      {string}      address     address to load the claims for.
    * @param      {string}      topic       topic to load the claims for.
    * @param      {boolean}     isIdentity  optional indicates if the subject is already a identity
-   * @return     {Array<any>}  all the claims with the following properties.
+   * @return     {Promise<Array<any>>}  all the claims with the following properties.
    *   {
    *     // creator of the claim
    *     issuer: '0x1813587e095cDdfd174DdB595372Cb738AA2753A',
@@ -239,9 +240,13 @@ export class EvanClaimService {
    *       'missing', // no claim exists
    *       'expired', // is the claim expired?
    *       'selfIssued' // issuer === subject
+   *       'invalid', // signature is manipulated
+   *       'parentMissing',  // parent path does not exists
+   *       'parentUntrusted',  // root path (/) is not issued by evan
+   *       'notEnsRootOwner' // invalid ens root owner when check topic is /
    *     ]
    *     // parent claims not valid
-   *     treeValid: false,
+   *     tree: [ ... ] // result of flatClaimsToLevels
    *   }
    */
   public async getClaims(address: string, topic: string, isIdentity?: boolean) {
@@ -400,8 +405,8 @@ export class EvanClaimService {
   /**
    * Load the list of claim topics, that are configured as active for the current profile
    *
-   * @param      {boolean}  includeSaving  should the saving flag returned?
-   * @return     {any}      Array of topics or object including claims array and saving property
+   * @param      {boolean}     includeSaving  should the saving flag returned?
+   * @return     {Array<any>}  Array of topics or object including claims array and saving property
    */
   public async getProfileActiveClaims(includeSaving?: boolean) {
     const queueData = this.queue.getQueueEntry(
