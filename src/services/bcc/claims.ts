@@ -339,7 +339,7 @@ export class EvanClaimService {
         name: topic,
         parents: [ ],
         status: -1,
-        subject: '0x1637Fa43D44a1Fb415D858a3cf4F7F8596A4048F',
+        subject: address,
         tree: [ ],
         warnings: [ 'missing' ],
       });

@@ -55,6 +55,7 @@ export const en = {
       },
       "since": "expired",
       "subject": "Subject",
+      "subject-no-identity": "No certificate administration has been created for this account yet, so no claims can be issued for this identity.",
       "topic": "Claim path",
       "until": "expires",
       "warnings": {

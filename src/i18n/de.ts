@@ -55,6 +55,7 @@ export const de = {
       },
       "since": "seit",
       "subject": "Zugewiesener",
+      "subject-no-identity": "Für diesen Account wurde noch keine Zertifikatsverwaltung erstellt, somit können für diese Identität keine Zertifikate ausgestellt werden.",
       "topic": "Zertifikatspfad",
       "until": "bis",
       "warnings": {

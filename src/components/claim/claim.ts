@@ -137,6 +137,11 @@ export class EvanClaimComponent extends AsyncComponent {
   private activeIdentity: any;
 
   /**
+   * identity contract address of the user that gets inspected
+   */
+  private subjectIdentity: any;
+
+  /**
    * activate the detail popup when a claim was clicked 
    */
   private activeClaim: any;
@@ -217,7 +222,7 @@ export class EvanClaimComponent extends AsyncComponent {
     }
 
     // enable issue buttons when no values was provided and the display mode is not icon
-    if (typeof this.enableIssue === 'undefined' && this.mode !== 'icon') {
+    if (typeof this.enableIssue === 'undefined') {
       this.enableIssue = true;
     }
     // load profile active claims
@@ -274,12 +279,22 @@ export class EvanClaimComponent extends AsyncComponent {
     this.loadingClaims = true;
     this.ref.detectChanges();
 
-    // if identity could be loaded, extract the contract address
+    // if issue identity could be loaded, extract the contract address
     this.activeIdentity = await this.bcc.claims.getIdentityForAccount(activeAccount);
-    if (this.activeIdentity && this.activeIdentity.options) {
+    if (this.activeIdentity && this.activeIdentity.options &&
+      this.activeIdentity.options.address !== '0x0000000000000000000000000000000000000000') {
       this.activeIdentity = this.activeIdentity.options.address;
     } else {
       this.activeIdentity = null;
+    }
+
+    // if subject identity identity could be loaded, extract the contract address
+    this.subjectIdentity = await this.bcc.claims.getIdentityForAccount(this.address);
+    if (this.subjectIdentity && this.subjectIdentity.options &&
+      this.subjectIdentity.options.address !== '0x0000000000000000000000000000000000000000') {
+      this.subjectIdentity = this.subjectIdentity.options.address;
+    } else {
+      this.subjectIdentity = null;
     }
 
     // load claims and the computed status to be able to display a combined view for all claims of a
