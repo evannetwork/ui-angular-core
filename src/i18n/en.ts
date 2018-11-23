@@ -47,6 +47,7 @@ export const en = {
       "issue-claim": "Issue Claim",
       "issued-by": "issued by",
       "issuer": "Issuer",
+      "issuer-no-identity": "No claim administration has yet been created for this account, so you cannot issue claims. Please visit the claim management application to set it up.",
       "okays": {
         "confirmed": "confirmed",
         "notExpired": "not expired",
@@ -55,7 +56,7 @@ export const en = {
       },
       "since": "expired",
       "subject": "Subject",
-      "subject-no-identity": "No certificate administration has been created for this account yet, so no claims can be issued for this identity.",
+      "subject-no-identity": "No claim administration has been created for this account yet, so no claims can be issued for this identity.",
       "topic": "Claim path",
       "until": "expires",
       "warnings": {

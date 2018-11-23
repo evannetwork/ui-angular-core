@@ -47,6 +47,7 @@ export const de = {
       "issue-claim": "Zertifikat ausstellen",
       "issued-by": "ausgestellt von",
       "issuer": "Aussteller",
+      "issuer-no-identity": "Für diesen Account wurde noch keine Zertifikatsverwaltung erstellt, somit können Sie keine Zertifikate ausstellen. Bitte besuchen die Zertifikasverwaltung Anwendung, um die diese einzurichten.",
       "okays": {
         "confirmed": "bestätigt",
         "notExpired": "gültig",

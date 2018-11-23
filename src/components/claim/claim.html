@@ -210,14 +210,18 @@
     <div text-center margin-top *ngIf="true || (!loadingClaims && topic !== '/' && topic !== '')">
       <ng-container *ngIf="enableIssue && canIssueClaim">
         <button ion-button outline round icon-left
-          *ngIf="subjectIdentity"
+          *ngIf="subjectIdentity && activeIdentity"
           [disabled]="computed.loading"
           (click)="this.issueClaim = claim; ref.detectChanges();">
           <ion-spinner *ngIf="computed.loading"></ion-spinner>
           {{ '_angularcore.claims.issue' | translate }}
         </button>
 
-        <div text-center *ngIf="!subjectIdentity">
+        <div text-center *ngIf="!activeIdentity">
+          {{ '_angularcore.claims.issuer-no-identity' | translate }}
+        </div>
+
+        <div text-center *ngIf="!subjectIdentity && activeIdentity">
           {{ '_angularcore.claims.subject-no-identity' | translate }}
         </div>
       </ng-container>
