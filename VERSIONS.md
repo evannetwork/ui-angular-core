@@ -3,6 +3,8 @@
 ## Next Version
 ### Features
 ### Fixes
+- `evan-claim`: add checks if subject or issuer identity does not exists, display notification text if not
+
 ### Deprecations
 
 ## Version 1.5.0
