@@ -212,6 +212,11 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   private claimMenuValue: string;
 
+  /**
+   * current detail container for auto scroll
+   */
+  @ViewChild('evanDetailClaim') evanDetailClaim: any;
+
   /***************** initialization  *****************/
   constructor(
     private _DomSanitizer: DomSanitizer,
@@ -514,14 +519,28 @@ export class EvanClaimComponent extends AsyncComponent {
     detailClaim.subRowHeight = this.subClaimsRowHeight(detailClaim);
     this.calculateSubClaimPositions(detailClaim);
 
+    // render it!
     this.ref.detectChanges();
+
+    // scroll to the most right position
+    setTimeout(() => {
+      if (this.evanDetailClaim) {
+        this.core.utils.scrollTo(
+          this.evanDetailClaim.nativeElement,
+          'horizontal',
+          this.evanDetailClaim.nativeElement.scrollWidth -
+          this.evanDetailClaim.nativeElement.clientWidth,
+          50
+        );
+      }
+    }, 300);
   }
 
   /**
    * Return the claims array or the parents object of an claim.
    *
    * @param      {any}         claim   the claim that should be analyzed
-   * @return     {Array<any>}  claims || parents
+   * @return     {Array<any>}  claims || parents q
    */
   private getClaimsOrParents(claim: any) {
     return claim.claims || claim.parents || [ ];

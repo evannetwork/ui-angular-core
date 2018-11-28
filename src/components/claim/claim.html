@@ -239,7 +239,7 @@
     </ng-container>
   </ng-container>
 
-  <div class="evan-detailed-claim" *ngIf="mode === 'detail'">
+  <div class="evan-detailed-claim" #evanDetailClaim *ngIf="mode === 'detail'">
     <ng-container col-12 col-xl-6 *ngIf="loadingClaims">
       <ng-container 
         *ngTemplateOutlet="claimDisplay;context:{ claim: computed, mode: mode }">
@@ -266,7 +266,7 @@
         {{ '_angularcore.claims.details-desc' | translate }}
       </p>
 
-      <div class="evan-detailed-claim">
+      <div class="evan-detailed-claim" #evanDetailClaim>
         <ng-container
           *ngTemplateOutlet="claimDetailDisplay;context:{ detailClaim: popupClaim }">
         </ng-container>

@@ -443,19 +443,21 @@ export class EvanUtilService implements OnDestroy {
    * @param      {Element}  $container  element that should be scrolled
    * @param      {string}   direction   horizontal / vertical
    * @param      {number}   scrollTo    position to scroll to
+   * @param      {number}   maxTurns    max turns to break animation (max.
+   *                                    200px)
    */
-  scrollTo($container: any, direction: string, scrollTo: number) {
+  scrollTo($container: any, direction: string, scrollTo: number, maxTurns?: number) {
     if (direction === 'vertical') {
       if (scrollTo < $container.scrollTop) {
-        this.scrollUp($container, scrollTo);
+        this.scrollUp($container, scrollTo, maxTurns);
       } else {
-        this.scrollDown($container, scrollTo);
+        this.scrollDown($container, scrollTo, maxTurns);
       }
     } else if (direction === 'horizontal') {
       if (scrollTo > $container.scrollLeft) {
-        this.scrollRight($container, scrollTo);
+        this.scrollRight($container, scrollTo, maxTurns);
       } else {
-        this.scrollLeft($container, scrollTo);
+        this.scrollLeft($container, scrollTo, maxTurns);
       }
     } else {
       throw new Error('unkown scroll direction')
