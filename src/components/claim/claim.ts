@@ -75,14 +75,14 @@ import { createGrowTransition } from '../../animations/grow';
   animations: [
     createGrowTransition(),
     createOpacityTransition(),
-    trigger('delayHide', [
+    trigger('slowGrowTransition', [
       transition(':enter', [
-        style({ display: 'none !important' }),
-        animate('500ms', style({ display: 'block' }))
+        style({ height: 0, 'min-height': 0 }),
+        animate('500ms', style({ height: '{{height}}' }))
       ]),
       transition(':leave', [
-        style({ display: 'block' }),
-        animate('0ms', style({ display: 'none !important' }))
+        style({ }),
+        animate('500ms', style({ height: 0, 'min-height': 0 }))
       ])
     ])
   ],
@@ -602,9 +602,9 @@ export class EvanClaimComponent extends AsyncComponent {
       } else {
         subClaims[i].vertical = {
           height: subClaims[i].topPos + this.subClaimMarginTop + (personContainerHeight / 2)
-            - halfHeight ,
+            - halfHeight,
+          bottom: 33
         };
-        subClaims[i].vertical.top = -1 * (subClaims[i].vertical.height - (personContainerHeight / 2));
       }
     }
   }

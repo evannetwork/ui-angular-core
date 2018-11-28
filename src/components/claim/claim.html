@@ -181,11 +181,13 @@
       [style.top]="subClaim.topPos + 'px'"
       (click)="activateSubClaim(detailClaim, subClaim)">
       <div [class]="'claim-connector claim-people-connector ' + (subClaim.active ? 'active' : '') + ' status-' + subClaim.status"
-        *ngIf="getClaimsOrParents(detailClaim).length > 1 && !subClaim.active && detailClaim.showSubConnectors">
+        *ngIf="getClaimsOrParents(detailClaim).length > 1 && !subClaim.active">
         <div></div>
-        <div
+        <div *ngIf="getClaimsOrParents(detailClaim).length > 1 && !subClaim.active"
+          [@slowGrowTransition]="{ value: ':enter', params : { height : subClaim.vertical.height + 'px' } }"
           [style.height]="subClaim.vertical.height + 'px'"
-          [style.top]="subClaim.vertical.top + 'px'">
+          [style.top]="subClaim.vertical.top ? subClaim.vertical.top + 'px' : ''"
+          [style.bottom]="subClaim.vertical.bottom ? subClaim.vertical.bottom + 'px' : ''">
         </div>
       </div>
       <ion-icon name="person"></ion-icon>
