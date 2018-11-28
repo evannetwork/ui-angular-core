@@ -357,8 +357,11 @@ export class EvanClaimComponent extends AsyncComponent {
         this.popupClaim = this.claimService.getComputedClaim(claimToActivate.name, [ claimToActivate ]);
       }
 
-      this.disableScrolling = true;
+      // enable correct positioning of the detail claim view
+      this.activateSubClaim(this.popupClaim, null);
 
+      // scrolling fix
+      this.disableScrolling = true;
       this.ref.detectChanges();
       setTimeout(() => {
         this.disableScrolling = false;
