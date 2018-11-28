@@ -31,6 +31,8 @@ import {
 
 import {
   AfterViewInit,
+  animate,
+  AnimationEntryMetadata,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -42,6 +44,9 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  style,
+  transition,
+  trigger,
   ViewChild,
 } from 'angular-libs';
 
@@ -54,6 +59,9 @@ import { EvanQueue } from '../../services/bcc/queue';
 import { EvanTranslationService } from '../../services/ui/translate';
 import { QueueId, } from '../../services/bcc/queue-utilities';
 
+import { createOpacityTransition } from '../../animations/opacity';
+import { createGrowTransition } from '../../animations/grow';
+
 /**************************************************************************************************/
 
 /**
@@ -64,7 +72,20 @@ import { QueueId, } from '../../services/bcc/queue-utilities';
 @Component({
   selector: 'evan-claim',
   templateUrl: 'claim.html',
-  animations: [ ],
+  animations: [
+    createGrowTransition(),
+    createOpacityTransition(),
+    trigger('delayHide', [
+      transition(':enter', [
+        style({ display: 'none !important' }),
+        animate('500ms', style({ display: 'block' }))
+      ]),
+      transition(':leave', [
+        style({ display: 'block' }),
+        animate('0ms', style({ display: 'none !important' }))
+      ])
+    ])
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EvanClaimComponent extends AsyncComponent {
@@ -90,11 +111,6 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   @Input() compute: boolean = true;
 
-  /**
-   * Are issue buttons are available? Not avaialble for icon mode
-   */
-  @Input() enableIssue: boolean;
-
   /*****************    variables    *****************/
   /**
    * available display modes
@@ -118,18 +134,17 @@ export class EvanClaimComponent extends AsyncComponent {
   /**
    * Are currently the claims loading?
    */
-  private loadingClaims: boolean;
-
-  /**
-   * can a user issue a new claim (when no claim was issued before by the logged in user for the
-   * selected topic and account)
-   */
-  private canIssueClaim: boolean;
+  private loadingClaims: boolean
 
   /**
    * Function to unsubscribe from queue results.
    */
   private queueWatcher: Function;
+
+  /**
+   * account id of the current logged in user
+   */
+  private activeAccount: any;
 
   /**
    * identity contract address of the current user
@@ -144,7 +159,7 @@ export class EvanClaimComponent extends AsyncComponent {
   /**
    * activate the detail popup when a claim was clicked 
    */
-  private activeClaim: any;
+  private popupClaim: any;
 
   /**
    * current addressbook contact
@@ -192,6 +207,11 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   private profileClaimsWatcher: Function;
 
+  /**
+   * menu value, when a claim menu entry was clicked
+   */
+  private claimMenuValue: string;
+
   /***************** initialization  *****************/
   constructor(
     private _DomSanitizer: DomSanitizer,
@@ -221,10 +241,6 @@ export class EvanClaimComponent extends AsyncComponent {
       this.mode = 'normal';
     }
 
-    // enable issue buttons when no values was provided and the display mode is not icon
-    if (typeof this.enableIssue === 'undefined') {
-      this.enableIssue = true;
-    }
     // load profile active claims
     this.profileClaimsWatcher = await this.queue.onQueueFinish(
       new QueueId(`profile.${ getDomainName() }`, '*'),
@@ -274,13 +290,12 @@ export class EvanClaimComponent extends AsyncComponent {
    * @return     {Promise<void>}  resolved when done
    */
   private async loadClaims() {
-    const activeAccount = this.core.activeAccount();
-
     this.loadingClaims = true;
     this.ref.detectChanges();
 
     // if issue identity could be loaded, extract the contract address
-    this.activeIdentity = await this.bcc.claims.getIdentityForAccount(activeAccount);
+    this.activeAccount = this.core.activeAccount();
+    this.activeIdentity = await this.bcc.claims.getIdentityForAccount(this.activeAccount);
     if (this.activeIdentity && this.activeIdentity.options &&
       this.activeIdentity.options.address !== '0x0000000000000000000000000000000000000000') {
       this.activeIdentity = this.activeIdentity.options.address;
@@ -288,22 +303,16 @@ export class EvanClaimComponent extends AsyncComponent {
       this.activeIdentity = null;
     }
 
-    // if subject identity identity could be loaded, extract the contract address
-    this.subjectIdentity = await this.bcc.claims.getIdentityForAccount(this.address);
-    if (this.subjectIdentity && this.subjectIdentity.options &&
-      this.subjectIdentity.options.address !== '0x0000000000000000000000000000000000000000') {
-      this.subjectIdentity = this.subjectIdentity.options.address;
-    } else {
-      this.subjectIdentity = null;
-    }
-
     // load claims and the computed status to be able to display a combined view for all claims of a
     // specific topic
     this.claims = await this.claimService.getClaims(this.address, this.topic);
     this.addressbook = await this.addressBookService.loadAccounts();
     this.computed = this.claimService.getComputedClaim(this.topic, this.claims);
-    this.canIssueClaim = this.claims.filter(claim => claim.issuer === this.activeIdentity)
-      .length === 0;
+
+    // if the detail mode is selected, activate the sub claims and set the positions
+    if (this.mode === 'detail') {
+      this.activateSubClaim(this.computed, null);
+    }
 
     this.loadingClaims = false;
     this.ref.detectChanges();
@@ -340,9 +349,14 @@ export class EvanClaimComponent extends AsyncComponent {
    *
    * @param      {any}     claimToActivate  computed / normal claim
    */
-  private activateClaim(claimToActivate: any, $event: any) {
-    if (!this.activeClaim) {
-      this.activeClaim = claimToActivate;
+  private openClaimPopup(claimToActivate: any, $event: any) {
+    if (!this.popupClaim) {
+      if (claimToActivate.claims) {
+        this.popupClaim = claimToActivate;
+      } else {
+        this.popupClaim = this.claimService.getComputedClaim(claimToActivate.name, [ claimToActivate ]);
+      }
+
       this.disableScrolling = true;
 
       this.ref.detectChanges();
@@ -361,8 +375,8 @@ export class EvanClaimComponent extends AsyncComponent {
   /**
    * Remove the active claim and close the modal dialog.
    */
-  private closeActiveClaim($event: any) {
-    this.activeClaim = null;
+  private closepopupClaim($event: any) {
+    this.popupClaim = null;
     this.ref.detectChanges();
 
     // prevent any other event when this button was clicked
@@ -380,5 +394,218 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   private isWarning(claim: any, warning: string) {
     return claim.warnings.indexOf(warning) !== -1;
+  }
+
+  /**
+   * When a user clicks a value within the select in an claim menu, start the specific action
+   *
+   * @param      {any}     claim   The claim for that an action should be runned.
+   * @param      {string}  type    the type that was clicked (issue, accept, delete)
+   */
+  private claimMenuClicked(claim: any, type: string) {
+    switch (type) {
+      case 'issue': {
+        this.issueClaim = claim;
+        break;
+      }
+      case 'accept': {
+        this.triggerDispatcher(claim, 'acceptDispatcher');
+        break;
+      }
+      case 'delete': {
+        this.triggerDispatcher(claim, 'deleteDispatcher');
+        break;
+      }
+    }
+
+    setTimeout(() => {
+      this.claimMenuValue = '';
+      this.ref.detectChanges();
+    });
+  }
+
+  /**
+   * Determines if the user is allowed to delete a claim.
+   *
+   * @param      {any}      claim   the claim
+   * @return     {boolean}  True if able to delete claim, False otherwise
+   */
+  private canDeleteClaim(claim: any) {
+    return claim.status !== -1 &&
+      (this.activeAccount === claim.subject || this.activeAccount === claim.issuerAccount);
+  }
+
+  /**
+   * Determines if the user is allowed to accept a claim.
+   *
+   * @param      {any}      claim   the claim
+   * @return     {boolean}  True if able to accept claim, False otherwise
+   */
+  private canAcceptClaim(claim: any) {
+    return claim.status === 0 && this.activeAccount === claim.subject;
+  }
+
+  /**
+   * Determines if the user is allowed to issue a claim.
+   *
+   * @param      {any}      claim   the claim
+   * @return     {boolean}  True if able to issue claim, False otherwise
+   */
+  private canIssueClaim(claim: any) {
+    return claim.subject && this.activeIdentity;
+  }
+
+  /*************************************** begin magic ********************************************/
+  private subClaimMarginTop: number = 40;
+
+  /**
+   * height of the sub claim with no active body 
+   */
+  private subClaimHeight:number = 70 + this.subClaimMarginTop;
+
+  /**
+   * height of an active sub claim including the body
+   */
+  private activeSubClaimheight:number = 170 + this.subClaimMarginTop;
+
+  /**
+   * Remove the active sub claim property of an array of claims and of all it's parents
+   *
+   * @param      {any}     subClaim  the sub claim, where all claims (in case of computed) and
+   *                                 parents should be closed
+   */
+  private deactiveSubClaims(claim: any) {
+    for (let subClaim of [ ].concat(this.getClaimsOrParents(claim))) {
+      delete subClaim.activeSubClaim;
+      delete subClaim.active;
+
+      this.deactiveSubClaims(subClaim);
+    }
+  }
+
+  /**
+   * Sets the activeSubclaim poperty to a detailClaim and removes previously all opened parent
+   * claims.
+   *
+   * @param      {any}     detailClaim  the parent detail claim that should where the subClaim
+   *                                    should be activated
+   * @param      {any}     subClaim     the sub claim that should be activated
+   */
+  private activateSubClaim(detailClaim: any, subClaim?: any) {
+    this.deactiveSubClaims(detailClaim);
+
+    // only activate the sub claim, if it's provided, else deactivate everything and update the ref
+    if (subClaim) {
+      detailClaim.activeSubClaim = subClaim;
+      subClaim.active = true;
+
+      // calculate sub claim height, to reset eventual caluclated height inlcuding an previously
+      // actived one
+      subClaim.subRowHeight = this.subClaimsRowHeight(subClaim);
+      this.calculateSubClaimPositions(subClaim);
+    } else {
+      delete detailClaim.activeSubClaim;
+    }
+
+    // calculate sub claim row
+    detailClaim.subRowHeight = this.subClaimsRowHeight(detailClaim);
+    this.calculateSubClaimPositions(detailClaim);
+
+    this.ref.detectChanges();
+  }
+
+  /**
+   * Return the claims array or the parents object of an claim.
+   *
+   * @param      {any}         claim   the claim that should be analyzed
+   * @return     {Array<any>}  claims || parents
+   */
+  private getClaimsOrParents(claim: any) {
+    return claim.claims || claim.parents || [ ];
+  }
+
+  /**
+   * Calculate the height of the claim row, depending of it's containing sub claims
+   *
+   * @param      {any}     claim   the claim that should be calculated
+   * @return     {number}  height of the row (e.g. 100px)
+   */
+  private subClaimsRowHeight(claim: any):number {
+    const subClaims = this.getClaimsOrParents(claim);
+
+    return this.subClaimMarginTop + (claim.activeSubClaim ? ((subClaims.length - 1) *
+      this.subClaimHeight) + this.activeSubClaimheight : subClaims.length * this.subClaimHeight);
+  }
+
+  /**
+   * Get the position of an sub claim (container of persons)
+   *
+   * @param      {any}     claim   the parent claim that should be analyzed
+   * @param      {number}  index   the index that should be positioned
+   * @return     {string}  top position in px (e.g. 100px);
+   */
+  private calculateSubClaimPositions(claim: any) {
+    const subClaims = this.getClaimsOrParents(claim);
+    let activeClaim = subClaims.filter(subClaim => subClaim.active);
+
+    if (activeClaim && activeClaim.length > 0) {
+      // set the active claim into the middle of the row container
+      activeClaim = activeClaim[0];
+      activeClaim.topPos = (claim.subRowHeight / 2) - (this.activeSubClaimheight / 2) -
+        this.subClaimMarginTop;
+
+      // place all other claims at top or bottom of the centered active claim
+      let activeClaimIndex = subClaims.indexOf(activeClaim);
+      for (let i = 0; i < subClaims.length; i++) {
+        if (i !== activeClaimIndex) {
+          if (i < activeClaimIndex) {
+            // move the previous claims more to the top, analogous to the active one
+            subClaims[i].topPos = activeClaim.topPos -
+              ((activeClaimIndex - i) * this.subClaimHeight);
+          } else {
+            // move the next claims downwards and add 100 (the active body height)
+            subClaims[i].topPos = activeClaim.topPos +
+              ((i - activeClaimIndex) * this.subClaimHeight) +
+              (this.activeSubClaimheight - this.subClaimHeight);
+          }
+        }
+      }
+
+      // if the first row gets into a negative position range, move it to the zero position and
+      // raise all other positions and the claim subRowHeight by the negative value 
+      if (subClaims[0].topPos < 0) {
+        const negativeTopPos = -1 * subClaims[0].topPos;
+
+        subClaims.forEach(subClaim => {
+          subClaim.topPos += negativeTopPos;
+        });
+
+        claim.subRowHeight += negativeTopPos;
+      }
+    } else {
+      for (let i = 0; i < subClaims.length; i++) {
+        subClaims[i].topPos = i * this.subClaimHeight;
+      }
+    }
+
+    // calculate height of vertical connectors
+    const halfHeight = (claim.subRowHeight / 2);
+    const personContainerHeight = 66;
+    const connectorWidth = 3;
+    for (let i = 0; i < subClaims.length; i++) {
+      if (subClaims[i].topPos < (halfHeight - this.subClaimMarginTop)) {
+        subClaims[i].vertical = {
+          height: halfHeight - subClaims[i].topPos - this.subClaimMarginTop - (personContainerHeight / 2)
+            + connectorWidth,
+          top: 30
+        };
+      } else {
+        subClaims[i].vertical = {
+          height: subClaims[i].topPos + this.subClaimMarginTop + (personContainerHeight / 2)
+            - halfHeight ,
+        };
+        subClaims[i].vertical.top = -1 * (subClaims[i].vertical.height - (personContainerHeight / 2));
+      }
+    }
   }
 }

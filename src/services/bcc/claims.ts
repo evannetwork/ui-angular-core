@@ -314,8 +314,8 @@ export class EvanClaimService {
             claim.warnings.push('parentUntrusted');
           }
         } else {
-          claim.parents = '';
-          claim.tree = '';
+          claim.parents = [ ];
+          claim.tree = [ ];
           claim.displayName = 'evan';
 
           if (claim.issuerAccount !== this.ensRootOwner || claim.subject !== this.ensRootOwner) {

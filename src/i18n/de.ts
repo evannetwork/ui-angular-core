@@ -37,7 +37,7 @@ export const de = {
       "cancel": "abbrechen",
       "close-details": "schließen",
       "creation-date": "Erstelldatum",
-      "delete": "Zertifikat ablehnen",
+      "delete": "Zertifikat löschen",
       "details": "Zertifikatsdetails",
       "details-desc": "Übersicht über Zertifikate und deren genaue Statusinformationen.",
       "done": "ok",

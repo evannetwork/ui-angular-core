@@ -37,7 +37,7 @@ export const en = {
       "cancel": "cancel",
       "close-details": "close",
       "creation-date": "Creation date",
-      "delete": "decline claim",
+      "delete": "delete claim",
       "details": "Claim detail",
       "details-desc": "Overview of claims and their exact status information.",
       "done": "ok",
