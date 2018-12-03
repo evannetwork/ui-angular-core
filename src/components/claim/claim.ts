@@ -456,17 +456,27 @@ export class EvanClaimComponent extends AsyncComponent {
    * @return     {boolean}  True if able to accept claim, False otherwise
    */
   private canAcceptClaim(claim: any) {
-    return claim.status === 0 && this.activeAccount === claim.subject;
+    return claim.status === 0 && this.activeAccount === claim.subject &&
+      claim.warnings.indexOf('issued');
   }
 
   /**
-   * Determines if the user is allowed to issue a claim.
+   * Determines if the user is allowed to issue a claim. (only allow computed claims)
    *
    * @param      {any}      claim   the claim
    * @return     {boolean}  True if able to issue claim, False otherwise
    */
   private canIssueClaim(claim: any) {
-    return claim.issuerAccount !== this.activeAccount && this.activeIdentity;
+    if (this.activeIdentity && claim.claims) {
+      // only allow claim issue for computed claims
+      const alreadyCreated = claim.claims
+        .filter(subClaim => subClaim.issuerAccount !== this.activeAccount).length === 0;
+      if (alreadyCreated) {
+        return true;
+      }
+    } else {
+      return false;
+    }
   }
 
   /*************************************** begin magic ********************************************/
@@ -535,8 +545,10 @@ export class EvanClaimComponent extends AsyncComponent {
     this.ref.detectChanges();
 
     if ($event) {
-      const claimRow: any = this.core.utils.getParentByClassName($event.srcElement, 'claim-detail-row');
-      const detailContainer: any = this.evanDetailClaim.nativeElement;
+      const claimRow: any = this.core.utils.getParentByClassName($event.srcElement,
+        'claim-detail-row');
+      const detailContainer: any = this.core.utils.getParentByClassName(claimRow,
+        'evan-detailed-claim');
 
       setTimeout(() => {
         let maxScroll = detailContainer.scrollWidth - detailContainer.clientWidth;
@@ -546,9 +558,12 @@ export class EvanClaimComponent extends AsyncComponent {
         this.core.utils.scrollTo(
           detailContainer,
           'horizontal',
-          rowScrollTo, // scroll to
-          50, // max amount of turns
-          (detailContainer.scrollLeft < rowScrollTo ? rowScrollTo - detailContainer.scrollLeft : detailContainer.scrollLeft - rowScrollTo) / 40
+          rowScrollTo,
+          50,
+          // calculate the scroll speed, so we will scroll to the start position, before the
+          // appear animation is finished (~400ms => 10ms timeouts => scroll range / 40 => use 30
+          // for timeout delays)
+          30
         );
 
         setTimeout(() =>{
@@ -558,8 +573,7 @@ export class EvanClaimComponent extends AsyncComponent {
             detailContainer,
             'horizontal',
             detailContainer.scrollWidth - detailContainer.clientWidth,
-            50,
-            (detailContainer.scrollLeft < maxScroll ? maxScroll - detailContainer.scrollLeft : detailContainer.scrollLeft - maxScroll) / 40,
+            50
           );
         }, 500);
       });

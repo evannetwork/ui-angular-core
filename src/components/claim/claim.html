@@ -114,6 +114,31 @@
   </div>
 </ng-template>
 
+<ng-template #claimInteraction let-interactionClaim="interactionClaim">
+  <ng-container *ngIf="canDeleteClaim(interactionClaim) || canAcceptClaim(interactionClaim) || canIssueClaim(interactionClaim)">
+    <ion-spinner *ngIf="interactionClaim.loading"></ion-spinner>
+    <button ion-button icon-only round clear
+      (click)="hoverMenu.open($event)">
+      <ion-icon name="more"></ion-icon>
+    </button>
+    <ion-select class="evan-callout" interface="popover" #hoverMenu
+      *ngIf="!interactionClaim.loading"
+      [(ngModel)]="claimMenuValue"
+      [selectOptions]="{ cssClass: 'evan-callout claim-callout top' }"
+      (ionChange)="claimMenuClicked(interactionClaim, claimMenuValue)">
+      <ion-option *ngIf="canIssueClaim(interactionClaim)" value="issue">
+        {{ '_angularcore.claims.issue' | translate:{ name: interactionClaim.displayName, affected: addressbook[interactionClaim.issuerAccount]?.alias || addressbook[interactionClaim.issuerAccount]?.email || interactionClaim.issuerAccount } }}
+      </ion-option>
+      <ion-option *ngIf="canAcceptClaim(interactionClaim)" value="accept">
+        {{ '_angularcore.claims.accept' | translate:{ name: interactionClaim.displayName, affected: addressbook[interactionClaim.issuerAccount]?.alias || addressbook[interactionClaim.issuerAccount]?.email || interactionClaim.issuerAccount } }}
+      </ion-option>
+      <ion-option *ngIf="canDeleteClaim(interactionClaim)" value="delete">
+        {{ '_angularcore.claims.delete' | translate:{ name: interactionClaim.displayName, affected: addressbook[interactionClaim.issuerAccount]?.alias || addressbook[interactionClaim.issuerAccount]?.email || interactionClaim.issuerAccount } }}
+      </ion-option>
+    </ion-select>
+  </ng-container>
+</ng-template>
+
 <!------------------------------------------ detailClaim ------------------------------------------>
 <ng-template #claimDetailDisplay let-detailClaim="detailClaim">
   <!-- if claims array exists on the detailClaims, we are currently running an computed claim, so we
@@ -127,6 +152,9 @@
       <div class="claim-person-label">
         <ng-container
           *ngTemplateOutlet="userAliasMulti;context:{ address: detailClaim.subject || detailClaim.subjects[0] }">
+        </ng-container>
+        <ng-container
+          *ngTemplateOutlet="claimInteraction;context:{ interactionClaim: detailClaim }">
         </ng-container>
       </div>
     </div>
@@ -173,28 +201,8 @@
         <ng-container
           *ngTemplateOutlet="userAliasMulti;context:{ address: subClaim.issuerAccount }">
         </ng-container>
-
-        <ng-container *ngIf="canDeleteClaim(subClaim) || canAcceptClaim(subClaim) || canIssueClaim(subClaim)">
-          <ion-spinner *ngIf="subClaim.loading"></ion-spinner>
-          <button ion-button icon-only round clear
-            (click)="hoverMenu.open($event)">
-            <ion-icon name="more"></ion-icon>
-          </button>
-          <ion-select class="evan-callout" interface="popover" #hoverMenu
-            *ngIf="!subClaim.loading"
-            [(ngModel)]="claimMenuValue"
-            [selectOptions]="{ cssClass: 'evan-callout claim-callout top' }"
-            (ionChange)="claimMenuClicked(subClaim, claimMenuValue)">
-            <ion-option *ngIf="canIssueClaim(subClaim)" value="issue">
-              {{ '_angularcore.claims.issue' | translate:{ name: subClaim.displayName, affected: addressbook[subClaim.issuerAccount]?.alias || addressbook[subClaim.issuerAccount]?.email || subClaim.issuerAccount } }}
-            </ion-option>
-            <ion-option *ngIf="canAcceptClaim(subClaim)" value="accept">
-              {{ '_angularcore.claims.accept' | translate:{ name: subClaim.displayName, affected: addressbook[subClaim.issuerAccount]?.alias || addressbook[subClaim.issuerAccount]?.email || subClaim.issuerAccount } }}
-            </ion-option>
-            <ion-option *ngIf="canDeleteClaim(subClaim)" value="delete">
-              {{ '_angularcore.claims.delete' | translate:{ name: subClaim.displayName, affected: addressbook[subClaim.issuerAccount]?.alias || addressbook[subClaim.issuerAccount]?.email || subClaim.issuerAccount } }}
-            </ion-option>
-          </ion-select>
+        <ng-container
+          *ngTemplateOutlet="claimInteraction;context:{ interactionClaim: subClaim }">
         </ng-container>
       </div>
       <div class="claim-person-detail" *ngIf="subClaim.active" [@growTransition]="{ value: ':enter', params : { height : '100px' } }">
@@ -279,7 +287,7 @@
     </ng-container>
   </div>
 
-  <div class="evan-modal"
+  <div class="evan-modal evan-claim-modal"
     [class.show-modal]="!!popupClaim"
     [class.disable-scrolling]="disableScrolling">
     <div class="backdrop" (click)="closepopupClaim($event)"></div>

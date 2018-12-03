@@ -63,11 +63,11 @@ export const en = {
         "expired": "expired",
         "invalid": "manipulated",
         "invalidPath": "Invalid claim chain",
-        "issued": "not confirmed",
+        "issued": "not accepted",
         "missing": "Claim does not exists.",
         "notEnsRootOwner": "Invalid root claim",
         "parentMissing": "Path does not exist",
-        "parentUntrusted": "Path not confirmed",
+        "parentUntrusted": "path invalid",
         "selfIssued": "self created",
         "title": "Warnings"
       }

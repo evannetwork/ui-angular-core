@@ -63,7 +63,7 @@ export const de = {
         "expired": "ausgelaufen",
         "invalid": "manipuliert",
         "invalidPath": "Ungültige Zertifikatskette",
-        "issued": "bestätigt",
+        "issued": "nicht bestätigt",
         "missing": "Zertifikat existiert nicht.",
         "notEnsRootOwner": "Ungültiges Stammzertifikat",
         "parentMissing": "Pfad nicht existent",
