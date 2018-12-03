@@ -440,24 +440,25 @@ export class EvanUtilService implements OnDestroy {
   /**
    * Scroll a container horizontal / vertical smooth to a specific position
    *
-   * @param      {Element}  $container  element that should be scrolled
-   * @param      {string}   direction   horizontal / vertical
-   * @param      {number}   scrollTo    position to scroll to
-   * @param      {number}   maxTurns    max turns to break animation (max.
-   *                                    200px)
+   * @param      {Element}  $container   element that should be scrolled
+   * @param      {string}   direction    horizontal / vertical
+   * @param      {number}   scrollTo     position to scroll to
+   * @param      {number}   maxTurns     max turns to break animation (max. 200px)
+   * @param      {Number}   scrollRange  amount of pixels that should be scrolled each timeout
    */
-  scrollTo($container: any, direction: string, scrollTo: number, maxTurns?: number) {
+  scrollTo($container: any, direction: string, scrollTo: number, maxTurns: number = 50,
+    scrollRange: number = 10) {
     if (direction === 'vertical') {
       if (scrollTo < $container.scrollTop) {
-        this.scrollUp($container, scrollTo, maxTurns);
+        this.scrollUp($container, scrollTo, maxTurns, scrollRange);
       } else {
-        this.scrollDown($container, scrollTo, maxTurns);
+        this.scrollDown($container, scrollTo, maxTurns, scrollRange);
       }
     } else if (direction === 'horizontal') {
       if (scrollTo > $container.scrollLeft) {
-        this.scrollRight($container, scrollTo, maxTurns);
+        this.scrollRight($container, scrollTo, maxTurns, scrollRange);
       } else {
-        this.scrollLeft($container, scrollTo, maxTurns);
+        this.scrollLeft($container, scrollTo, maxTurns, scrollRange);
       }
     } else {
       throw new Error('unkown scroll direction')
@@ -467,15 +468,14 @@ export class EvanUtilService implements OnDestroy {
   /**
    * Scrolls the suggestions container upwards
    *
-   * @param      {Element}  $container  $container that should be scrolled
-   * @param      {number}   scrollTo    where the container should be scrolled
-   *                                    to
-   * @param      {number}   maxTurns    max turns to break animation (max.
-   *                                    200px)
+   * @param      {Element}  $container   $container that should be scrolled
+   * @param      {number}   scrollTo     where the container should be scrolled to
+   * @param      {number}   maxTurns     max turns to break animation (max. 200px)
+   * @param      {Number}   scrollRange  amount of pixels that should be scrolled each timeout
    */
-  scrollUp($container: Element, scrollTo: number, maxTurns = 20) {
+  scrollUp($container: Element, scrollTo: number, maxTurns = 50, scrollRange: number = 10) {
     if (scrollTo < $container.scrollTop && maxTurns !== 0) {
-      $container.scrollTop -= 10;
+      $container.scrollTop -= scrollRange;
       maxTurns--;
 
       setTimeout(() => {
@@ -487,15 +487,14 @@ export class EvanUtilService implements OnDestroy {
   /**
    * Scrolls the suggestions container downwards.
    *
-   * @param      {Element}  $container  $container that should be scrolled
-   * @param      {number}   scrollTo    where the container should be scrolled
-   *                                    to
-   * @param      {number}   maxTurns    max turns to break animation (max.
-   *                                    200px)
+   * @param      {Element}  $container   $container that should be scrolled
+   * @param      {number}   scrollTo     where the container should be scrolled to
+   * @param      {number}   maxTurns     max turns to break animation (max. 200px)
+   * @param      {Number}   scrollRange  amount of pixels that should be scrolled each timeout
    */
-  scrollDown($container, scrollTo, maxTurns = 20) {
+  scrollDown($container, scrollTo, maxTurns = 50, scrollRange: number = 10) {
     if (scrollTo > $container.scrollTop && maxTurns !== 0) {
-      $container.scrollTop += 10;
+      $container.scrollTop += scrollRange;
       maxTurns--;
 
       setTimeout(() => {
@@ -508,15 +507,14 @@ export class EvanUtilService implements OnDestroy {
   /**
    * Scrolls the suggestions container to the right.
    *
-   * @param      {Element}  $container  $container that should be scrolled
-   * @param      {number}   scrollTo    where the container should be scrolled
-   *                                    to
-   * @param      {number}   maxTurns    max turns to break animation (max.
-   *                                    200px)
+   * @param      {Element}  $container   $container that should be scrolled
+   * @param      {number}   scrollTo     where the container should be scrolled to
+   * @param      {number}   maxTurns     max turns to break animation (max. 200px)
+   * @param      {Number}   scrollRange  amount of pixels that should be scrolled each timeout
    */
-  scrollRight($container, scrollTo, maxTurns = 20) {
+  scrollRight($container, scrollTo, maxTurns = 50, scrollRange: number = 10) {
     if (scrollTo > $container.scrollLeft && maxTurns !== 0) {
-      $container.scrollLeft += 10;
+      $container.scrollLeft += scrollRange;
       maxTurns--;
 
       setTimeout(() => {
@@ -527,16 +525,15 @@ export class EvanUtilService implements OnDestroy {
 
   /**
    * Scrolls the suggestions container to the left.
-
-   * @param      {Element}  $container  $container that should be scrolled
-   * @param      {number}   scrollTo    where the container should be scrolled
-   *                                    to
-   * @param      {number}   maxTurns    max turns to break animation (max.
-   *                                    200px)
+   *
+   * @param      {Element}  $container   $container that should be scrolled
+   * @param      {number}   scrollTo     where the container should be scrolled to
+   * @param      {number}   maxTurns     max turns to break animation (max. 200px)
+   * @param      {Number}   scrollRange  amount of pixels that should be scrolled each timeout
    */
-  scrollLeft($container, scrollTo, maxTurns = 20) {
+  scrollLeft($container, scrollTo, maxTurns = 50, scrollRange: number = 10) {
     if (scrollTo < $container.scrollLeft && maxTurns !== 0) {
-      $container.scrollLeft -= 10;
+      $container.scrollLeft -= scrollRange;
       maxTurns--;
 
       setTimeout(() => {

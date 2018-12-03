@@ -45,8 +45,8 @@
       <p>{{ claimService.ensRootOwner }}</p>
     </ng-container>
     <ng-container *ngIf="address !== claimService.ensRootOwner">
-      <b *ngIf="addressbook[address]?.alias || addressbook[address]?.email">
-        {{ addressbook[address]?.alias || addressbook[address]?.email }}
+      <b>
+        {{ addressbook[address]?.alias || addressbook[address]?.email || ('_angularcore.no-alias' | translate) }}
       </b>
       <p>
         {{ address }}
@@ -110,28 +110,6 @@
         {{ claim.claims.length }} <ion-icon name="people"></ion-icon>
         <ion-spinner *ngIf="claim.loading"></ion-spinner>
       </div>
-      <ng-container *ngIf="canDeleteClaim(claim) || canAcceptClaim(claim) || canIssueClaim(claim)">
-        <ion-spinner *ngIf="computed.loading"></ion-spinner>
-        <button ion-button icon-only round clear
-          (click)="hoverMenu.open($event)">
-          <ion-icon name="more"></ion-icon>
-        </button>
-        <ion-select class="evan-callout" interface="popover" #hoverMenu
-          *ngIf="!computed.loading"
-          [(ngModel)]="claimMenuValue"
-          [selectOptions]="{ cssClass: 'evan-callout top' }"
-          (ionChange)="claimMenuClicked(claim, claimMenuValue)">
-          <ion-option *ngIf="canIssueClaim(claim)" value="issue">
-            {{ '_angularcore.claims.issue' | translate }}
-          </ion-option>
-          <ion-option *ngIf="canDeleteClaim(claim)" value="accept">
-            {{ '_angularcore.claims.accept' | translate }}
-          </ion-option>
-          <ion-option *ngIf="canAcceptClaim(claim)" value="delete">
-            {{ '_angularcore.claims.delete' | translate }}
-          </ion-option>
-        </ion-select>
-      </ng-container>
     </ng-container>
   </div>
 </ng-template>
@@ -141,10 +119,10 @@
   <!-- if claims array exists on the detailClaims, we are currently running an computed claim, so we
        cann show the first corresponding user -->
   <div class="claim-detail-row static-height"
-    *ngIf="detailClaim.claims">
+    *ngIf="detailClaim.claims && detailClaim.topLevel">
     <div
       [class]="'claim-person status-' + detailClaim.status"
-      (click)="activateSubClaim(detailClaim, null)">
+      (click)="activateSubClaim(detailClaim, null, $event)">
       <ion-icon name="person"></ion-icon>
       <div class="claim-person-label">
         <ng-container
@@ -169,7 +147,7 @@
   <div class="claim-detail-row static-width"
     [class.padding-left]="getClaimsOrParents(detailClaim).length > 1 && !detailClaim.activeSubClaim"
     [style.height]="detailClaim.subRowHeight + 'px'"
-    *ngIf="getClaimsOrParents(detailClaim).length > 0">
+    *ngIf="detailClaim.warnings.indexOf('missing') === -1 && getClaimsOrParents(detailClaim).length > 0">
     <div [class]="'claim-connector claim-row-connector ' + (detailClaim.activeSubClaim ? 'active' : '') + ' status-' + (detailClaim.activeSubClaim ? detailClaim.activeSubClaim.status : detailClaim.status)">
       <ion-icon name="arrow-dropleft"></ion-icon>
       <div></div>
@@ -179,7 +157,7 @@
       *ngFor="let subClaim of getClaimsOrParents(detailClaim); let i = index"
       [class]="'claim-person status-' + subClaim.status"
       [style.top]="subClaim.topPos + 'px'"
-      (click)="activateSubClaim(detailClaim, subClaim)">
+      (click)="activateSubClaim(detailClaim, subClaim, $event)">
       <div [class]="'claim-connector claim-people-connector ' + (subClaim.active ? 'active' : '') + ' status-' + subClaim.status"
         *ngIf="getClaimsOrParents(detailClaim).length > 1 && !subClaim.active">
         <div></div>
@@ -195,22 +173,71 @@
         <ng-container
           *ngTemplateOutlet="userAliasMulti;context:{ address: subClaim.issuerAccount }">
         </ng-container>
+
+        <ng-container *ngIf="canDeleteClaim(subClaim) || canAcceptClaim(subClaim) || canIssueClaim(subClaim)">
+          <ion-spinner *ngIf="subClaim.loading"></ion-spinner>
+          <button ion-button icon-only round clear
+            (click)="hoverMenu.open($event)">
+            <ion-icon name="more"></ion-icon>
+          </button>
+          <ion-select class="evan-callout" interface="popover" #hoverMenu
+            *ngIf="!subClaim.loading"
+            [(ngModel)]="claimMenuValue"
+            [selectOptions]="{ cssClass: 'evan-callout claim-callout top' }"
+            (ionChange)="claimMenuClicked(subClaim, claimMenuValue)">
+            <ion-option *ngIf="canIssueClaim(subClaim)" value="issue">
+              {{ '_angularcore.claims.issue' | translate:{ name: subClaim.displayName, affected: addressbook[subClaim.issuerAccount]?.alias || addressbook[subClaim.issuerAccount]?.email || subClaim.issuerAccount } }}
+            </ion-option>
+            <ion-option *ngIf="canAcceptClaim(subClaim)" value="accept">
+              {{ '_angularcore.claims.accept' | translate:{ name: subClaim.displayName, affected: addressbook[subClaim.issuerAccount]?.alias || addressbook[subClaim.issuerAccount]?.email || subClaim.issuerAccount } }}
+            </ion-option>
+            <ion-option *ngIf="canDeleteClaim(subClaim)" value="delete">
+              {{ '_angularcore.claims.delete' | translate:{ name: subClaim.displayName, affected: addressbook[subClaim.issuerAccount]?.alias || addressbook[subClaim.issuerAccount]?.email || subClaim.issuerAccount } }}
+            </ion-option>
+          </ion-select>
+        </ng-container>
       </div>
       <div class="claim-person-detail" *ngIf="subClaim.active" [@growTransition]="{ value: ':enter', params : { height : '100px' } }">
-        <div class="display-flex-justify" text-center>
-          <ion-icon name="add-circle"></ion-icon>
-          <span>{{ subClaim.creationDate | date:'mediumDate':'':translate.translate.currentLang }}</span>
+        <div class="claim-detail-dates display-flex-justify">
+          <div>
+            <div class="display-flex-justify" text-center>
+              <ion-icon name="add-circle"></ion-icon>
+              <span>{{ subClaim.creationDate | date:'mediumDate':'':translate.translate.currentLang }}</span>
+            </div>
+            <div class="display-flex-justify" text-center
+              [class.danger]="subClaim.warnings.indexOf('expired') !== -1"
+              *ngIf="subClaim.expirationDate">
+              <ion-icon name="time"></ion-icon>
+              <span>
+                {{ subClaim.expirationDate | date:'mediumDate':'':translate.translate.currentLang }}
+              </span>
+            </div>
+          </div>
         </div>
-        <div class="display-flex-justify" text-center
-          [class.danger]="subClaim.warnings.indexOf('expired') !== -1"
-          *ngIf="subClaim.expirationDate">
-          <ion-icon name="time"></ion-icon>
+
+        <div class="detail-desc big-icon success" *ngIf="subClaim.warnings.length === 0">
+          <ion-icon name="checkmark"></ion-icon>
+        </div>
+
+        <div class="detail-desc danger" *ngIf="subClaim.warnings.length > 0">
+          <ion-icon name="close"></ion-icon>
           <span>
-            {{ subClaim.expirationDate | date:'mediumDate':'':translate.translate.currentLang }}
+            {{ ('_angularcore.claims.warnings.' + subClaim.warnings[0]) | translate }}
           </span>
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="claim-detail-row static-width claim-missing"
+    *ngIf="detailClaim.warnings.indexOf('missing') !== -1">
+    <div class="claim-connector claim-row-connector status--1">
+      <ion-icon name="arrow-dropleft"></ion-icon>
+      <div></div>
+    </div>
+    <ion-icon class="clickable" name="close-circle" color="danger"
+      (click)="issueClaim = detailClaim; ref.detectChanges()">
+    </ion-icon>
   </div>
 
   <!-- if a sub claim was clicked, show the next tree -->
@@ -329,7 +356,7 @@
           [disabled]="computed.loading || (issueClaim.enableExpirationDate ? !issueClaim.expirationDate : false)"
           (click)="triggerDispatcher(issueClaim, 'issueDispatcher')">
           <ion-spinner *ngIf="computed.loading"></ion-spinner>
-          {{ '_angularcore.claims.issue' | translate }}
+          {{ '_angularcore.claims.issue-claim' | translate }}
         </button>
       </div>
     </div>

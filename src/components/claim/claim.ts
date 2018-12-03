@@ -314,6 +314,9 @@ export class EvanClaimComponent extends AsyncComponent {
     this.addressbook = await this.addressBookService.loadAccounts();
     this.computed = this.claimService.getComputedClaim(this.topic, this.claims);
 
+    // add the topLevel property to the computed claim to display the initial person claim
+    this.computed.topLevel = true;
+
     // if the detail mode is selected, activate the sub claims and set the positions
     if (this.mode === 'detail') {
       this.activateSubClaim(this.computed, null);
@@ -336,6 +339,7 @@ export class EvanClaimComponent extends AsyncComponent {
       {
         address: this.address,
         expirationDate: claim.enableExpirationDate ? claim.expirationDate : null,
+        id: claim.id,
         issuer: claim.issuerAccount,
         topic: claim.name,
       }
@@ -357,10 +361,13 @@ export class EvanClaimComponent extends AsyncComponent {
   private openClaimPopup(claimToActivate: any, $event: any) {
     if (!this.popupClaim) {
       if (claimToActivate.claims) {
-        this.popupClaim = claimToActivate;
+        this.popupClaim = this.core.utils.deepCopy(claimToActivate);
       } else {
         this.popupClaim = this.claimService.getComputedClaim(claimToActivate.name, [ claimToActivate ]);
       }
+
+      // show initial person
+      this.popupClaim.topLevel = true;
 
       // enable correct positioning of the detail claim view
       this.activateSubClaim(this.popupClaim, null);
@@ -439,8 +446,7 @@ export class EvanClaimComponent extends AsyncComponent {
    * @return     {boolean}  True if able to delete claim, False otherwise
    */
   private canDeleteClaim(claim: any) {
-    return claim.status !== -1 &&
-      (this.activeAccount === claim.subject || this.activeAccount === claim.issuerAccount);
+    return claim.status !== -1 && (this.activeAccount === claim.subject || this.activeAccount === claim.issuerAccount);
   }
 
   /**
@@ -460,7 +466,7 @@ export class EvanClaimComponent extends AsyncComponent {
    * @return     {boolean}  True if able to issue claim, False otherwise
    */
   private canIssueClaim(claim: any) {
-    return claim.subject && this.activeIdentity;
+    return claim.issuerAccount !== this.activeAccount && this.activeIdentity;
   }
 
   /*************************************** begin magic ********************************************/
@@ -498,21 +504,27 @@ export class EvanClaimComponent extends AsyncComponent {
    * @param      {any}     detailClaim  the parent detail claim that should where the subClaim
    *                                    should be activated
    * @param      {any}     subClaim     the sub claim that should be activated
+   * @param      {any}     $event       the click event
    */
-  private activateSubClaim(detailClaim: any, subClaim?: any) {
+  private activateSubClaim(detailClaim: any, subClaim?: any, $event?: any) {
+    // close the full tree
+    delete detailClaim.activeSubClaim;
     this.deactiveSubClaims(detailClaim);
 
     // only activate the sub claim, if it's provided, else deactivate everything and update the ref
-    if (subClaim) {
-      detailClaim.activeSubClaim = subClaim;
+    if (subClaim && subClaim.parentComputed) {
+      detailClaim.activeSubClaim = subClaim.parentComputed;
       subClaim.active = true;
+      detailClaim.activeSubClaim.active = true;
+
+      // close the full sub tree
+      delete detailClaim.activeSubClaim.activeSubClaim;
+      this.deactiveSubClaims(detailClaim.activeSubClaim);
 
       // calculate sub claim height, to reset eventual caluclated height inlcuding an previously
       // actived one
-      subClaim.subRowHeight = this.subClaimsRowHeight(subClaim);
-      this.calculateSubClaimPositions(subClaim);
-    } else {
-      delete detailClaim.activeSubClaim;
+      detailClaim.activeSubClaim.subRowHeight = this.subClaimsRowHeight(detailClaim.activeSubClaim);
+      this.calculateSubClaimPositions(detailClaim.activeSubClaim);
     }
 
     // calculate sub claim row
@@ -522,25 +534,43 @@ export class EvanClaimComponent extends AsyncComponent {
     // render it!
     this.ref.detectChanges();
 
-    // scroll to the most right position
-    setTimeout(() => {
-      if (this.evanDetailClaim) {
+    if ($event) {
+      const claimRow: any = this.core.utils.getParentByClassName($event.srcElement, 'claim-detail-row');
+      const detailContainer: any = this.evanDetailClaim.nativeElement;
+
+      setTimeout(() => {
+        let maxScroll = detailContainer.scrollWidth - detailContainer.clientWidth;
+        let rowScrollTo = claimRow.offsetLeft - detailContainer.clientWidth + 300;
+        rowScrollTo = rowScrollTo > 0 ? rowScrollTo : 0;
+
         this.core.utils.scrollTo(
-          this.evanDetailClaim.nativeElement,
+          detailContainer,
           'horizontal',
-          this.evanDetailClaim.nativeElement.scrollWidth -
-          this.evanDetailClaim.nativeElement.clientWidth,
-          50
+          rowScrollTo, // scroll to
+          50, // max amount of turns
+          (detailContainer.scrollLeft < rowScrollTo ? rowScrollTo - detailContainer.scrollLeft : detailContainer.scrollLeft - rowScrollTo) / 40
         );
-      }
-    }, 300);
+
+        setTimeout(() =>{
+          maxScroll = detailContainer.scrollWidth - detailContainer.clientWidth;
+
+          this.core.utils.scrollTo(
+            detailContainer,
+            'horizontal',
+            detailContainer.scrollWidth - detailContainer.clientWidth,
+            50,
+            (detailContainer.scrollLeft < maxScroll ? maxScroll - detailContainer.scrollLeft : detailContainer.scrollLeft - maxScroll) / 40,
+          );
+        }, 500);
+      });
+    }
   }
 
   /**
    * Return the claims array or the parents object of an claim.
    *
    * @param      {any}         claim   the claim that should be analyzed
-   * @return     {Array<any>}  claims || parents q
+   * @return     {Array<any>}  claims || parents
    */
   private getClaimsOrParents(claim: any) {
     return claim.claims || claim.parents || [ ];
