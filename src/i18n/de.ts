@@ -148,12 +148,12 @@ export const de = {
     "warnings": {
       "dont-show-again": "Meldung nicht mehr anzeigen",
       "eve-empty": {
-        "body": "Sie haben ihr vollständiges Kondingent an Eve's aufgebraucht ({{ value }} Eves). Es ist nicht mehr möglich, Verträge zu erstellen oder Transaktionen zu senden.",
-        "title": "Eve's sind aufgebraucht"
+        "body": "Sie haben ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist nicht mehr möglich, Verträge zu erstellen oder Transaktionen zu senden.",
+        "title": "EVEs sind aufgebraucht"
       },
       "eve-low": {
-        "body": "Sie haben fast ihr vollständiges Kondingent an Eve's aufgebraucht ({{ value }} Eves). Es ist möglich, dass spezielle Aktionen (Vertragserstellungen, Speichertransaktionen) bei einem zu geringen Eve Wert fehlschlagen.",
-        "title": "Eve's sind fast aufgebraucht"
+        "body": "Sie haben fast ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist möglich, dass spezielle Aktionen (Vertragserstellungen, Speichertransaktionen) bei einem zu geringen EVE Wert fehlschlagen.",
+        "title": "EVEs sind fast aufgebraucht"
       },
       "indexdb-not-available": {
         "body": "Der von Ihnen genutzte Browser unterstützt nicht das lokale zwischenspeichern von Daten, was zu Laufzeitproblemen führen kann.Bitte benutzen Sie einen der folgenden Browsern: <b>Chrome, Firefox Safari, Edge</b>.<br><br><b>Hinweis</b>: Einige Browser besitzen in einem privaten Modus eingeschränkte Speicherkapazitäten.",
