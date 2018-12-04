@@ -203,6 +203,11 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
    */
   private developerModeSwitch: Function;
 
+  /**
+   * last amount of queue buttons
+   */
+  private lastQueueButtonCount: number;
+
   /***************** initialization  *****************/
   constructor(
     private _DomSanitizer: DomSanitizer,
@@ -255,31 +260,31 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
       }
     });
 
-    // check for new mails
-    await this.mailboxService.checkNewMails();
-    this.mailCheckInterval = setInterval(async () => {
-      await this.mailboxService.checkNewMails();
-
-      this.ref.detectChanges();
-    }, 30 * 1000);
-
-    // watch for queue changes and try to sync everything
-    this.onQueueUpdate = this.utilService.onEvent('evan-queue-update', async () => {
-      if (this.evanQueue.isInstantSave()) {
-        await this.evanQueue.loadDispatcherForQueue();
-
-        this.evanQueue.startSyncAll(true);
-      }
-
-      this.ref.detectChanges();
-    });
-
     // check for new translations, submitted by sub dapps => update the i18n of
     // the current application
     this.translationUpdate = this.translateService.watchTranslationUpdate(() => this.ref.detectChanges());
 
-    // if the header is shown, apply the notification
+    // if the header is shown, apply the notification, mails, queue buttons and so on
     if (this.showHeader) {
+      // check for new mails
+      await this.mailboxService.checkNewMails();
+      this.mailCheckInterval = setInterval(async () => {
+        await this.mailboxService.checkNewMails();
+
+        this.ref.detectChanges();
+      }, 30 * 1000);
+
+      // watch for queue changes and try to sync everything
+      this.onQueueUpdate = this.utilService.onEvent('evan-queue-update', async () => {
+        if (this.evanQueue.isInstantSave()) {
+          await this.evanQueue.loadDispatcherForQueue();
+
+          this.evanQueue.startSyncAll(true);
+        }
+
+        this.ref.detectChanges();
+      });
+
       // if a notification is available, but we didn't ask the user before to open this notification
       // show an alert and ask the user
       if (notifications.notifications.length > 0 &&
@@ -458,11 +463,19 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
    * @return     {number}  Number of buttons to show
    */
   queueButtonCount() {
-    return [
+    const lastQueueButtonCount = [
       this.evanQueue.queue.entries.length > 0,
       this.mailboxService.newMailCount > 0,
       this.logErrors.length > 0 && !this.evanQueue.exception
     ].filter(check => check === true).length;
+
+    if (lastQueueButtonCount !== this.lastQueueButtonCount) {
+      this.utilService.sendEvent('evan-queue-button-count');
+    }
+
+    this.lastQueueButtonCount = lastQueueButtonCount;
+
+    return this.lastQueueButtonCount;
   }
 
   /*****************    functions    *****************/

@@ -93,10 +93,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content
-  [class.queue-button-active]="queueButtonCount() === 1"
-  [class.queue-button-active-2]="queueButtonCount() === 2"
-  [class.queue-button-active-3]="queueButtonCount() === 3">
+<ion-content>
   <ng-content select="[evan-content]"></ng-content>
 </ion-content>
 <ion-menu side="right" swipeEnabled="false" id="queueMenu" text-center [content]="sequenceContent">

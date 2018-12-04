@@ -457,7 +457,7 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   private canAcceptClaim(claim: any) {
     return claim.status === 0 && this.activeAccount === claim.subject &&
-      claim.warnings.indexOf('issued');
+      claim.warnings.indexOf('issued') !== -1;
   }
 
   /**
