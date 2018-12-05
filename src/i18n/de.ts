@@ -48,6 +48,8 @@ export const de = {
       "issued-by": "ausgestellt von",
       "issuer": "Aussteller",
       "issuer-no-identity": "Für diesen Account wurde noch keine Zertifikatsverwaltung erstellt, somit können Sie keine Zertifikate ausstellen. Bitte besuchen die Zertifikasverwaltung Anwendung, um die diese einzurichten.",
+      "not-set": "Nicht ausgestellt",
+      "not-set-desc": "...",
       "okays": {
         "confirmed": "bestätigt",
         "notExpired": "gültig",

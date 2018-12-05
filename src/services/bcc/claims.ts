@@ -37,12 +37,13 @@ import {
   OnInit, Injectable, // '@angular/core';
 } from 'angular-libs';
 
-import { SingletonService } from '../singleton-service';
-import { EvanCoreService } from './core';
 import { EvanBCCService } from './bcc';
-import { EvanUtilService } from '../utils';
+import { EvanDescriptionService } from '../bcc/description';
+import { EvanCoreService } from './core';
 import { EvanQueue } from './queue';
+import { EvanUtilService } from '../utils';
 import { QueueId } from './queue-utilities';
+import { SingletonService } from '../singleton-service';
 
 /**************************************************************************************************/
 
@@ -64,6 +65,7 @@ export class EvanClaimService {
   constructor(
     private bcc: EvanBCCService,
     private core: EvanCoreService,
+    private descriptionService: EvanDescriptionService,
     private queue: EvanQueue,
     private singleton: SingletonService,
     private utils: EvanUtilService,
@@ -275,6 +277,9 @@ export class EvanClaimService {
         claim.issuerAccount = this.bcc.executor.web3.eth.accounts
           .recover(dataHash, claim.signature);
 
+        // ensure, that the description was loaded
+        await this.ensureClaimDescription(claim);
+
         // check if anything is loading for the claim (accept, issue, delete)
         claim.loading = this.isClaimLoading(claim);
 
@@ -301,13 +306,8 @@ export class EvanClaimService {
           // load all sub claims
           claim.parents = await this.getClaims(claim.issuerAccount, claim.parent || '/', false);
 
-          // use all the parents and create a viewable computed tree
-          claim.tree = this
-            .flatClaimsToLevels(claim)
-            .map(level => this.getComputedClaim(level.name, level.claims));
-
           // load the computed status of all parent claims, to check if the parent tree is valid
-          claim.parentComputed = this.getComputedClaim(claim.parent, claim.parents);
+          claim.parentComputed = await this.getComputedClaim(claim.parent, claim.parents);
           if (claim.parentComputed.status === -1) {
             claim.warnings.push('parentMissing');
           } else if (claim.parentComputed.status === 0) {
@@ -343,12 +343,53 @@ export class EvanClaimService {
         tree: [ ],
         warnings: [ 'missing' ],
       });
+
+      await this.ensureClaimDescription(claims[0]);
     }
 
-    // TODO: implement claims image loading
-    // claims[0].icon = 'https://upload.wikimedia.org/wikipedia/de/6/63/T%C3%9CV_S%C3%BCd_logo.svg'
-
     return claims;
+  }
+
+  /**
+   * Map the topic of a claim to it's default ens domain
+   *
+   * @param      {string}  topic   the claim name / topic
+   * @return     {string}  The claim ens address
+   */
+  public getClaimEnsAddress(topic: string) {
+    // split the topic and use only the most top level domain
+    return `${ topic.split('/').pop() }.claims.evan`;
+  }
+
+  /**
+   * Gets the default description for a claim if it does not exists.
+   *
+   * @param      {any}     claim   the claim that should be checked
+   */
+  public async ensureClaimDescription(claim: any) {
+    if (!claim.description) {
+      try {
+        claim.description = await this.bcc.description
+          .getDescription(this.getClaimEnsAddress(claim.name));
+      } catch (ex) { }
+    }
+
+    if (claim.description) {
+      // map the properties to a flat description
+      if (claim.description.public) {
+        claim.description = claim.description.public;
+      }
+
+      // move the img to the basic claim
+      if (claim.description.imgSquare) {
+        claim.icon = claim.description.imgSquare;
+      }
+
+      // try to load a clear name
+      try {
+        claim.displayName = claim.description.i18n.name.en;
+      } catch (ex) { }
+    }
   }
 
   /**
@@ -359,7 +400,7 @@ export class EvanClaimService {
    * @return     {any}         computed claim including latest creationDate, combined color,
    *                           displayName
    */
-  public getComputedClaim(topic: string, claims: Array<any>) {
+  public async getComputedClaim(topic: string, claims: Array<any>) {
     const computed:any = {
       claims: claims,
       creationDate: null,
@@ -371,9 +412,13 @@ export class EvanClaimService {
       warnings: [ ],
     };
 
+    // load the description for the given topic
+    await this.ensureClaimDescription(computed);
+
     // keep creationDates of all claims, so we can check after the final combined status was set,
     // which creation date should be used
     const creationDates = { '-1': [ ], '0': [ ], '1': [ ]}
+    const expirationDates = { '-1': [ ], '0': [ ], '1': [ ]}
 
     // iterate through all claims and check for warnings and the latest creation date of an claim
     for (let claim of claims) {
@@ -392,11 +437,21 @@ export class EvanClaimService {
       if (typeof claim.creationDate !== 'undefined') {
         creationDates[claim.status].push(claim.creationDate);
       }
+
+      // save all creation dates for later usage
+      if (typeof claim.expirationDate !== 'undefined') {
+        expirationDates[claim.status].push(claim.expirationDate);
+      }
     }
 
     // use the latest creationDate for the specific status
     if (creationDates[computed.status].length > 0) {
       computed.creationDate = creationDates[computed.status].sort().pop();
+    }
+
+    // use the latest creationDate for the specific status
+    if (expirationDates[computed.status].length > 0) {
+      computed.expirationDate = creationDates[computed.status].sort().pop();
     }
 
     return computed;

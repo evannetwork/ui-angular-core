@@ -111,6 +111,11 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   @Input() compute: boolean = true;
 
+  /**
+   * is the component allowed to issue claims?
+   */
+  @Input() enableIssue: boolean = true;
+
   /*****************    variables    *****************/
   /**
    * available display modes
@@ -312,7 +317,7 @@ export class EvanClaimComponent extends AsyncComponent {
     // specific topic
     this.claims = await this.claimService.getClaims(this.address, this.topic);
     this.addressbook = await this.addressBookService.loadAccounts();
-    this.computed = this.claimService.getComputedClaim(this.topic, this.claims);
+    this.computed = await this.claimService.getComputedClaim(this.topic, this.claims);
 
     // add the topLevel property to the computed claim to display the initial person claim
     this.computed.topLevel = true;
@@ -358,12 +363,13 @@ export class EvanClaimComponent extends AsyncComponent {
    *
    * @param      {any}     claimToActivate  computed / normal claim
    */
-  private openClaimPopup(claimToActivate: any, $event: any) {
+  private async openClaimPopup(claimToActivate: any, $event: any) {
     if (!this.popupClaim) {
       if (claimToActivate.claims) {
         this.popupClaim = this.core.utils.deepCopy(claimToActivate);
       } else {
-        this.popupClaim = this.claimService.getComputedClaim(claimToActivate.name, [ claimToActivate ]);
+        this.popupClaim = await this.claimService
+          .getComputedClaim(claimToActivate.name, [ claimToActivate ]);
       }
 
       // show initial person
@@ -412,6 +418,18 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /**
+   * Opens the issue claim popup, when the user is able to open the issue claim.
+   *
+   * @param      {any}     claim   the claim that should be opened
+   */
+  private openIssueClaim(claim: any) {
+    if (this.canIssueClaim(claim)) {
+      this.issueClaim = claim;
+      this.ref.detectChanges();
+    }
+  }
+
+  /**
    * When a user clicks a value within the select in an claim menu, start the specific action
    *
    * @param      {any}     claim   The claim for that an action should be runned.
@@ -420,7 +438,7 @@ export class EvanClaimComponent extends AsyncComponent {
   private claimMenuClicked(claim: any, type: string) {
     switch (type) {
       case 'issue': {
-        this.issueClaim = claim;
+        this.openIssueClaim(claim);
         break;
       }
       case 'accept': {
@@ -467,13 +485,10 @@ export class EvanClaimComponent extends AsyncComponent {
    * @return     {boolean}  True if able to issue claim, False otherwise
    */
   private canIssueClaim(claim: any) {
-    if (this.activeIdentity && claim.claims) {
+    if (this.activeIdentity && claim.claims && this.enableIssue) {
       // only allow claim issue for computed claims
-      const alreadyCreated = claim.claims
-        .filter(subClaim => subClaim.issuerAccount !== this.activeAccount).length === 0;
-      if (alreadyCreated) {
-        return true;
-      }
+      return claim.claims
+        .filter(subClaim => subClaim.issuerAccount === this.activeAccount).length === 0;
     } else {
       return false;
     }
@@ -517,24 +532,44 @@ export class EvanClaimComponent extends AsyncComponent {
    * @param      {any}     $event       the click event
    */
   private activateSubClaim(detailClaim: any, subClaim?: any, $event?: any) {
-    // close the full tree
-    delete detailClaim.activeSubClaim;
-    this.deactiveSubClaims(detailClaim);
-
     // only activate the sub claim, if it's provided, else deactivate everything and update the ref
-    if (subClaim && subClaim.parentComputed) {
-      detailClaim.activeSubClaim = subClaim.parentComputed;
-      subClaim.active = true;
-      detailClaim.activeSubClaim.active = true;
+    if (subClaim) {
+      // if the claim is already active, close everything
+      if (subClaim.active) {
+        // close the full sub tree
+        if (detailClaim.activeSubClaim) {
+          delete detailClaim.activeSubClaim.activeSubClaim;
+          delete detailClaim.activeSubClaim;
+        }
 
-      // close the full sub tree
-      delete detailClaim.activeSubClaim.activeSubClaim;
-      this.deactiveSubClaims(detailClaim.activeSubClaim);
+        delete subClaim.active;
+        this.deactiveSubClaims(detailClaim);
+        this.deactiveSubClaims(subClaim);
+      } else {
+        // close the full tree
+        delete detailClaim.activeSubClaim;
+        this.deactiveSubClaims(detailClaim);
 
-      // calculate sub claim height, to reset eventual caluclated height inlcuding an previously
-      // actived one
-      detailClaim.activeSubClaim.subRowHeight = this.subClaimsRowHeight(detailClaim.activeSubClaim);
-      this.calculateSubClaimPositions(detailClaim.activeSubClaim);
+        subClaim.active = true;
+
+        if (subClaim.parentComputed) {
+          detailClaim.activeSubClaim = subClaim.parentComputed;
+          detailClaim.activeSubClaim.active = true;
+
+          // close the full sub tree
+          delete detailClaim.activeSubClaim.activeSubClaim;
+          this.deactiveSubClaims(detailClaim.activeSubClaim);
+
+          // calculate sub claim height, to reset eventual caluclated height inlcuding an previously
+          // actived one
+          detailClaim.activeSubClaim.subRowHeight = this.subClaimsRowHeight(detailClaim.activeSubClaim);
+          this.calculateSubClaimPositions(detailClaim.activeSubClaim);
+        }
+      }
+    } else {
+      // close the full tree
+      delete detailClaim.activeSubClaim;
+      this.deactiveSubClaims(detailClaim);
     }
 
     // calculate sub claim row
@@ -566,7 +601,7 @@ export class EvanClaimComponent extends AsyncComponent {
           30
         );
 
-        setTimeout(() =>{
+        setTimeout(() => {
           maxScroll = detailContainer.scrollWidth - detailContainer.clientWidth;
 
           this.core.utils.scrollTo(

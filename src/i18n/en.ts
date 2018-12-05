@@ -48,6 +48,8 @@ export const en = {
       "issued-by": "issued by",
       "issuer": "Issuer",
       "issuer-no-identity": "No claim administration has yet been created for this account, so you cannot issue claims. Please visit the claim management application to set it up.",
+      "not-set": "Not issued",
+      "not-set-desc": "...",
       "okays": {
         "confirmed": "confirmed",
         "notExpired": "not expired",

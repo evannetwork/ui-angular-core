@@ -83,7 +83,9 @@
         </g>
       </svg>
 
-      <img *ngIf="claim.icon" [src]="_DomSanitizer.bypassSecurityTrustUrl(claim.icon)">
+      <img
+        *ngIf="claim.icon"
+        [src]="_DomSanitizer.bypassSecurityTrustUrl(claim.icon)">
     </ng-container>
   </div>
 </ng-template>
@@ -102,6 +104,10 @@
           <b>{{ claim.displayName }}</b>
           <p>
             {{ claim.creationDate | date:'mediumDate':'':translate.translate.currentLang }}
+
+            <ng-container *ngIf="claim.expirationDate">
+              - {{ claim.expirationDate | date:'mediumDate':'':translate.translate.currentLang }}
+            </ng-container>
           </p>
         </div>
       </div>
@@ -175,7 +181,7 @@
   <div class="claim-detail-row static-width"
     [class.padding-left]="getClaimsOrParents(detailClaim).length > 1 && !detailClaim.activeSubClaim"
     [style.height]="detailClaim.subRowHeight + 'px'"
-    *ngIf="detailClaim.warnings.indexOf('missing') === -1 && getClaimsOrParents(detailClaim).length > 0">
+    *ngIf="getClaimsOrParents(detailClaim).length > 0">
     <div [class]="'claim-connector claim-row-connector ' + (detailClaim.activeSubClaim ? 'active' : '') + ' status-' + (detailClaim.activeSubClaim ? detailClaim.activeSubClaim.status : detailClaim.status)">
       <ion-icon name="arrow-dropleft"></ion-icon>
       <div></div>
@@ -197,7 +203,7 @@
         </div>
       </div>
       <ion-icon name="person"></ion-icon>
-      <div class="claim-person-label">
+      <div class="claim-person-label" *ngIf="subClaim.warnings.indexOf('missing') === -1">
         <ng-container
           *ngTemplateOutlet="userAliasMulti;context:{ address: subClaim.issuerAccount }">
         </ng-container>
@@ -205,12 +211,21 @@
           *ngTemplateOutlet="claimInteraction;context:{ interactionClaim: subClaim }">
         </ng-container>
       </div>
+      <div class="claim-person-label" *ngIf="subClaim.warnings.indexOf('missing') !== -1">
+        <b>{{ '_angularcore.claims.not-set' | translate }}</b>
+        <p>{{ '_angularcore.claims.not-set-desc' | translate }}</p>
+      </div>
       <div class="claim-person-detail" *ngIf="subClaim.active" [@growTransition]="{ value: ':enter', params : { height : '100px' } }">
         <div class="claim-detail-dates display-flex-justify">
           <div>
             <div class="display-flex-justify" text-center>
               <ion-icon name="add-circle"></ion-icon>
-              <span>{{ subClaim.creationDate | date:'mediumDate':'':translate.translate.currentLang }}</span>
+              <span *ngIf="subClaim.creationDate">
+                {{ subClaim.creationDate | date:'mediumDate':'':translate.translate.currentLang }}
+              </span>
+              <span *ngIf="!subClaim.creationDate">
+                ---
+              </span>
             </div>
             <div class="display-flex-justify" text-center
               [class.danger]="subClaim.warnings.indexOf('expired') !== -1"
@@ -227,8 +242,11 @@
           <ion-icon name="checkmark"></ion-icon>
         </div>
 
-        <div class="detail-desc danger" *ngIf="subClaim.warnings.length > 0">
-          <ion-icon name="close"></ion-icon>
+        <div class="detail-desc"
+          [class.danger]="subClaim.warnings.indexOf('missing') !== -1"
+          [class.warning]="subClaim.warnings.indexOf('missing') === -1"
+          *ngIf="subClaim.warnings.length > 0">
+          <ion-icon name="alert"></ion-icon>
           <span>
             {{ ('_angularcore.claims.warnings.' + subClaim.warnings[0]) | translate }}
           </span>
@@ -236,7 +254,7 @@
       </div>
     </div>
   </div>
-
+<!-- 
   <div class="claim-detail-row static-width claim-missing"
     *ngIf="detailClaim.warnings.indexOf('missing') !== -1">
     <div class="claim-connector claim-row-connector status--1">
@@ -244,9 +262,9 @@
       <div></div>
     </div>
     <ion-icon class="clickable" name="close-circle" color="danger"
-      (click)="issueClaim = detailClaim; ref.detectChanges()">
+      (click)="openIssueClaim(detailClaim)">
     </ion-icon>
-  </div>
+  </div> -->
 
   <!-- if a sub claim was clicked, show the next tree -->
   <div class="sub-claims-container" *ngIf="detailClaim.activeSubClaim"
@@ -300,6 +318,31 @@
       <p ion-text class="m-b-0 m-t-0" *ngIf="!showAddressSelect">
         {{ '_angularcore.claims.details-desc' | translate }}
       </p>
+
+      <ion-row>
+        <ion-col margin-top col-12 col-md-6>
+          <b>{{ '_angularcore.claims.topic' | translate }}</b>
+          <p class="m-b-0 m-t-0">{{ popupClaim.name }}</p>
+        </ion-col>
+        <ion-col margin-top col-12 col-md-6>
+          <b>{{ '_angularcore.claims.subject' | translate }}</b>
+          <p class="m-b-0 m-t-0">
+            <ng-container *ngIf="popupClaim.subjects">
+              <ng-container *ngFor="let subject of popupClaim.subjects; let i = index">
+                <span *ngIf="i !== 0">, </span>
+                <ng-container *ngTemplateOutlet="userAlias;context:{ address:subject }"></ng-container>
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="!popupClaim.subjects">
+              <ng-container *ngTemplateOutlet="userAlias;context:{ address:popupClaim.subject }"></ng-container>
+            </ng-container>
+          </p>
+        </ion-col>
+      </ion-row>
+
+      <div margin-vertical *ngFor="let claim of (popupClaim.claims ? popupClaim.claims : [ popupClaim ])">
+        <ng-container *ngTemplateOutlet="claimDetailDisplay;context:{ claim: claim }"></ng-container>
+      </div>
 
       <div class="evan-detailed-claim" #evanDetailClaim>
         <ng-container
@@ -355,7 +398,7 @@
 
       <div margin-top text-center>
         <button ion-button icon-left color="medium-gray" round outline
-          (click)="closepopupClaim($event)">
+          (click)="this.issueClaim = null; ref.detectChanges()">
           <ion-icon name="close" color="light"></ion-icon>
           <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
         </button>
