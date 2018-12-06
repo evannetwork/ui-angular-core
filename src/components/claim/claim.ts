@@ -527,17 +527,23 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /*************************************** begin magic ********************************************/
-  private subClaimMarginTop: number = 40;
+  private subClaimMarginTop: number = 20;
 
   /**
    * height of the sub claim with no active body 
    */
-  private subClaimHeight:number = 70 + this.subClaimMarginTop;
+  private subClaimHeight:number = 68 + this.subClaimMarginTop;
+
+  /**
+   * move the activated element 70 downwards, so the arrow will go directly through the bottom of
+   * person icon
+   */
+  private activeTopOffset:number = 0;
 
   /**
    * height of an active sub claim including the body
    */
-  private activeSubClaimheight:number = 170 + this.subClaimMarginTop;
+  private activeSubClaimheight:number = 173 + this.subClaimMarginTop;
 
   /**
    * Remove the active sub claim property of an array of claims and of all it's parents
@@ -588,19 +594,17 @@ export class EvanClaimComponent extends AsyncComponent {
 
         subClaim.active = true;
 
-        if (subClaim.parentComputed) {
-          detailClaim.activeSubClaim = subClaim.parentComputed;
-          detailClaim.activeSubClaim.active = true;
+        detailClaim.activeSubClaim = subClaim.parentComputed || subClaim;
+        detailClaim.activeSubClaim.active = true;
 
-          // close the full sub tree
-          delete detailClaim.activeSubClaim.activeSubClaim;
-          this.deactiveSubClaims(detailClaim.activeSubClaim);
+        // close the full sub tree
+        delete detailClaim.activeSubClaim.activeSubClaim;
+        this.deactiveSubClaims(detailClaim.activeSubClaim);
 
-          // calculate sub claim height, to reset eventual caluclated height inlcuding an previously
-          // actived one
-          detailClaim.activeSubClaim.subRowHeight = this.subClaimsRowHeight(detailClaim.activeSubClaim);
-          this.calculateSubClaimPositions(detailClaim.activeSubClaim);
-        }
+        // calculate sub claim height, to reset eventual caluclated height inlcuding an previously
+        // actived one
+        detailClaim.activeSubClaim.subRowHeight = this.subClaimsRowHeight(detailClaim.activeSubClaim);
+        this.calculateSubClaimPositions(detailClaim.activeSubClaim);
       }
     } else {
       // close the full tree
@@ -613,42 +617,44 @@ export class EvanClaimComponent extends AsyncComponent {
     this.calculateSubClaimPositions(detailClaim);
 
     // render it!
-    this.ref.detectChanges();
+    window.requestAnimationFrame(() => {
+      this.ref.detectChanges();
 
-    if ($event) {
-      const claimRow: any = this.core.utils.getParentByClassName($event.srcElement,
-        'claim-detail-row');
-      const detailContainer: any = this.core.utils.getParentByClassName(claimRow,
-        'evan-detailed-claim');
-
-      setTimeout(() => {
-        let maxScroll = detailContainer.scrollWidth - detailContainer.clientWidth;
-        let rowScrollTo = claimRow.offsetLeft - detailContainer.clientWidth + 300;
-        rowScrollTo = rowScrollTo > 0 ? rowScrollTo : 0;
-
-        this.core.utils.scrollTo(
-          detailContainer,
-          'horizontal',
-          rowScrollTo,
-          50,
-          // calculate the scroll speed, so we will scroll to the start position, before the
-          // appear animation is finished (~400ms => 10ms timeouts => scroll range / 40 => use 30
-          // for timeout delays)
-          30
-        );
+      if ($event) {
+        const claimRow: any = this.core.utils.getParentByClassName($event.srcElement,
+          'claim-detail-row');
+        const detailContainer: any = this.core.utils.getParentByClassName(claimRow,
+          'evan-detailed-claim');
 
         setTimeout(() => {
-          maxScroll = detailContainer.scrollWidth - detailContainer.clientWidth;
+          let maxScroll = detailContainer.scrollWidth - detailContainer.clientWidth;
+          let rowScrollTo = claimRow.offsetLeft - detailContainer.clientWidth + 300;
+          rowScrollTo = rowScrollTo > 0 ? rowScrollTo : 0;
 
           this.core.utils.scrollTo(
             detailContainer,
             'horizontal',
-            detailContainer.scrollWidth - detailContainer.clientWidth,
-            50
+            rowScrollTo,
+            50,
+            // calculate the scroll speed, so we will scroll to the start position, before the
+            // appear animation is finished (~400ms => 10ms timeouts => scroll range / 40 => use 30
+            // for timeout delays)
+            30
           );
-        }, 500);
-      });
-    }
+
+          setTimeout(() => {
+            maxScroll = detailContainer.scrollWidth - detailContainer.clientWidth;
+
+            this.core.utils.scrollTo(
+              detailContainer,
+              'horizontal',
+              detailContainer.scrollWidth - detailContainer.clientWidth,
+              50
+            );
+          }, 500);
+        });
+      }
+    });
   }
 
   /**
@@ -688,8 +694,7 @@ export class EvanClaimComponent extends AsyncComponent {
     if (activeClaim && activeClaim.length > 0) {
       // set the active claim into the middle of the row container
       activeClaim = activeClaim[0];
-      activeClaim.topPos = (claim.subRowHeight / 2) - (this.activeSubClaimheight / 2) -
-        this.subClaimMarginTop;
+      activeClaim.topPos = (claim.subRowHeight / 2) - this.subClaimHeight - 1;
 
       // place all other claims at top or bottom of the centered active claim
       let activeClaimIndex = subClaims.indexOf(activeClaim);
@@ -717,11 +722,11 @@ export class EvanClaimComponent extends AsyncComponent {
           subClaim.topPos += negativeTopPos;
         });
 
-        claim.subRowHeight += negativeTopPos;
+        claim.subRowHeight += negativeTopPos * 2;
       }
     } else {
       for (let i = 0; i < subClaims.length; i++) {
-        subClaims[i].topPos = i * this.subClaimHeight;
+        subClaims[i].topPos = i * this.subClaimHeight + 2;
       }
     }
 

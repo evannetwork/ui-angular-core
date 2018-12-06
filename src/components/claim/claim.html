@@ -160,11 +160,13 @@
     <div
       [class]="'claim-person status-' + detailClaim.status"
       (click)="activateSubClaim(detailClaim, null, $event)">
-      <ion-icon name="person"></ion-icon>
       <div class="claim-person-label">
-        <ng-container
-          *ngTemplateOutlet="userAliasMulti;context:{ address: detailClaim.subject || detailClaim.subjects[0] }">
-        </ng-container>
+        <ion-icon name="person"></ion-icon>
+        <div>
+          <ng-container
+            *ngTemplateOutlet="userAliasMulti;context:{ address: detailClaim.subject || detailClaim.subjects[0] }">
+          </ng-container>
+        </div>
       </div>
       <div class="claim-person-detail only-interaction" *ngIf="canIssueClaim(detailClaim)">
         <ng-container
@@ -176,7 +178,9 @@
 
   <!-- display the detail claim batch -->
   <div class="claim-detail-row static-height">
-    <div [class]="'claim-connector claim-row-connector active status-' + detailClaim.status">
+    <div
+      [class]="'claim-connector claim-row-connector active status-' + detailClaim.status"
+      *ngIf="detailClaim.claims && detailClaim.topLevel">
       <ion-icon name="arrow-dropleft"></ion-icon>
       <div></div>
     </div>
@@ -190,7 +194,7 @@
     [class.padding-left]="getClaimsOrParents(detailClaim).length > 1 && !detailClaim.activeSubClaim"
     [style.height]="detailClaim.subRowHeight + 'px'"
     *ngIf="getClaimsOrParents(detailClaim).length > 0">
-    <div [class]="'claim-connector claim-row-connector ' + (detailClaim.activeSubClaim ? 'active' : '') + ' status-' + (detailClaim.activeSubClaim ? detailClaim.activeSubClaim.status : detailClaim.status)">
+    <div [class]="'claim-connector claim-row-connector large ' + (detailClaim.activeSubClaim ? 'active' : '') + ' status-' + (detailClaim.activeSubClaim ? detailClaim.activeSubClaim.status : detailClaim.status)">
       <ion-icon name="arrow-dropleft"></ion-icon>
       <div></div>
     </div>
@@ -209,19 +213,24 @@
           [style.bottom]="subClaim.vertical.bottom ? subClaim.vertical.bottom + 'px' : ''">
         </div>
       </div>
-      <ion-icon name="person"></ion-icon>
       <div class="claim-person-label"
         *ngIf="subClaim.warnings.indexOf('missing') === -1"
         (click)="activateSubClaim(detailClaim, subClaim, $event)">
-        <ng-container
-          *ngTemplateOutlet="userAliasMulti;context:{ address: subClaim.issuerAccount }">
-        </ng-container>
+        <ion-icon name="person"></ion-icon>
+        <div>
+          <ng-container
+            *ngTemplateOutlet="userAliasMulti;context:{ address: subClaim.issuerAccount }">
+          </ng-container>
+        </div>
       </div>
       <div class="claim-person-label"
         *ngIf="subClaim.warnings.indexOf('missing') !== -1"
         (click)="activateSubClaim(detailClaim, subClaim, $event)">
-        <b>{{ '_angularcore.claims.not-set' | translate }}</b>
-        <p>{{ '_angularcore.claims.not-set-desc' | translate }}</p>
+        <ion-icon name="person"></ion-icon>
+        <div>
+          <b>{{ '_angularcore.claims.not-set' | translate }}</b>
+          <p>{{ '_angularcore.claims.not-set-desc' | translate }}</p>
+        </div>
       </div>
       <div class="claim-person-detail"
         *ngIf="subClaim.active"
@@ -270,7 +279,7 @@
   </div>
 
   <!-- if a sub claim was clicked, show the next tree -->
-  <div class="sub-claims-container" *ngIf="detailClaim.activeSubClaim"
+  <div class="sub-claims-container" *ngIf="detailClaim.activeSubClaim && getClaimsOrParents(detailClaim.activeSubClaim).length > 0"
     [@opacityTransition]>
     <ng-container
       *ngTemplateOutlet="claimDetailDisplay;context:{ detailClaim: detailClaim.activeSubClaim }">
