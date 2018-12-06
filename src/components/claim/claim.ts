@@ -715,9 +715,9 @@ export class EvanClaimComponent extends AsyncComponent {
       // available => more space is needed
       let activeSubClaimHeight = this.activeSubClaimheight;
       if (this.claimInteractionCount(activeClaim) === 0) {
-        activeClaim.topPos = (claim.subRowHeight / 2) - this.subClaimHeight - 2;
+        activeClaim.topPos = (claim.subRowHeight / 2) - this.subClaimHeight - 1;
       } else {
-        activeClaim.topPos = (claim.subRowHeight / 2) - this.subClaimHeight - 12;
+        activeClaim.topPos = (claim.subRowHeight / 2) - this.subClaimHeight - 11;
         activeSubClaimHeight = this.activeSubClaimheight + this.subClaimInteractionHeight;
       }
 

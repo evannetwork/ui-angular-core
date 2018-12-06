@@ -264,6 +264,13 @@ export class EvanClaimService {
         claim.warnings = [ ];
         claim.creationDate = claim.creationDate * 1000;
 
+        // if a root '/' is applied, the parent will be empty, so we need to set the '/' as parent,
+        // so the event claim could be checked 
+        const topicSlashes = topic.match(/\//);
+        if (!claim.parent && topic !== '/' && topicSlashes && topicSlashes.length > 0) {
+          claim.parent = '/';
+        }
+
         // if expiration date is given, format the unix timestamp
         if (claim.expirationDate) {
           claim.expirationDate = claim.expirationDate * 1000;
@@ -292,8 +299,9 @@ export class EvanClaimService {
           claim.warnings.push('invalid');
         }
 
-        // if isser === subject, 
-        if (claim.issuerAccount === claim.subject) {
+        // if isser === subject and only if a parent is passed, so if the root one is empty and no
+        // slash is available
+        if (claim.issuerAccount === claim.subject && claim.parent) {
           claim.warnings.push('selfIssued');
         }
 
@@ -302,16 +310,20 @@ export class EvanClaimService {
         }
 
         // if the current topic is '/' (evan root) do not load parents, it's the highest
-        if (topic !== '/' && topic !== '') {
-          // load all sub claims
-          claim.parents = await this.getClaims(claim.issuerAccount, claim.parent || '/', false);
+        if (topic !== '/') {
+          if (claim.parent) {
+            // load all sub claims
+            claim.parents = await this.getClaims(claim.issuerAccount, claim.parent, false);
 
-          // load the computed status of all parent claims, to check if the parent tree is valid
-          claim.parentComputed = await this.getComputedClaim(claim.parent, claim.parents);
-          if (claim.parentComputed.status === -1) {
-            claim.warnings.push('parentMissing');
-          } else if (claim.parentComputed.status === 0) {
-            claim.warnings.push('parentUntrusted');
+            // load the computed status of all parent claims, to check if the parent tree is valid
+            claim.parentComputed = await this.getComputedClaim(claim.parent, claim.parents);
+            if (claim.parentComputed.status === -1) {
+              claim.warnings.push('parentMissing');
+            } else if (claim.parentComputed.status === 0) {
+              claim.warnings.push('parentUntrusted');
+            }
+          } else {
+            claim.parents = [ ];
           }
         } else {
           claim.parents = [ ];
@@ -357,8 +369,14 @@ export class EvanClaimService {
    * @return     {string}  The claim ens address
    */
   public getClaimEnsAddress(topic: string) {
-    // split the topic and use only the most top level domain
-    return `${ topic.split('/').pop() }.claims.evan`;
+    const reverse = topic.split('/').reverse();
+
+    if (reverse[reverse.length - 1] === '') {
+      reverse.pop();
+    }
+
+    // use the reverse topic and remove the empty first slash
+    return `${ reverse.join('.') }.claims.evan`;
   }
 
   /**
