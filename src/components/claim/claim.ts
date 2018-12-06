@@ -546,6 +546,11 @@ export class EvanClaimComponent extends AsyncComponent {
   private activeSubClaimheight:number = 173 + this.subClaimMarginTop;
 
   /**
+   * amount of height that should be added, if interactions for a active claim is available
+   */
+  private subClaimInteractionHeight: number = 20;
+
+  /**
    * Remove the active sub claim property of an array of claims and of all it's parents
    *
    * @param      {any}     subClaim  the sub claim, where all claims (in case of computed) and
@@ -675,9 +680,20 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   private subClaimsRowHeight(claim: any):number {
     const subClaims = this.getClaimsOrParents(claim);
+    let caluclated;
 
-    return this.subClaimMarginTop + (claim.activeSubClaim ? ((subClaims.length - 1) *
-      this.subClaimHeight) + this.activeSubClaimheight : subClaims.length * this.subClaimHeight);
+    if (claim.activeSubClaim) {
+      caluclated = (subClaims.length - 1) * this.subClaimHeight + this.activeSubClaimheight;
+
+      // if the size must be adjusted to include the interaction count, include it!
+      if (this.claimInteractionCount(claim.activeSubClaim) !== 0) {
+        caluclated += this.subClaimInteractionHeight;
+      }
+    } else {
+      caluclated = subClaims.length * this.subClaimHeight;
+    }
+
+    return this.subClaimMarginTop + caluclated;
   }
 
   /**
@@ -694,7 +710,16 @@ export class EvanClaimComponent extends AsyncComponent {
     if (activeClaim && activeClaim.length > 0) {
       // set the active claim into the middle of the row container
       activeClaim = activeClaim[0];
-      activeClaim.topPos = (claim.subRowHeight / 2) - this.subClaimHeight - 1;
+      
+      // calculate the position and the active subclaim height including the interactions that are
+      // available => more space is needed
+      let activeSubClaimHeight = this.activeSubClaimheight;
+      if (this.claimInteractionCount(activeClaim) === 0) {
+        activeClaim.topPos = (claim.subRowHeight / 2) - this.subClaimHeight - 2;
+      } else {
+        activeClaim.topPos = (claim.subRowHeight / 2) - this.subClaimHeight - 12;
+        activeSubClaimHeight = this.activeSubClaimheight + this.subClaimInteractionHeight;
+      }
 
       // place all other claims at top or bottom of the centered active claim
       let activeClaimIndex = subClaims.indexOf(activeClaim);
@@ -708,7 +733,7 @@ export class EvanClaimComponent extends AsyncComponent {
             // move the next claims downwards and add 100 (the active body height)
             subClaims[i].topPos = activeClaim.topPos +
               ((i - activeClaimIndex) * this.subClaimHeight) +
-              (this.activeSubClaimheight - this.subClaimHeight);
+              (activeSubClaimHeight - this.subClaimHeight);
           }
         }
       }

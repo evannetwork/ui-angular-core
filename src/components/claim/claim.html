@@ -201,7 +201,7 @@
 
     <div class="claim-person"
       *ngFor="let subClaim of getClaimsOrParents(detailClaim); let i = index"
-      [class]="'claim-person status-' + subClaim.status + (subClaim.active ? ' active' : '')"
+      [class]="'claim-person status-' + subClaim.status + (subClaim.active ? ' active' : '') + (claimInteractionCount(subClaim) !== 0 ? ' interaction-available' : '')"
       [style.top]="subClaim.topPos + 'px'">
       <div [class]="'claim-connector claim-people-connector ' + (subClaim.active ? 'active' : '') + ' status-' + subClaim.status"
         *ngIf="getClaimsOrParents(detailClaim).length > 1 && !subClaim.active">
