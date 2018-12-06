@@ -32,19 +32,34 @@ export const de = {
     "camera": "Kamera",
     "cancel": "Abbrechen",
     "claims": {
-      "accept": "Zertifikat \"{{ name }}\" bestätigen",
+      "accept": "bestätigen",
       "all-issuers": "Alle Zertifikate den diesen Zertifikatspfad und Nutzer betreffen.",
       "cancel": "abbrechen",
       "close-details": "schließen",
       "creation-date": "Erstelldatum",
-      "delete": "Zertifikat \"{{ name }}\" löschen",
+      "delete": "löschen",
       "details": "Zertifikatsdetails",
       "details-desc": "Übersicht über Zertifikate und deren genaue Statusinformationen.",
+      "dispatcher": {
+        "acceptDispatcher": {
+          "description": "Möchten Sie das Zertifikat \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> bestätigen?",
+          "ok": "bestätigen",
+          "title": "Zertifikat bestätigen"
+        },
+        "cancel": "abbrechen",
+        "deleteDispatcher": {
+          "description": "Möchten Sie das Zertifikat \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> löschen?",
+          "ok": "löschen",
+          "title": "Zertifikat löschen"
+        }
+      },
       "done": "ok",
       "enable-expiration-date": "Ablaufdatum benutzen",
       "expiration-date": "Ablaufdatum",
-      "issue": "Zertifikat \"{{ name }}\" ausstellen",
+      "interactions": "Bearbeitung",
+      "issue": "ausstellen",
       "issue-claim": "Zertifikat ausstellen",
+      "issue-claim-description": "Möchten Sie das Zertifikat \"<b>{{ topic }}</b>\" für den Nutzer <b>{{ to }}</b> ausstellen?",
       "issued-by": "ausgestellt von",
       "issuer": "Aussteller",
       "issuer-no-identity": "Für diesen Account wurde noch keine Zertifikatsverwaltung erstellt, somit können Sie keine Zertifikate ausstellen. Bitte besuchen die Zertifikasverwaltung Anwendung, um die diese einzurichten.",

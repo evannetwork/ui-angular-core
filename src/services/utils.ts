@@ -668,4 +668,19 @@ export class EvanUtilService implements OnDestroy {
   public activateColorTheme(colorTheme: string) {
     utils.activateColorTheme(colorTheme);
   }
+
+  /**
+   * Stops the browser event bubbling for a dom event (click, hover, ...).
+   *
+   * @param      {any}     $event  the interaction event
+   * @return     {boolean}  false to break everything
+   */
+  public stopEventBubbling($event?: any) {
+    if ($event) {
+      $event.preventDefault();
+      $event.stopPropagation();
+    }
+
+    return false;
+  }
 }

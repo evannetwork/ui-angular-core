@@ -32,19 +32,34 @@ export const en = {
     "camera": "Camera",
     "cancel": "Cancel",
     "claims": {
-      "accept": "accept \"{{ name }}\" claim",
+      "accept": "accept",
       "all-issuers": "All claims related to this claim path and user.",
       "cancel": "cancel",
       "close-details": "close",
       "creation-date": "Creation date",
-      "delete": "delete \"{{ name }}\" claim",
+      "delete": "delete",
       "details": "Claim detail",
       "details-desc": "Overview of claims and their exact status information.",
+      "dispatcher": {
+        "acceptDispatcher": {
+          "description": "Do you want to accept the claim \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
+          "ok": "accept",
+          "title": "Accept claim"
+        },
+        "cancel": "cancel",
+        "deleteDispatcher": {
+          "description": "Do you want to delete the claim \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
+          "ok": "delete",
+          "title": "Delete claim"
+        }
+      },
       "done": "ok",
       "enable-expiration-date": "Use expiration date",
       "expiration-date": "Expiration date",
-      "issue": "issue \"{{ name }}\" claim",
+      "interactions": "Editing",
+      "issue": "issue",
       "issue-claim": "Issue Claim",
+      "issue-claim-description": "Do you want to issue the claim \"<b>{{ topic }}</b>\" to the user <b>{{ to }}</b>?",
       "issued-by": "issued by",
       "issuer": "Issuer",
       "issuer-no-identity": "No claim administration has yet been created for this account, so you cannot issue claims. Please visit the claim management application to set it up.",

@@ -52,6 +52,7 @@ import {
 
 import { AsyncComponent } from '../../classes/AsyncComponent';
 import { EvanAddressBookService } from '../../services/bcc/address-book';
+import { EvanAlertService, } from '../../services/ui/alert';
 import { EvanBCCService } from '../../services/bcc/bcc';
 import { EvanClaimService } from '../../services/bcc/claims';
 import { EvanCoreService } from '../../services/bcc/core';
@@ -226,6 +227,7 @@ export class EvanClaimComponent extends AsyncComponent {
   constructor(
     private _DomSanitizer: DomSanitizer,
     private addressBookService: EvanAddressBookService,
+    private alertService: EvanAlertService,
     private bcc: EvanBCCService,
     private claimService: EvanClaimService,
     private core: EvanCoreService,
@@ -334,11 +336,36 @@ export class EvanClaimComponent extends AsyncComponent {
   /**
    * Issue a new claim the current opened topic and the subject.
    *
-   * @param      {any}     claim   the claim for that the action should be triggerd
-   * @param      {string}  type    type of the dispatcher (issueDispatcher, acceptDispatcher,
-   *                               deleteDispatcher)
+   * @param      {any}      claim   the claim for that the action should be triggerd
+   * @param      {string}   type    type of the dispatcher (issueDispatcher, acceptDispatcher,
+   *                                deleteDispatcher)
+   * @param      {any}      $event  the click event
+   * @return     {boolean}  false to break the event bubbling
    */
-  private triggerDispatcher(claim: any, type: string) {
+  private async triggerDispatcher(claim: any, type: string, $event: any) {
+    if (type !== 'issueDispatcher') {
+      try {
+        const from = await this.addressBookService.getNameForAccount(claim.issuerAccount);
+        const to = await this.addressBookService.getNameForAccount(claim.subject);
+
+        await this.alertService.showSubmitAlert(
+          `_angularcore.claims.dispatcher.${ type }.title`,
+          {
+            key: `_angularcore.claims.dispatcher.${ type }.description`,
+            translateOptions: {
+              topic: claim.name,
+              from: from,
+              to: to,
+            }
+          },
+          `_angularcore.claims.dispatcher.cancel`,
+          `_angularcore.claims.dispatcher.${ type }.ok`
+        );
+      } catch (ex) {
+        return this.core.utils.stopEventBubbling($event);
+      }
+    }
+
     this.queue.addQueueData(
       this.claimService.getQueueId(type),
       {
@@ -354,6 +381,7 @@ export class EvanClaimComponent extends AsyncComponent {
       delete this.issueClaim;
     }
 
+    claim.loading = true;
     this.computed.loading = true;
     this.ref.detectChanges();
   }
@@ -388,9 +416,7 @@ export class EvanClaimComponent extends AsyncComponent {
     }
 
     // prevent any other event when this button was clicked
-    $event.preventDefault();
-    $event.stopPropagation();
-    return false;
+    this.core.utils.stopEventBubbling($event);
   }
 
   /**
@@ -401,9 +427,7 @@ export class EvanClaimComponent extends AsyncComponent {
     this.ref.detectChanges();
 
     // prevent any other event when this button was clicked
-    $event.preventDefault();
-    $event.stopPropagation();
-    return false;
+    this.core.utils.stopEventBubbling($event);
   }
 
   /**
@@ -420,41 +444,17 @@ export class EvanClaimComponent extends AsyncComponent {
   /**
    * Opens the issue claim popup, when the user is able to open the issue claim.
    *
-   * @param      {any}     claim   the claim that should be opened
+   * @param      {any}    claim   the claim that should be opened
+   * @param      {any}    $event  the click event
+   * @return     {false}  break the event bubbling
    */
-  private openIssueClaim(claim: any) {
+  private openIssueClaim(claim: any, $event) {
     if (this.canIssueClaim(claim)) {
       this.issueClaim = claim;
       this.ref.detectChanges();
-    }
-  }
 
-  /**
-   * When a user clicks a value within the select in an claim menu, start the specific action
-   *
-   * @param      {any}     claim   The claim for that an action should be runned.
-   * @param      {string}  type    the type that was clicked (issue, accept, delete)
-   */
-  private claimMenuClicked(claim: any, type: string) {
-    switch (type) {
-      case 'issue': {
-        this.openIssueClaim(claim);
-        break;
-      }
-      case 'accept': {
-        this.triggerDispatcher(claim, 'acceptDispatcher');
-        break;
-      }
-      case 'delete': {
-        this.triggerDispatcher(claim, 'deleteDispatcher');
-        break;
-      }
+      return this.core.utils.stopEventBubbling($event);
     }
-
-    setTimeout(() => {
-      this.claimMenuValue = '';
-      this.ref.detectChanges();
-    });
   }
 
   /**
@@ -485,12 +485,44 @@ export class EvanClaimComponent extends AsyncComponent {
    * @return     {boolean}  True if able to issue claim, False otherwise
    */
   private canIssueClaim(claim: any) {
+    if (claim.warnings.indexOf('missing') !== -1) {
+      return true;
+    }
+
     if (this.activeIdentity && claim.claims && this.enableIssue) {
       // only allow claim issue for computed claims
       return claim.claims
         .filter(subClaim => subClaim.issuerAccount === this.activeAccount).length === 0;
     } else {
       return false;
+    }
+  }
+
+  /**
+   * Return the amount of interactions that the current user can trigger on a specific claim.
+   *
+   * @param      {any}     claim   the claim that should be checked
+   * @return     {number}  amount of interactions (0 - 3)
+   */
+  private claimInteractionCount(claim: any) {
+    return [
+      this.canDeleteClaim(claim),
+      this.canAcceptClaim(claim),
+      this.canIssueClaim(claim)
+    ].filter(interaction => !!interaction).length;
+  }
+
+  /**
+   * Returns the name or the account of a account from the addressbook.
+   *
+   * @param      {string}  accountId  the account id thath should be checked
+   * @return     {string}  The addressbook name
+   */
+  private getAddressbookName(accountId: string) {
+    if (this.addressbook && this.addressbook[accountId]) {
+      return this.addressbook[accountId].alias || this.addressbook[accountId].email || accountId;
+    } else {
+      return accountId;
     }
   }
 
@@ -517,6 +549,7 @@ export class EvanClaimComponent extends AsyncComponent {
     for (let subClaim of [ ].concat(this.getClaimsOrParents(claim))) {
       delete subClaim.activeSubClaim;
       delete subClaim.active;
+      delete subClaim.showInteractions;
 
       this.deactiveSubClaims(subClaim);
     }
@@ -540,14 +573,17 @@ export class EvanClaimComponent extends AsyncComponent {
         if (detailClaim.activeSubClaim) {
           delete detailClaim.activeSubClaim.activeSubClaim;
           delete detailClaim.activeSubClaim;
+          delete detailClaim.showInteractions;
         }
 
         delete subClaim.active;
+        delete subClaim.showInteractions;
         this.deactiveSubClaims(detailClaim);
         this.deactiveSubClaims(subClaim);
       } else {
         // close the full tree
         delete detailClaim.activeSubClaim;
+        delete detailClaim.showInteractions;
         this.deactiveSubClaims(detailClaim);
 
         subClaim.active = true;
