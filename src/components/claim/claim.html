@@ -93,6 +93,7 @@
 <!---------------------------------------- claim display ------------------------------------------>
 <ng-template #claimDisplay let-claim="claim" let-mode="mode" let-action="action">
   <div [class]="'evan-claim mode-' + mode + ' status-' + claim.status"
+    [title]="claim.displayName + ' (' + claim.name + ') '"
     (click)="action ? action($event) : openClaimPopup(claim, $event)">
     <ng-container *ngTemplateOutlet="claimIcon;context:{ claim: claim, mode: mode }"></ng-container>
     <ng-container *ngIf="!loadingClaims && mode != 'icon'">
@@ -145,7 +146,7 @@
         [title]="'_angularcore.claims.dispatcher.deleteDispatcher.title' | translate"
         *ngIf="canDeleteClaim(interactionClaim)"
         (click)="triggerDispatcher(interactionClaim, 'deleteDispatcher', $event)">
-        <ion-icon name="trash"></ion-icon>
+        <ion-icon name="cut"></ion-icon>
       </button>
     </ng-container>
   </div>
@@ -194,7 +195,7 @@
     [class.padding-left]="getClaimsOrParents(detailClaim).length > 1 && !detailClaim.activeSubClaim"
     [style.height]="detailClaim.subRowHeight + 'px'"
     *ngIf="getClaimsOrParents(detailClaim).length > 0">
-    <div [class]="'claim-connector claim-row-connector large ' + (detailClaim.activeSubClaim ? 'active' : '') + ' status-' + (detailClaim.activeSubClaim ? detailClaim.activeSubClaim.status : detailClaim.status)">
+    <div [class]="'claim-connector claim-row-connector large ' + (detailClaim.activeSubClaim ? 'active status-' + detailClaim.activeSubClaim.status : 'status-' + detailClaim.status) + (detailClaim.activeSubClaim && getClaimsOrParents(detailClaim.activeSubClaim).length === 0 ? ' last-connector' : '')">
       <ion-icon name="arrow-dropleft"></ion-icon>
       <div></div>
     </div>

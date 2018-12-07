@@ -82,6 +82,7 @@ export const en = {
         "invalidPath": "Invalid claim chain",
         "issued": "not accepted",
         "missing": "Claim does not exists.",
+        "noIdentity": "Claim management missing",
         "notEnsRootOwner": "Invalid root claim",
         "parentMissing": "Path does not exist",
         "parentUntrusted": "path invalid",

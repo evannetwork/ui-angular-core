@@ -485,6 +485,10 @@ export class EvanClaimComponent extends AsyncComponent {
    * @return     {boolean}  True if able to issue claim, False otherwise
    */
   private canIssueClaim(claim: any) {
+    if (claim.warnings.indexOf('noIdentity') !== -1) {
+      return false;
+    }
+
     if (claim.warnings.indexOf('missing') !== -1) {
       return true;
     }

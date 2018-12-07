@@ -171,7 +171,7 @@ export class EvanDescriptionService {
 
       return copy;
     } else {
-      return this.descriptions[ensAddress];
+      return description;
     }
   }
 

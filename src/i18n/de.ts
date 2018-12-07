@@ -82,6 +82,7 @@ export const de = {
         "invalidPath": "Ungültige Zertifikatskette",
         "issued": "nicht bestätigt",
         "missing": "Zertifikat existiert nicht.",
+        "noIdentity": "Zertifikatsverwaltung fehlt",
         "notEnsRootOwner": "Ungültiges Stammzertifikat",
         "parentMissing": "Pfad nicht existent",
         "parentUntrusted": "Pfad nicht bestätigt",

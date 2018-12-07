@@ -2,6 +2,10 @@
 
 ## Next Version
 ### Features
+- claims
+  - Remove automated root evan claim checking, so it needs to be specified within the claim check
+  - new claim tree styling
+
 ### Fixes
 - `evan-claim`: add checks if subject or issuer identity does not exists, display notification text if not
 - `dashboard-top-buttons`: move the component everytime to the most top level ion-app to fix eventually appearing position containing bugs

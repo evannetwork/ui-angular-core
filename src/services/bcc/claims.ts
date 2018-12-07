@@ -252,7 +252,18 @@ export class EvanClaimService {
    *   }
    */
   public async getClaims(address: string, topic: string, isIdentity?: boolean) {
-    const claims = await this.bcc.claims.getClaims(topic, address, isIdentity);
+    const isValidAddress = this.bcc.web3.utils.isAddress(address);
+    let claims = [ ];
+
+    // prepent starting slash if it does not exists
+    if (topic.indexOf('/') !== 0) {
+      topic = '/' + topic;
+    }
+
+    // only load claims for correct contract / accoun id's
+    if (isValidAddress) {
+      claims = await this.bcc.claims.getClaims(topic, address, isIdentity);
+    }
 
     if (claims.length > 0) {
       // build display name for claims and apply computed states for ui status
@@ -263,13 +274,6 @@ export class EvanClaimService {
         claim.parent = splitName.join('/');
         claim.warnings = [ ];
         claim.creationDate = claim.creationDate * 1000;
-
-        // if a root '/' is applied, the parent will be empty, so we need to set the '/' as parent,
-        // so the event claim could be checked 
-        const topicSlashes = topic.match(/\//);
-        if (!claim.parent && topic !== '/' && topicSlashes && topicSlashes.length > 0) {
-          claim.parent = '/';
-        }
 
         // if expiration date is given, format the unix timestamp
         if (claim.expirationDate) {
@@ -309,28 +313,22 @@ export class EvanClaimService {
           claim.warnings.push('expired');
         }
 
-        // if the current topic is '/' (evan root) do not load parents, it's the highest
-        if (topic !== '/') {
-          if (claim.parent) {
-            // load all sub claims
-            claim.parents = await this.getClaims(claim.issuerAccount, claim.parent, false);
+        if (claim.parent) {
+          // load all sub claims
+          claim.parents = await this.getClaims(claim.issuerAccount, claim.parent, false);
 
-            // load the computed status of all parent claims, to check if the parent tree is valid
-            claim.parentComputed = await this.getComputedClaim(claim.parent, claim.parents);
-            if (claim.parentComputed.status === -1) {
-              claim.warnings.push('parentMissing');
-            } else if (claim.parentComputed.status === 0) {
-              claim.warnings.push('parentUntrusted');
-            }
-          } else {
-            claim.parents = [ ];
+          // load the computed status of all parent claims, to check if the parent tree is valid
+          claim.parentComputed = await this.getComputedClaim(claim.parent, claim.parents);
+          if (claim.parentComputed.status === -1) {
+            claim.warnings.push('parentMissing');
+          } else if (claim.parentComputed.status === 0) {
+            claim.warnings.push('parentUntrusted');
           }
         } else {
           claim.parents = [ ];
-          claim.tree = [ ];
-          claim.displayName = 'evan';
 
-          if (claim.issuerAccount !== this.ensRootOwner || claim.subject !== this.ensRootOwner) {
+          if (claim.name === '/evan' &&
+             (claim.issuerAccount !== this.ensRootOwner || claim.subject !== this.ensRootOwner)) {
             claim.warnings = [ 'notEnsRootOwner' ];
           } else {
             claim.status = 1;
@@ -354,7 +352,16 @@ export class EvanClaimService {
         subject: address,
         tree: [ ],
         warnings: [ 'missing' ],
+        subjectIdentity: isValidAddress ?
+          await this.bcc.executor.executeContractCall(
+            this.bcc.claims.contracts.storage, 'users', address) :
+          '0x0000000000000000000000000000000000000000',
       });
+
+      if (!claims[0].subjectIdentity ||
+          claims[0].subjectIdentity === '0x0000000000000000000000000000000000000000') {
+        claims[0].warnings.unshift('noIdentity');
+      }
 
       await this.ensureClaimDescription(claims[0]);
     }
@@ -369,14 +376,18 @@ export class EvanClaimService {
    * @return     {string}  The claim ens address
    */
   public getClaimEnsAddress(topic: string) {
-    const reverse = topic.split('/').reverse();
+    // remove starting evan, /evan and / to get the correct domain
+    const clearedTopic = topic.replace(/^(?:(?:\/)?(?:evan)?)(?:\/)?/gm, '');
 
-    if (reverse[reverse.length - 1] === '') {
-      reverse.pop();
+    // if a reverse domain is available, add it and seperate using a dot
+    let domain = 'claims.evan';
+    if (clearedTopic.length > 0) {
+      domain = `${ clearedTopic.split('/').reverse().join('.') }.${ domain }`;
+    } else if (topic.indexOf('/evan') === 0 || topic.indexOf('evan') === 0) {
+      domain = `evan.${ domain }`;
     }
 
-    // use the reverse topic and remove the empty first slash
-    return `${ reverse.join('.') }.claims.evan`;
+    return domain;
   }
 
   /**
