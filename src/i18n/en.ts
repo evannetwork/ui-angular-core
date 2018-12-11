@@ -33,24 +33,30 @@ export const en = {
     "cancel": "Cancel",
     "claims": {
       "accept": "accept",
-      "all-issuers": "All claims related to this claim path and user.",
+      "all-issuers": "All verifications related to this verification path and user.",
       "cancel": "cancel",
       "close-details": "close",
       "creation-date": "Creation date",
       "delete": "delete",
-      "details": "Claim detail",
-      "details-desc": "Overview of claims and their exact status information.",
+      "details": "Verification detail",
+      "details-desc": "Overview of verifications and their exact status information.",
       "dispatcher": {
         "acceptDispatcher": {
-          "description": "Do you want to accept the claim \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
+          "description": "Do you want to accept the verification \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
           "ok": "accept",
-          "title": "Accept claim"
+          "title": "Accept verification"
         },
         "cancel": "cancel",
         "deleteDispatcher": {
-          "description": "Do you want to delete the claim \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
+          "description": "Do you want to delete the verification \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
           "ok": "delete",
-          "title": "Delete claim"
+          "title": "Delete verification"
+        },
+        "rejectDispatcher": {
+          "description": "Do you want to discard the verification \"<b>{{ topic }}}</b>\" of the user <b>{{ to }}</b>?",
+          "ok": "reject",
+          "rejected-description": "The verification <b>{{ topic }}</b> by the user <b>{{ from }}</b> to <b>{{ to }}</b> was rejected by <b>{{ rejector }}</b>: ",
+          "title": "Reject verification"
         }
       },
       "done": "ok",
@@ -59,33 +65,36 @@ export const en = {
       "interactions": "Editing",
       "issue": "issue",
       "issue-claim": "Issue Claim",
-      "issue-claim-description": "Do you want to issue the claim \"<b>{{ topic }}</b>\" to the user <b>{{ to }}</b>?",
+      "issue-claim-description": "Do you want to issue the verification \"<b>{{ topic }}</b>\" to the user <b>{{ to }}</b>?",
       "issued-by": "issued by",
       "issuer": "Issuer",
-      "issuer-no-identity": "No claim administration has yet been created for this account, so you cannot issue claims. Please visit the claim management application to set it up.",
+      "issuer-no-identity": "No verification administration has yet been created for this account, so you cannot issue verifications. Please visit the verification management application to set it up.",
       "not-set": "Not issued",
       "not-set-desc": "...",
       "okays": {
         "confirmed": "confirmed",
         "notExpired": "not expired",
         "valid": "valid",
-        "validPath": "valid claim chain"
+        "validPath": "valid verification chain"
       },
+      "reject-claim": "reject",
+      "reject-reason": "Reason",
       "since": "expired",
       "subject": "Subject",
-      "subject-no-identity": "No claim administration has been created for this account yet, so no claims can be issued for this identity.",
+      "subject-no-identity": "No verification administration has been created for this account yet, so no verifications can be issued for this identity.",
       "topic": "Claim path",
       "until": "expires",
       "warnings": {
         "expired": "expired",
         "invalid": "manipulated",
-        "invalidPath": "Invalid claim chain",
+        "invalidPath": "Invalid verification chain",
         "issued": "not accepted",
         "missing": "Claim does not exists.",
         "noIdentity": "Claim management missing",
-        "notEnsRootOwner": "Invalid root claim",
+        "notEnsRootOwner": "Invalid root verification",
         "parentMissing": "Path does not exist",
         "parentUntrusted": "path invalid",
+        "rejected": "rejected",
         "selfIssued": "self created",
         "title": "Warnings"
       }

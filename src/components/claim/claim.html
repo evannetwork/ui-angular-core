@@ -146,6 +146,12 @@
         [title]="'_angularcore.claims.dispatcher.deleteDispatcher.title' | translate"
         *ngIf="canDeleteClaim(interactionClaim)"
         (click)="triggerDispatcher(interactionClaim, 'deleteDispatcher', $event)">
+        <ion-icon name="trash"></ion-icon>
+      </button>
+      <button ion-button icon-left round icon-only color="danger"
+        [title]="'_angularcore.claims.dispatcher.rejectDispatcher.title' | translate"
+        *ngIf="canRejectClaim(interactionClaim)"
+        (click)="openRejectClaim(interactionClaim, $event)">
         <ion-icon name="cut"></ion-icon>
       </button>
     </ng-container>
@@ -263,13 +269,20 @@
         </div>
 
         <div class="detail-desc"
-          [class.danger]="subClaim.warnings.indexOf('missing') !== -1"
-          [class.warning]="subClaim.warnings.indexOf('missing') === -1"
+          [class.danger]="subClaim.warnings.indexOf('missing') !== -1 || subClaim.warnings.indexOf('rejected') !== -1"
+          [class.warning]="subClaim.warnings.indexOf('missing') === -1 && subClaim.warnings.indexOf('rejected') === -1"
           *ngIf="subClaim.warnings.length > 0">
           <ion-icon name="alert"></ion-icon>
           <span>
             {{ ('_angularcore.claims.warnings.' + subClaim.warnings[0]) | translate }}
           </span>
+
+          <button ion-button icon-left icon-only clear
+            [title]="'_angularcore.claims.reject-reason' | translate"
+            *ngIf="subClaim.warnings.indexOf('rejected') !== -1 && subClaim.rejectReason"
+            (click)="openRejectClaim(subClaim, $event)">
+            <ion-icon name="help"></ion-icon>
+          </button>
         </div>
 
         <ng-container
@@ -421,6 +434,74 @@
           (click)="triggerDispatcher(issueClaim, 'issueDispatcher')">
           <ion-spinner *ngIf="computed.loading"></ion-spinner>
           {{ '_angularcore.claims.issue-claim' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="evan-modal"
+    [class.show-modal]="!!rejectClaim"
+    [class.disable-scrolling]="disableScrolling">
+    <div class="backdrop" (click)="rejectClaim = null; ref.detectChanges()"></div>
+
+    <div class="evan-content evan-small-content" *ngIf="rejectClaim">
+      <h2 class="content-header">{{ '_angularcore.claims.dispatcher.rejectDispatcher.title' | translate }}</h2>
+
+      <ng-container
+        *ngIf="rejectClaim.warnings.indexOf('rejected') === -1">
+        <span
+          [innerHTML]="'_angularcore.claims.dispatcher.rejectDispatcher.description' | translate:{ topic: rejectClaim.name, from: getAddressbookName(rejectClaim.issuerAccount), to: getAddressbookName(rejectClaim.subjects ? rejectClaim.subjects[0] : rejectClaim.subject) }">
+        </span>
+
+        <div class="display-flex-justify">
+          <ion-checkbox margin-right
+            [(ngModel)]="rejectClaim.enableReason"
+            (ionChange)="ref.detectChanges()"
+            (focusout)="ref.detectChanges()">
+          </ion-checkbox>
+          <ion-item>
+            <ion-label stacked>
+              {{ '_angularcore.claims.reject-reason' | translate }}*
+            </ion-label>
+            <ion-textarea rows="6"
+              [disabled]="!rejectClaim.enableReason"
+              [(ngModel)]="rejectClaim.rejectReason.reason"
+              (ionChange)="ref.detectChanges()">
+            </ion-textarea>
+          </ion-item>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="rejectClaim.warnings.indexOf('rejected') !== -1">
+        <span
+          [innerHTML]="'_angularcore.claims.dispatcher.rejectDispatcher.rejected-description' | translate:{ topic: rejectClaim.name, from: getAddressbookName(rejectClaim.issuerAccount), to: getAddressbookName(rejectClaim.subjects ? rejectClaim.subjects[0] : rejectClaim.subject), rejector: getAddressbookName(rejectClaim.rejectReason.rejector) }">
+        </span>
+        <b>{{ rejectClaim.rejectReason.date | date:'mediumDate':'':translate.translate.currentLang }}</b>.
+        <div class="display-flex-justify">
+          <ion-item>
+            <ion-label stacked>
+              {{ '_angularcore.claims.reject-reason' | translate }}
+            </ion-label>
+            <ion-textarea rows="6" readonly
+              [(ngModel)]="rejectClaim.rejectReason.reason"
+              (ionChange)="ref.detectChanges()">
+            </ion-textarea>
+          </ion-item>
+        </div>
+      </ng-container>
+
+      <div margin-top text-center *ngIf="rejectClaim.warnings.indexOf('rejected') === -1">
+        <button ion-button icon-left color="medium-gray" round outline
+          (click)="this.rejectClaim = null; ref.detectChanges()">
+          <ion-icon name="close" color="light"></ion-icon>
+          <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
+        </button>
+
+        <button ion-button outline round icon-left
+          [disabled]="computed.loading || (rejectClaim.enableReason ? !rejectClaim.rejectReason.reason : false)"
+          (click)="triggerDispatcher(rejectClaim, 'rejectDispatcher')">
+          <ion-spinner *ngIf="computed.loading"></ion-spinner>
+          {{ '_angularcore.claims.reject-claim' | translate }}
         </button>
       </div>
     </div>

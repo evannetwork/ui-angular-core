@@ -60,6 +60,11 @@ export class EvanClaimService {
   public ensRootOwner: string = '0x4a6723fC5a926FA150bAeAf04bfD673B056Ba83D';
 
   /**
+   * backup already loaded claim descriptions
+   */
+  public claimDescriptions: any = { };
+
+  /**
    * make it standalone and load dependency services
    */
   constructor(
@@ -224,6 +229,7 @@ export class EvanClaimService {
    *     // -1: Not issued => no claim was issued
    *     // 0: Issued => issued by a non-issuer parent claim holder, self issued state is 0
    *     // 1: Confirmed => issued by both, self issued state is 2, values match
+   *     // 2: Rejected => reject by the creator / subject
    *     status: 2,
    *     // claim for account id / contract id
    *     subject: address,
@@ -298,6 +304,10 @@ export class EvanClaimService {
           claim.warnings.push('issued');
         }
 
+        if (claim.status === 2) {
+          claim.warnings.unshift('rejected');
+        }
+
         // if signature is not valid
         if (!claim.valid) {
           claim.warnings.push('invalid');
@@ -336,8 +346,10 @@ export class EvanClaimService {
           }
         }
 
-        // set computed status
-        claim.status = claim.warnings.length > 0 ? 0 : 1;
+        if (claim.status !== 2) {
+          // set computed status
+          claim.status = claim.warnings.length > 0 ? 0 : 1;
+        }
       }));
     }
 
@@ -396,11 +408,23 @@ export class EvanClaimService {
    * @param      {any}     claim   the claim that should be checked
    */
   public async ensureClaimDescription(claim: any) {
+    // if no description was set, use the latest one or load it
     if (!claim.description) {
-      try {
-        claim.description = await this.bcc.description
-          .getDescription(this.getClaimEnsAddress(claim.name));
-      } catch (ex) { }
+      const ensAddress = this.getClaimEnsAddress(claim.name);
+
+      // if the description could not be loaded, the cache will set to false, so we do not need to load again
+      if (this.claimDescriptions[ensAddress] !== false) {
+        this.claimDescriptions[ensAddress] = (async () => {
+          try {
+            // load the description
+            return await this.bcc.description.getDescription(ensAddress);
+          } catch (ex) {
+            return false;
+          }
+        })();
+      }
+
+      claim.description = await this.claimDescriptions[ensAddress];
     }
 
     if (claim.description) {
@@ -446,16 +470,26 @@ export class EvanClaimService {
 
     // keep creationDates of all claims, so we can check after the final combined status was set,
     // which creation date should be used
-    const creationDates = { '-1': [ ], '0': [ ], '1': [ ]}
-    const expirationDates = { '-1': [ ], '0': [ ], '1': [ ]}
+    const creationDates = { '-1': [ ], '0': [ ], '1': [ ], '2': [ ]};
+    const expirationDates = { '-1': [ ], '0': [ ], '1': [ ], '2': [ ]};
 
     // iterate through all claims and check for warnings and the latest creation date of an claim
     for (let claim of claims) {
       // concadinate all warnings
       computed.warnings = computed.warnings.concat(claim.warnings);
 
-      // use the highest status (-1 missing, 0 issued, 1 valid)
-      computed.status = computed.status < claim.status ? claim.status : computed.status;
+      // use the highest status (-1 missing, 0 issued, 1 valid, 2 rejected)
+      if (claim.status === 2) {
+        if (computed.status === -1) {
+          computed.status = 2;
+        }
+      } else {
+        if (computed.status === 2) {
+          computed.status = claim.status;
+        } else {
+          computed.status = computed.status < claim.status ? claim.status : computed.status;
+        }
+      }
 
       // search one subject of all
       if (computed.subjects.indexOf(claim.subject) === -1) {

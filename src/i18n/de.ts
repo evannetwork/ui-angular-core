@@ -33,24 +33,30 @@ export const de = {
     "cancel": "Abbrechen",
     "claims": {
       "accept": "bestätigen",
-      "all-issuers": "Alle Zertifikate den diesen Zertifikatspfad und Nutzer betreffen.",
+      "all-issuers": "Alle Verifizierungen den diesen Verifizierungspfad und Nutzer betreffen.",
       "cancel": "abbrechen",
       "close-details": "schließen",
       "creation-date": "Erstelldatum",
       "delete": "löschen",
-      "details": "Zertifikatsdetails",
-      "details-desc": "Übersicht über Zertifikate und deren genaue Statusinformationen.",
+      "details": "Verifizierungsdetails",
+      "details-desc": "Übersicht über Verifizierunge und deren genaue Statusinformationen.",
       "dispatcher": {
         "acceptDispatcher": {
-          "description": "Möchten Sie das Zertifikat \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> bestätigen?",
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> bestätigen?",
           "ok": "bestätigen",
-          "title": "Zertifikat bestätigen"
+          "title": "Verifizierung bestätigen"
         },
         "cancel": "abbrechen",
         "deleteDispatcher": {
-          "description": "Möchten Sie das Zertifikat \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> löschen?",
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> löschen?",
           "ok": "löschen",
-          "title": "Zertifikat löschen"
+          "title": "Verifizierung löschen"
+        },
+        "rejectDispatcher": {
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> verwerfen?",
+          "ok": "verwerfen",
+          "rejected-description": "Die Verifizierung <b>{{ topic }}</b> von dem Nutzer <b>{{ from }}</b> an <b>{{ to }}</b> wurde von <b>{{ rejector }}</b> verworfen: ",
+          "title": "Verifizierung verwerfen"
         }
       },
       "done": "ok",
@@ -58,34 +64,37 @@ export const de = {
       "expiration-date": "Ablaufdatum",
       "interactions": "Bearbeitung",
       "issue": "ausstellen",
-      "issue-claim": "Zertifikat ausstellen",
-      "issue-claim-description": "Möchten Sie das Zertifikat \"<b>{{ topic }}</b>\" für den Nutzer <b>{{ to }}</b> ausstellen?",
+      "issue-claim": "Verifizierung ausstellen",
+      "issue-claim-description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" für den Nutzer <b>{{ to }}</b> ausstellen?",
       "issued-by": "ausgestellt von",
       "issuer": "Aussteller",
-      "issuer-no-identity": "Für diesen Account wurde noch keine Zertifikatsverwaltung erstellt, somit können Sie keine Zertifikate ausstellen. Bitte besuchen die Zertifikasverwaltung Anwendung, um die diese einzurichten.",
+      "issuer-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können Sie keine Verifizierunge ausstellen. Bitte besuchen die Zertifikasverwaltung Anwendung, um die diese einzurichten.",
       "not-set": "Nicht ausgestellt",
       "not-set-desc": "...",
       "okays": {
         "confirmed": "bestätigt",
         "notExpired": "gültig",
         "valid": "valide",
-        "validPath": "gültige Zertifikatskette"
+        "validPath": "gültige Verifizierungskette"
       },
+      "reject-claim": "Verwerfen",
+      "reject-reason": "Ablehnungsgrund",
       "since": "seit",
       "subject": "Zugewiesener",
-      "subject-no-identity": "Für diesen Account wurde noch keine Zertifikatsverwaltung erstellt, somit können für diese Identität keine Zertifikate ausgestellt werden.",
-      "topic": "Zertifikatspfad",
+      "subject-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können für diese Identität keine Verifizierunge ausgestellt werden.",
+      "topic": "Verifizierungspfad",
       "until": "bis",
       "warnings": {
         "expired": "ausgelaufen",
         "invalid": "manipuliert",
-        "invalidPath": "Ungültige Zertifikatskette",
+        "invalidPath": "Ungültige Verifizierungskette",
         "issued": "nicht bestätigt",
-        "missing": "Zertifikat existiert nicht.",
-        "noIdentity": "Zertifikatsverwaltung fehlt",
+        "missing": "Verifizierung existiert nicht.",
+        "noIdentity": "Verifizierungsverwaltung fehlt",
         "notEnsRootOwner": "Ungültiges Stammzertifikat",
         "parentMissing": "Pfad nicht existent",
         "parentUntrusted": "Pfad nicht bestätigt",
+        "rejected": "verworfen",
         "selfIssued": "selbst erstellt",
         "title": "Warnungen"
       }
@@ -143,6 +152,7 @@ export const de = {
     },
     "refresh": "Aktualisieren...",
     "refreshing": "Aktualisiere...",
+    "reject-reason": "Begründung",
     "requests-permissions": "benötigt Rechte auf",
     "smart-agent": {
       "created-at": "Erstellt am",

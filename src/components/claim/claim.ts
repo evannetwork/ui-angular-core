@@ -117,6 +117,16 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   @Input() enableIssue: boolean = true;
 
+  /**
+   * should the delete button be shown?
+   */
+  @Input() enableDelete: boolean = false;
+
+  /**
+   * should the delete button be shown?
+   */
+  @Input() enableReject: boolean = true;
+
   /*****************    variables    *****************/
   /**
    * available display modes
@@ -192,6 +202,11 @@ export class EvanClaimComponent extends AsyncComponent {
    * new claim that should be issued
    */
   private issueClaim: any;
+
+  /**
+   * claim that should be rejected
+   */
+  private rejectClaim: any;
 
   /**
    * all modals that are used by the claims component to handle correct scoped and sized modal dialogs
@@ -343,7 +358,7 @@ export class EvanClaimComponent extends AsyncComponent {
    * @return     {boolean}  false to break the event bubbling
    */
   private async triggerDispatcher(claim: any, type: string, $event: any) {
-    if (type !== 'issueDispatcher') {
+    if (type !== 'issueDispatcher' && type !== 'rejectDispatcher') {
       try {
         const from = await this.addressBookService.getNameForAccount(claim.issuerAccount);
         const to = await this.addressBookService.getNameForAccount(claim.subject);
@@ -373,6 +388,7 @@ export class EvanClaimComponent extends AsyncComponent {
         expirationDate: claim.enableExpirationDate ? claim.expirationDate : null,
         id: claim.id,
         issuer: claim.issuerAccount,
+        rejectReason: claim.enableReason ? claim.rejectReason : null,
         topic: claim.name,
       }
     );
@@ -380,6 +396,10 @@ export class EvanClaimComponent extends AsyncComponent {
     if (type === 'issueDispatcher') {
       delete this.issueClaim;
     }
+
+    delete this.issueClaim;
+    delete this.rejectClaim.rejectReason;
+    delete this.rejectClaim;
 
     claim.loading = true;
     this.computed.loading = true;
@@ -458,13 +478,44 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /**
+   * Opens the issue claim popup, when the user is able to open the issue claim.
+   *
+   * @param      {any}    claim   the claim that should be opened
+   * @param      {any}    $event  the click event
+   * @return     {false}  break the event bubbling
+   */
+  private openRejectClaim(claim: any, $event) {
+    if (this.canRejectClaim(claim) || claim.warnings.indexOf('rejected') !== -1) {
+      this.rejectClaim = claim;
+      this.rejectClaim.rejectReason = this.rejectClaim.rejectReason || { reason: '', };
+
+      this.ref.detectChanges();
+
+      return this.core.utils.stopEventBubbling($event);
+    }
+  }
+
+
+  /**
    * Determines if the user is allowed to delete a claim.
    *
    * @param      {any}      claim   the claim
    * @return     {boolean}  True if able to delete claim, False otherwise
    */
   private canDeleteClaim(claim: any) {
-    return claim.status !== -1 && (this.activeAccount === claim.subject || this.activeAccount === claim.issuerAccount);
+    return this.enableDelete && claim.status !== -1 &&
+      (this.activeAccount === claim.subject || this.activeAccount === claim.issuerAccount);
+  }
+
+  /**
+   * Determines if the user is allowed to delete a claim.
+   *
+   * @param      {any}      claim   the claim
+   * @return     {boolean}  True if able to delete claim, False otherwise
+   */
+  private canRejectClaim(claim: any) {
+    return this.enableReject && claim.status !== -1 && claim.warnings.indexOf('rejected') === -1 &&
+      (this.activeAccount === claim.subject || this.activeAccount === claim.issuerAccount);
   }
 
   /**
@@ -489,7 +540,7 @@ export class EvanClaimComponent extends AsyncComponent {
       return false;
     }
 
-    if (claim.warnings.indexOf('missing') !== -1) {
+    if (claim.warnings.indexOf('missing') !== -1 || claim.warnings.indexOf('rejected') !== -1) {
       return true;
     }
 
@@ -510,9 +561,10 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   private claimInteractionCount(claim: any) {
     return [
-      this.canDeleteClaim(claim),
       this.canAcceptClaim(claim),
-      this.canIssueClaim(claim)
+      this.canDeleteClaim(claim),
+      this.canIssueClaim(claim),
+      this.canRejectClaim(claim),
     ].filter(interaction => !!interaction).length;
   }
 
