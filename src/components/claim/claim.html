@@ -121,184 +121,172 @@
   </div>
 </ng-template>
 
-<ng-template #claimInteraction let-interactionClaim="interactionClaim">
-  <div class="claim-interaction"
-    *ngIf="claimInteractionCount(interactionClaim) !== 0">
-    <button ion-button icon-left round outline icon-only disabled
-      *ngIf="interactionClaim.loading">
-      <ion-spinner></ion-spinner>
-    </button>
+<ng-template #claimDetailHover let-node="node">
+  <div>
+    <div class="header">
+      <ng-container *ngIf="node.data.warnings.indexOf('missing') !== -1">
+        <b>{{ '_angularcore.claims.not-set' | translate }}</b>
+        <p>{{ '_angularcore.claims.not-set-desc' | translate }}</p>
+      </ng-container>
+      <ng-container*ngIf="node.data.warnings.indexOf('missing') === -1">
+        <b>{{ node.data.displayName }}</b>
+        <p>{{ node.data.name }}</p>
+      </ng-container>
 
-    <ng-container *ngIf="!interactionClaim.loading">
-      <button ion-button icon-left round icon-only color="success"
-        [title]="'_angularcore.claims.dispatcher.acceptDispatcher.title' | translate"
-        *ngIf="canAcceptClaim(interactionClaim)"
-        (click)="triggerDispatcher(interactionClaim, 'acceptDispatcher', $event)">
-        <ion-icon name="checkmark"></ion-icon>
+      <button ion-button round outline icon-only
+        *ngIf="true">
+        <ion-icon name="create">
       </button>
-      <button ion-button icon-left round icon-only
-        [title]="'_angularcore.claims.issue-claim' | translate"
-        *ngIf="canIssueClaim(interactionClaim)"
-        (click)="openIssueClaim(interactionClaim, $event)">
-        <ion-icon name="ribbon"></ion-icon>
+    </div>
+
+    <div class="body">
+      <ion-row>
+        <ion-col col-md-6>
+          <b>{{ '_angularcore.claims.status' | translate }}</b>
+          <p [class]="'status-' + node.data.status">
+            {{ ('_angularcore.claims.warnings.' + node.data.warnings[0]) | translate }}
+          </p>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col col-md-6>
+          <b>{{ '_angularcore.claims.trust-taker' | translate }}</b>
+          <p>
+            <ng-container
+              *ngTemplateOutlet="userAlias;context:{ address: node.data.subjects ? node.data.subjects[0] : node.data.subject }">
+            </ng-container>
+          </p>
+        </ion-col>
+        <ion-col col-md-6>
+          <b>{{ '_angularcore.claims.trust-provider' | translate }}</b>
+          <p *ngIf="node.data.issuerAccount">
+            <ng-container
+              *ngTemplateOutlet="userAlias;context:{ address: node.data.issuerAccount }">
+            </ng-container>
+          </p>
+          <p *ngIf="!node.data.issuerAccount">---</p>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col col-md-6>
+          <b>{{ '_angularcore.claims.creation-date' | translate }}</b>
+          <p>
+            <span *ngIf="node.data.creationDate">
+              {{ node.data.creationDate | date:'mediumDate':'':translate.translate.currentLang }}
+            </span>
+            <span *ngIf="!node.data.creationDate">
+              ---
+            </span>
+          </p>
+        </ion-col>
+        <ion-col col-md-6 *ngIf="node.data.expirationDate">
+          <b>{{ '_angularcore.claims.expiration-date' | translate }}</b>
+          <p>
+            <span>
+              {{ node.data.expirationDate | date:'mediumDate':'':translate.translate.currentLang }}
+            </span>
+          </p>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <div class="footer">
+      <button ion-button icon-left round outline icon-only disabled
+        *ngIf="computed.loading">
+        <ion-spinner></ion-spinner>
       </button>
-      <button ion-button icon-left round icon-only color="danger"
-        [title]="'_angularcore.claims.dispatcher.deleteDispatcher.title' | translate"
-        *ngIf="canDeleteClaim(interactionClaim)"
-        (click)="triggerDispatcher(interactionClaim, 'deleteDispatcher', $event)">
-        <ion-icon name="trash"></ion-icon>
-      </button>
-      <button ion-button icon-left round icon-only color="danger"
-        [title]="'_angularcore.claims.dispatcher.rejectDispatcher.title' | translate"
-        *ngIf="canRejectClaim(interactionClaim)"
-        (click)="openRejectClaim(interactionClaim, $event)">
-        <ion-icon name="cut"></ion-icon>
-      </button>
-    </ng-container>
+
+      <ng-container *ngIf="!computed.loading">
+        <button ion-button icon-left round outline color="danger"
+          [title]="'_angularcore.claims.dispatcher.deleteDispatcher.title' | translate"
+          *ngIf="canDeleteClaim(node.data)"
+          (click)="triggerDispatcher(node.data, 'deleteDispatcher', $event)">
+          {{ '_angularcore.claims.delete' | translate }}
+        </button>
+        <button ion-button icon-left round outline color="danger"
+          [title]="'_angularcore.claims.dispatcher.rejectDispatcher.title' | translate"
+          *ngIf="canRejectClaim(node.data)"
+          (click)="openRejectClaim(node.data, $event)">
+          {{ '_angularcore.claims.reject' | translate }}
+        </button>
+        <button ion-button icon-left round outline
+          [title]="'_angularcore.claims.issue-claim' | translate"
+          *ngIf="canIssueClaim(node.data)"
+          (click)="openIssueClaim(node.data, $event)">
+          {{ '_angularcore.claims.issue' | translate }}
+        </button>
+        <button ion-button icon-left round outline color="success"
+          [title]="'_angularcore.claims.dispatcher.acceptDispatcher.title' | translate"
+          *ngIf="canAcceptClaim(node.data)"
+          (click)="triggerDispatcher(node.data, 'acceptDispatcher', $event)">
+          {{ '_angularcore.claims.accept' | translate }}
+        </button>
+      </ng-container>
+    </div>
   </div>
 </ng-template>
 
 <!------------------------------------------ detailClaim ------------------------------------------>
 <ng-template #claimDetailDisplay let-detailClaim="detailClaim">
-  <!-- if claims array exists on the detailClaims, we are currently running an computed claim, so we
-       cann show the first corresponding user -->
-  <div class="claim-detail-row static-height"
-    *ngIf="detailClaim.claims && detailClaim.topLevel">
-    <div
-      [class]="'claim-person status-' + detailClaim.status"
-      (click)="activateSubClaim(detailClaim, null, $event)">
-      <div class="claim-person-label">
-        <ion-icon name="person"></ion-icon>
-        <div>
-          <ng-container
-            *ngTemplateOutlet="userAliasMulti;context:{ address: detailClaim.subject || detailClaim.subjects[0] }">
+  <svg (click)="activeDetailHover = null; ref.detectChanges();">
+    <g
+      [attr.width]="d3.dimensions.width"
+      [attr.height]="d3.dimensions.height">
+      <g class="tree-container">
+        <defs>
+          <marker id="arrow-danger" orient="auto" markerWidth="10" markerHeight="10" refX="1" refY="4">
+            <path class="arrow danger" d="M0,4 L8,0 L8,8 z"></path>
+          </marker>
+          <marker id="arrow-warning" orient="auto" markerWidth="10" markerHeight="10" refX="1" refY="4">
+            <path class="arrow warning" d="M0,4 L8,0 L8,8 z"></path>
+          </marker>
+          <marker id="arrow-success" orient="auto" markerWidth="10" markerHeight="10" refX="1" refY="4">
+            <path class="arrow success" d="M0,4 L8,0 L8,8 z"></path>
+          </marker>
+        </defs>
+        <svg:path class="link"
+          *ngFor="let link of d3.links"
+          [attr.d]="link.elbow"
+          [class.success]="link.data.status === 1 && link.data.warnings.indexOf('rejected') === -1"
+          [class.warning]="link.data.status === 0 && link.data.warnings.indexOf('rejected') === -1"
+          [class.danger]="link.data.status === -1 || link.data.warnings.indexOf('rejected') !== -1"
+          [attr.marker-start]="link.markerStart">
+        </svg:path>
+        <g class="node"
+          *ngFor="let node of d3.nodes"
+          [attr.transform]="node.transform">
+          <ng-container *ngIf="getClaimsOrParents(node.data).length > 0">
+            <circle cx="122" cy="0" r="10"
+              [class.active]="node.children"
+              (click)="node.toggle($event)">
+            </circle>
+            <text x="122" y="5" text-anchor="middle" stroke-width="1px"
+              (click)="node.toggle($event)">
+              {{ node.children ? '<' : '>' }}
+            </text>
           </ng-container>
-        </div>
-      </div>
-      <div class="claim-person-detail only-interaction" *ngIf="canIssueClaim(detailClaim)">
+          <foreignObject
+            [attr.height]="d3.dimensions.boxHeight"
+            [attr.width]="d3.dimensions.boxWidth - d3.dimensions.connectorDot"
+            [attr.x]="-(d3.dimensions.boxWidth / 2)"
+            [attr.y]="-(d3.dimensions.boxHeight / 2)">
+            <ng-container
+              *ngTemplateOutlet="claimDisplay;context:{ claim: node.data, mode: mode, action: node.toggleDetail }">
+            </ng-container>
+          </foreignObject>
+        </g>
+      </g>
+
+      <foreignObject class="evan-detail-hover"
+        *ngIf="activeDetailHover"
+        [attr.transform]="activeDetailHover.transform"
+        [@opacityTransition]>
         <ng-container
-          *ngTemplateOutlet="claimInteraction;context:{ interactionClaim: detailClaim }">
+          *ngTemplateOutlet="claimDetailHover;context:{ node: activeDetailHover }">
         </ng-container>
-      </div>
-    </div>
-  </div>
-
-  <!-- display the detail claim batch -->
-  <div class="claim-detail-row static-height">
-    <div
-      [class]="'claim-connector claim-row-connector active status-' + detailClaim.status"
-      *ngIf="detailClaim.claims && detailClaim.topLevel">
-      <ion-icon name="arrow-dropleft"></ion-icon>
-      <div></div>
-    </div>
-    <ng-container
-      *ngTemplateOutlet="claimDisplay;context:{ claim: detailClaim, mode: 'normal', action: activateSubClaim.bind(this, detailClaim, null) }">
-    </ng-container>
-  </div>
-
-  <!-- display claims in case of a computed claim or parents, in case of a normal claim -->
-  <div class="claim-detail-row static-width"
-    [class.padding-left]="getClaimsOrParents(detailClaim).length > 1 && !detailClaim.activeSubClaim"
-    [style.height]="detailClaim.subRowHeight + 'px'"
-    *ngIf="getClaimsOrParents(detailClaim).length > 0">
-    <div [class]="'claim-connector claim-row-connector large ' + (detailClaim.activeSubClaim ? 'active status-' + detailClaim.activeSubClaim.status : 'status-' + detailClaim.status) + (detailClaim.activeSubClaim && getClaimsOrParents(detailClaim.activeSubClaim).length === 0 ? ' last-connector' : '')">
-      <ion-icon name="arrow-dropleft"></ion-icon>
-      <div></div>
-    </div>
-
-    <div class="claim-person"
-      *ngFor="let subClaim of getClaimsOrParents(detailClaim); let i = index"
-      [class]="'claim-person status-' + subClaim.status + (subClaim.active ? ' active' : '') + (claimInteractionCount(subClaim) !== 0 ? ' interaction-available' : '')"
-      [style.top]="subClaim.topPos + 'px'">
-      <div [class]="'claim-connector claim-people-connector ' + (subClaim.active ? 'active' : '') + ' status-' + subClaim.status"
-        *ngIf="getClaimsOrParents(detailClaim).length > 1 && !subClaim.active">
-        <div></div>
-        <div *ngIf="getClaimsOrParents(detailClaim).length > 1 && !subClaim.active"
-          [@slowGrowTransition]="{ value: ':enter', params : { height : subClaim.vertical.height + 'px' } }"
-          [style.height]="subClaim.vertical.height + 'px'"
-          [style.top]="subClaim.vertical.top ? subClaim.vertical.top + 'px' : ''"
-          [style.bottom]="subClaim.vertical.bottom ? subClaim.vertical.bottom + 'px' : ''">
-        </div>
-      </div>
-      <div class="claim-person-label"
-        *ngIf="subClaim.warnings.indexOf('missing') === -1"
-        (click)="activateSubClaim(detailClaim, subClaim, $event)">
-        <ion-icon name="person"></ion-icon>
-        <div>
-          <ng-container
-            *ngTemplateOutlet="userAliasMulti;context:{ address: subClaim.issuerAccount }">
-          </ng-container>
-        </div>
-      </div>
-      <div class="claim-person-label"
-        *ngIf="subClaim.warnings.indexOf('missing') !== -1"
-        (click)="activateSubClaim(detailClaim, subClaim, $event)">
-        <ion-icon name="person"></ion-icon>
-        <div>
-          <b>{{ '_angularcore.claims.not-set' | translate }}</b>
-          <p>{{ '_angularcore.claims.not-set-desc' | translate }}</p>
-        </div>
-      </div>
-      <div class="claim-person-detail"
-        *ngIf="subClaim.active"
-        [@growTransition]="{ value: ':enter', params : { height : '100px' } }">
-        <div class="claim-detail-dates display-flex-justify">
-          <div>
-            <div class="display-flex-justify" text-center>
-              <ion-icon name="add-circle"></ion-icon>
-              <span *ngIf="subClaim.creationDate">
-                {{ subClaim.creationDate | date:'mediumDate':'':translate.translate.currentLang }}
-              </span>
-              <span *ngIf="!subClaim.creationDate">
-                ---
-              </span>
-            </div>
-            <div class="display-flex-justify" text-center
-              [class.danger]="subClaim.warnings.indexOf('expired') !== -1"
-              *ngIf="subClaim.expirationDate">
-              <ion-icon name="time"></ion-icon>
-              <span>
-                {{ subClaim.expirationDate | date:'mediumDate':'':translate.translate.currentLang }}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div class="detail-desc big-icon success" *ngIf="subClaim.warnings.length === 0">
-          <ion-icon name="checkmark"></ion-icon>
-        </div>
-
-        <div class="detail-desc"
-          [class.danger]="subClaim.warnings.indexOf('missing') !== -1 || subClaim.warnings.indexOf('rejected') !== -1"
-          [class.warning]="subClaim.warnings.indexOf('missing') === -1 && subClaim.warnings.indexOf('rejected') === -1"
-          *ngIf="subClaim.warnings.length > 0">
-          <ion-icon name="alert"></ion-icon>
-          <span>
-            {{ ('_angularcore.claims.warnings.' + subClaim.warnings[0]) | translate }}
-          </span>
-
-          <button ion-button icon-left icon-only clear
-            [title]="'_angularcore.claims.reject-reason' | translate"
-            *ngIf="subClaim.warnings.indexOf('rejected') !== -1 && subClaim.rejectReason"
-            (click)="openRejectClaim(subClaim, $event)">
-            <ion-icon name="help"></ion-icon>
-          </button>
-        </div>
-
-        <ng-container
-          *ngTemplateOutlet="claimInteraction;context:{ interactionClaim: subClaim }">
-        </ng-container>
-      </div>
-    </div>
-  </div>
-
-  <!-- if a sub claim was clicked, show the next tree -->
-  <div class="sub-claims-container" *ngIf="detailClaim.activeSubClaim && getClaimsOrParents(detailClaim.activeSubClaim).length > 0"
-    [@opacityTransition]>
-    <ng-container
-      *ngTemplateOutlet="claimDetailDisplay;context:{ detailClaim: detailClaim.activeSubClaim }">
-    </ng-container>
-  </div>
+      </foreignObject>
+    </g>
+  </svg>
 </ng-template>
 
 <!--------------------------------------- usal component ------------------------------------------>
@@ -506,4 +494,97 @@
       </div>
     </div>
   </div>
+
+  <!--<div class="evan-modal"
+    [class.show-modal]="!!rejectClaim"
+    [class.disable-scrolling]="disableScrolling">
+    <div class="backdrop" (click)="rejectClaim = null; ref.detectChanges()"></div>
+
+    <div class="evan-content" margin-top [@opacityTransition]
+      *ngIf="topicDetails[i].owner === activeAccount && topicDetails[i].showDescription">
+      <h3 class="content-header m-b-0 m-t-0">
+        {{ '_claims.claim-description' | translate }}: {{ topic }}
+      </h3>
+
+      <form no-margin #descForm="ngForm">
+        <ion-row>
+          <ion-col col-md-6 col-12 *ngIf="showTopicSelect">
+            <ion-item>
+              <ion-label stacked>
+               {{ '_claims.descName.title' | translate }}*
+              </ion-label>
+              <ion-input name="descName" required autofocus
+                [(ngModel)]="topicDetails[i].description.i18n.name.en"
+                [placeholder]="'_claims.descName.desc' | translate"
+                (ionChange)="ref.detectChanges()"
+                (focusout)="ref.detectChanges()">
+              </ion-input>
+            </ion-item>
+            <ion-chip class="error-hint" *ngIf="showError(descForm, 'descName')" color="danger">
+              <ion-label>{{ '_claims.descName.error' | translate }}</ion-label>
+            </ion-chip>
+          </ion-col>
+          <ion-col col-md-6 col-12>
+            <ion-label class="standalone">
+             {{ '_claims.select-desc-img.title' | translate }}*
+            </ion-label>
+
+            <div text-center class="img-selector">
+              <svg *ngIf="!topicDetails[i].description.imgSquare" version="1.0" xmlns="http://www.w3.org/2000/svg"
+                width="512.000000pt" height="512.000000pt" viewBox="0 0 512.000000 512.000000"
+                preserveAspectRatio="xMidYMid meet">
+                  <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" stroke="none">
+                  <path d="M2510 4994 c-135 -140 -432 -395 -635 -547 -502 -375 -990 -618
+                  -1444 -719 l-104 -23 7 -107 c14 -233 92 -597 192 -894 311 -930 933 -1793
+                  1784 -2475 164 -131 188 -149 198 -149 20 0 283 183 420 293 594 475 1057
+                  1046 1388 1712 233 468 377 929 453 1450 12 77 21 147 21 156 0 11 -34 29
+                  -112 58 -335 126 -816 354 -1103 522 -374 219 -660 429 -906 667 -59 56 -108
+                  102 -111 102 -2 0 -24 -21 -48 -46z m143 -406 c392 -340 1056 -731 1682 -988
+                  72 -30 133 -56 137 -59 9 -7 -39 -250 -82 -421 -141 -556 -410 -1114 -770
+                  -1595 -149 -199 -270 -337 -474 -540 -200 -200 -320 -306 -491 -434 -144 -108
+                  -115 -109 -248 2 -422 354 -786 755 -1063 1172 -301 452 -517 931 -632 1405
+                  -33 135 -74 361 -67 368 2 3 69 26 147 52 466 156 946 432 1439 826 63 51 163
+                  135 223 188 59 53 109 96 112 96 2 0 41 -32 87 -72z"/>
+                  <path d="M2555 4460 c-11 -17 -256 -219 -395 -324 -411 -312 -848 -557 -1240
+                  -697 l-105 -37 2 -45 c2 -66 66 -317 127 -501 258 -773 756 -1489 1469 -2114
+                  l118 -104 37 28 c209 159 518 451 698 659 421 487 719 1003 908 1577 53 162
+                  126 451 129 509 l2 41 -110 47 c-609 263 -1145 578 -1582 930 -29 24 -54 37
+                  -58 31z"/>
+                </g>
+              </svg>
+              <img
+                *ngIf="topicDetails[i].description.imgSquare"
+                [src]="_DomSanitizer.bypassSecurityTrustUrl(topicDetails[i].description.imgSquare)">
+
+              <evan-file-select name="image" #imgFileSelect
+                class="img-file-select"
+                [(ngModel)]="topicDetails[i].image"
+                [accept]="'image/x-png,image/gif,image/jpeg'"
+                [buttonText]="'_claims.select-desc-img.select' | translate"
+                [multiple]="false"
+                (onChange)="descriptionImgChanged(topicDetails[i])">
+              </evan-file-select>
+
+              <div text-center>
+                <button ion-button outline round margin-top icon-left
+                  (click)="imgFileSelect.selectFiles()">
+                  {{ '_claims.select-desc-img.select' | translate }}
+                </button>
+              </div>
+            </div>
+          </ion-col>
+        </ion-row>
+      </form>
+
+      <div text-right>
+        <button ion-button outline round margin-top icon-left
+          [disabled]="!topicDetails[i].description.i18n.name.en || savingTopicDetail"
+          (click)="setDescription(topicDetails[i])">
+          <ion-spinner *ngIf="savingTopicDetail"></ion-spinner>
+
+          {{ '_claims.set-description' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>-->
 </ng-container>

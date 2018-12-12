@@ -77,12 +77,16 @@ export const en = {
         "valid": "valid",
         "validPath": "valid verification chain"
       },
+      "reject": "reject",
       "reject-claim": "reject",
       "reject-reason": "Reason",
       "since": "expired",
+      "status": "Status",
       "subject": "Subject",
       "subject-no-identity": "No verification administration has been created for this account yet, so no verifications can be issued for this identity.",
       "topic": "Claim path",
+      "trust-provider": "Trust provider",
+      "trust-taker": "Trust taker",
       "until": "expires",
       "warnings": {
         "expired": "expired",
@@ -96,7 +100,8 @@ export const en = {
         "parentUntrusted": "path invalid",
         "rejected": "rejected",
         "selfIssued": "self created",
-        "title": "Warnings"
+        "title": "Warnings",
+        "undefined": "valid"
       }
     },
     "contract-members": {

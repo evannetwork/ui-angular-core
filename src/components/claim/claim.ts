@@ -48,6 +48,7 @@ import {
   transition,
   trigger,
   ViewChild,
+  d3,
 } from 'angular-libs';
 
 import { AsyncComponent } from '../../classes/AsyncComponent';
@@ -127,7 +128,7 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   @Input() enableReject: boolean = true;
 
-  /*****************    variables    *****************/
+  /*****************    letiables    *****************/
   /**
    * available display modes
    */
@@ -232,6 +233,20 @@ export class EvanClaimComponent extends AsyncComponent {
    * menu value, when a claim menu entry was clicked
    */
   private claimMenuValue: string;
+
+  /**
+   * contains all current d3 specific variables
+   */
+  private d3: any = {
+    dimensions: { width: 0, height: 0 },
+    nodes: [ ],
+    links: [ ]
+  };
+
+  /**
+   * current clicked d3 node, for that the detail should be shown
+   */
+  private activeDetailHover: any;
 
   /**
    * current detail container for auto scroll
@@ -341,7 +356,7 @@ export class EvanClaimComponent extends AsyncComponent {
 
     // if the detail mode is selected, activate the sub claims and set the positions
     if (this.mode === 'detail') {
-      this.activateSubClaim(this.computed, null);
+      this.renderDetail(this.computed);
     }
 
     this.loadingClaims = false;
@@ -381,6 +396,7 @@ export class EvanClaimComponent extends AsyncComponent {
       }
     }
 
+    // trigger the queue data
     this.queue.addQueueData(
       this.claimService.getQueueId(type),
       {
@@ -393,14 +409,14 @@ export class EvanClaimComponent extends AsyncComponent {
       }
     );
 
-    if (type === 'issueDispatcher') {
-      delete this.issueClaim;
+    // close all hovers
+    delete this.issueClaim;
+    if (this.rejectClaim) {
+      delete this.rejectClaim.rejectReason;
+      delete this.rejectClaim;
     }
 
-    delete this.issueClaim;
-    delete this.rejectClaim.rejectReason;
-    delete this.rejectClaim;
-
+    // show the loading symbol
     claim.loading = true;
     this.computed.loading = true;
     this.ref.detectChanges();
@@ -424,11 +440,12 @@ export class EvanClaimComponent extends AsyncComponent {
       this.popupClaim.topLevel = true;
 
       // enable correct positioning of the detail claim view
-      this.activateSubClaim(this.popupClaim, null);
+      this.renderDetail(this.popupClaim);
 
       // scrolling fix
       this.disableScrolling = true;
       this.ref.detectChanges();
+
       setTimeout(() => {
         this.disableScrolling = false;
         this.ref.detectChanges()
@@ -582,142 +599,6 @@ export class EvanClaimComponent extends AsyncComponent {
     }
   }
 
-  /*************************************** begin magic ********************************************/
-  private subClaimMarginTop: number = 20;
-
-  /**
-   * height of the sub claim with no active body 
-   */
-  private subClaimHeight:number = 68 + this.subClaimMarginTop;
-
-  /**
-   * move the activated element 70 downwards, so the arrow will go directly through the bottom of
-   * person icon
-   */
-  private activeTopOffset:number = 0;
-
-  /**
-   * height of an active sub claim including the body
-   */
-  private activeSubClaimheight:number = 173 + this.subClaimMarginTop;
-
-  /**
-   * amount of height that should be added, if interactions for a active claim is available
-   */
-  private subClaimInteractionHeight: number = 20;
-
-  /**
-   * Remove the active sub claim property of an array of claims and of all it's parents
-   *
-   * @param      {any}     subClaim  the sub claim, where all claims (in case of computed) and
-   *                                 parents should be closed
-   */
-  private deactiveSubClaims(claim: any) {
-    for (let subClaim of [ ].concat(this.getClaimsOrParents(claim))) {
-      delete subClaim.activeSubClaim;
-      delete subClaim.active;
-      delete subClaim.showInteractions;
-
-      this.deactiveSubClaims(subClaim);
-    }
-  }
-
-  /**
-   * Sets the activeSubclaim poperty to a detailClaim and removes previously all opened parent
-   * claims.
-   *
-   * @param      {any}     detailClaim  the parent detail claim that should where the subClaim
-   *                                    should be activated
-   * @param      {any}     subClaim     the sub claim that should be activated
-   * @param      {any}     $event       the click event
-   */
-  private activateSubClaim(detailClaim: any, subClaim?: any, $event?: any) {
-    // only activate the sub claim, if it's provided, else deactivate everything and update the ref
-    if (subClaim) {
-      // if the claim is already active, close everything
-      if (subClaim.active) {
-        // close the full sub tree
-        if (detailClaim.activeSubClaim) {
-          delete detailClaim.activeSubClaim.activeSubClaim;
-          delete detailClaim.activeSubClaim;
-          delete detailClaim.showInteractions;
-        }
-
-        delete subClaim.active;
-        delete subClaim.showInteractions;
-        this.deactiveSubClaims(detailClaim);
-        this.deactiveSubClaims(subClaim);
-      } else {
-        // close the full tree
-        delete detailClaim.activeSubClaim;
-        delete detailClaim.showInteractions;
-        this.deactiveSubClaims(detailClaim);
-
-        subClaim.active = true;
-
-        detailClaim.activeSubClaim = subClaim.parentComputed || subClaim;
-        detailClaim.activeSubClaim.active = true;
-
-        // close the full sub tree
-        delete detailClaim.activeSubClaim.activeSubClaim;
-        this.deactiveSubClaims(detailClaim.activeSubClaim);
-
-        // calculate sub claim height, to reset eventual caluclated height inlcuding an previously
-        // actived one
-        detailClaim.activeSubClaim.subRowHeight = this.subClaimsRowHeight(detailClaim.activeSubClaim);
-        this.calculateSubClaimPositions(detailClaim.activeSubClaim);
-      }
-    } else {
-      // close the full tree
-      delete detailClaim.activeSubClaim;
-      this.deactiveSubClaims(detailClaim);
-    }
-
-    // calculate sub claim row
-    detailClaim.subRowHeight = this.subClaimsRowHeight(detailClaim);
-    this.calculateSubClaimPositions(detailClaim);
-
-    // render it!
-    window.requestAnimationFrame(() => {
-      this.ref.detectChanges();
-
-      if ($event) {
-        const claimRow: any = this.core.utils.getParentByClassName($event.srcElement,
-          'claim-detail-row');
-        const detailContainer: any = this.core.utils.getParentByClassName(claimRow,
-          'evan-detailed-claim');
-
-        setTimeout(() => {
-          let maxScroll = detailContainer.scrollWidth - detailContainer.clientWidth;
-          let rowScrollTo = claimRow.offsetLeft - detailContainer.clientWidth + 300;
-          rowScrollTo = rowScrollTo > 0 ? rowScrollTo : 0;
-
-          this.core.utils.scrollTo(
-            detailContainer,
-            'horizontal',
-            rowScrollTo,
-            50,
-            // calculate the scroll speed, so we will scroll to the start position, before the
-            // appear animation is finished (~400ms => 10ms timeouts => scroll range / 40 => use 30
-            // for timeout delays)
-            30
-          );
-
-          setTimeout(() => {
-            maxScroll = detailContainer.scrollWidth - detailContainer.clientWidth;
-
-            this.core.utils.scrollTo(
-              detailContainer,
-              'horizontal',
-              detailContainer.scrollWidth - detailContainer.clientWidth,
-              50
-            );
-          }, 500);
-        });
-      }
-    });
-  }
-
   /**
    * Return the claims array or the parents object of an claim.
    *
@@ -728,107 +609,183 @@ export class EvanClaimComponent extends AsyncComponent {
     return claim.claims || claim.parents || [ ];
   }
 
-  /**
-   * Calculate the height of the claim row, depending of it's containing sub claims
-   *
-   * @param      {any}     claim   the claim that should be calculated
-   * @return     {number}  height of the row (e.g. 100px)
-   */
-  private subClaimsRowHeight(claim: any):number {
-    const subClaims = this.getClaimsOrParents(claim);
-    let caluclated;
+  /******************************************** d3.js *********************************************/
+  private async renderDetail(claim: any) {
+    await this.core.utils.timeout(0);
 
-    if (claim.activeSubClaim) {
-      caluclated = (subClaims.length - 1) * this.subClaimHeight + this.activeSubClaimheight;
+    // Set the dimensions and margins of the diagram
+    const containerWidth =  this.element.nativeElement.parentElement.offsetWidth;
+    const margin = {top: 50, right: 90, bottom: 50, left: 90};
+    const width = containerWidth - margin.left - margin.right;
+    const fullHeight = 500;
+    const height = fullHeight - margin.top - margin.bottom;
+    // claim width + width of connector dot
+    const connectorDot = 20;
+    const boxWidth =  250 + connectorDot; 
+    const boxHeight = 55;
+    const svg = this.element.nativeElement.querySelectorAll('.evan-detailed-claim svg')[0];
 
-      // if the size must be adjusted to include the interaction count, include it!
-      if (this.claimInteractionCount(claim.activeSubClaim) !== 0) {
-        caluclated += this.subClaimInteractionHeight;
+    // declares a tree layout and assigns the size
+    let treemap = d3.tree()
+      // Using nodeSize we are able to control
+      // the separation between nodes. If we used
+      // the size parameter instead then d3 would
+      // calculate the separation dynamically to fill
+      // the available space.
+      .nodeSize([ 70, 300 + connectorDot ])
+  
+      // By default, cousins are drawn further apart than siblings.
+      // By returning the same value in all cases, we draw cousins
+      // the same distance apart as siblings.
+      .separation(function(){
+        return 1;
+      })
+
+    // Assigns parent, children, height, depth
+    const root = d3.hierarchy(claim, (d) => { return this.getClaimsOrParents(d) });
+
+    // initialize zooming of the element
+    const zoom = d3.zoom()
+      .scaleExtent([.1,1])
+      .on('zoom', () => {
+        const transform = d3.event.transform;
+        svg.children[0].setAttribute(
+          'transform',
+          `translate(${ transform.x }, ${ transform.y }) scale(${ transform.k })`
+        );
+      });
+
+    d3.select(svg)
+      .call(zoom)
+      .call(
+        zoom.transform,
+        d3.zoomIdentity.translate(margin.left + margin.right, fullHeight / 2).scale(1)
+      );
+
+    // Collapse the node and all it's children
+    function collapse(d) {
+      if (d.children) {
+        d._children = d.children
+        d._children.forEach(collapse)
+        d.children = null
       }
-    } else {
-      caluclated = subClaims.length * this.subClaimHeight;
     }
 
-    return this.subClaimMarginTop + caluclated;
-  }
+    /**
+     * Custom path function that creates straight connecting lines.
+     * Calculate start and end position of links.
+     * Instead of drawing to the center of the node,
+     * draw to the border of the person profile box.
+     * That way drawing order doesn't matter. In other
+     * words, if we draw to the center of the node
+     * then we have to draw the links first and the
+     * draw the boxes on top of them.
+     */
+    function elbow(d) {
+      var sourceX = d.parent.x,
+          sourceY = d.parent.y + (boxWidth / 2),
+          targetX = d.x,
+          targetY = d.y - (boxWidth / 2);
+          
+      return "M" + sourceY + "," + sourceX
+        + "H" + (sourceY + (targetY-sourceY)/2)
+        + "V" + targetX 
+        + "H" + targetY;
+    }
 
-  /**
-   * Get the position of an sub claim (container of persons)
-   *
-   * @param      {any}     claim   the parent claim that should be analyzed
-   * @param      {number}  index   the index that should be positioned
-   * @return     {string}  top position in px (e.g. 100px);
-   */
-  private calculateSubClaimPositions(claim: any) {
-    const subClaims = this.getClaimsOrParents(claim);
-    let activeClaim = subClaims.filter(subClaim => subClaim.active);
+    const update = (source) => {
+      // Assigns the x and y position for the nodes
+      let treeData = treemap(root);
 
-    if (activeClaim && activeClaim.length > 0) {
-      // set the active claim into the middle of the row container
-      activeClaim = activeClaim[0];
-      
-      // calculate the position and the active subclaim height including the interactions that are
-      // available => more space is needed
-      let activeSubClaimHeight = this.activeSubClaimheight;
-      if (this.claimInteractionCount(activeClaim) === 0) {
-        activeClaim.topPos = (claim.subRowHeight / 2) - this.subClaimHeight - 1;
-      } else {
-        activeClaim.topPos = (claim.subRowHeight / 2) - this.subClaimHeight - 11;
-        activeSubClaimHeight = this.activeSubClaimheight + this.subClaimInteractionHeight;
-      }
+      // Compute the new tree layout.
+      let nodes = treeData.descendants(),
+          links = treeData.descendants().slice(1);
 
-      // place all other claims at top or bottom of the centered active claim
-      let activeClaimIndex = subClaims.indexOf(activeClaim);
-      for (let i = 0; i < subClaims.length; i++) {
-        if (i !== activeClaimIndex) {
-          if (i < activeClaimIndex) {
-            // move the previous claims more to the top, analogous to the active one
-            subClaims[i].topPos = activeClaim.topPos -
-              ((activeClaimIndex - i) * this.subClaimHeight);
+      // bind special function handlers for each node
+      nodes.forEach((node, index) => {
+        node.id = index;
+
+        // bind toggle event
+        node.toggle = (($event) => {
+          if (node.children) {
+            node._children = node.children;
+            node.children = null;
           } else {
-            // move the next claims downwards and add 100 (the active body height)
-            subClaims[i].topPos = activeClaim.topPos +
-              ((i - activeClaimIndex) * this.subClaimHeight) +
-              (activeSubClaimHeight - this.subClaimHeight);
+            node.children = node._children;
+            node._children = null;
+          }
+
+          // update node positions
+          update(node);
+
+          // deactivate hover
+          delete this.activeDetailHover;
+
+          // stop event bubbling
+          return this.core.utils.stopEventBubbling($event);
+        }).bind(this);
+
+        // add the show detail function
+        node.toggleDetail = (($event) => {
+          if (node === this.activeDetailHover) {
+            delete this.activeDetailHover;
+          } else {
+            this.activeDetailHover = node;
+          }
+
+          this.ref.detectChanges();
+          return this.core.utils.stopEventBubbling($event);
+        }).bind(this);
+
+        node.transform = `translate(${ node.y },${ node.x })`;
+      });
+
+      // create the link elbow connectors
+      links.forEach(link => {
+        link.elbow = elbow(link)
+
+        if (link.data.warnings.indexOf('rejected') !== -1) {
+          link.markerStart = 'url(#arrow-danger)';
+        } else {
+          switch (link.data.status) {
+            case -1: {
+              link.markerStart = 'url(#arrow-danger)';
+              break;
+            }
+            case 0: {
+              link.markerStart = 'url(#arrow-warning)';
+              break;
+            }
+            case 1: {
+              link.markerStart = 'url(#arrow-success)';
+              break;
+            }
           }
         }
-      }
+      });
 
-      // if the first row gets into a negative position range, move it to the zero position and
-      // raise all other positions and the claim subRowHeight by the negative value 
-      if (subClaims[0].topPos < 0) {
-        const negativeTopPos = -1 * subClaims[0].topPos;
+      // Normalize for fixed-depth.
+      nodes.forEach(function(d){ d.y = d.depth * 180});
 
-        subClaims.forEach(subClaim => {
-          subClaim.topPos += negativeTopPos;
-        });
+      // update current d3 object
+      this.d3 = {
+        nodes, links, source, root,
+        dimensions: {
+          boxHeight,
+          boxWidth,
+          connectorDot,
+          containerWidth,
+          height,
+          margin,
+          svg,
+          width,
+        }
+      };
 
-        claim.subRowHeight += negativeTopPos * 2;
-      }
-    } else {
-      for (let i = 0; i < subClaims.length; i++) {
-        subClaims[i].topPos = i * this.subClaimHeight + 2;
-      }
+      this.ref.detectChanges();
     }
 
-    // calculate height of vertical connectors
-    const halfHeight = (claim.subRowHeight / 2);
-    const personContainerHeight = 66;
-    const connectorWidth = 3;
-    for (let i = 0; i < subClaims.length; i++) {
-      if (subClaims[i].topPos < (halfHeight - this.subClaimMarginTop)) {
-        subClaims[i].vertical = {
-          height: halfHeight - subClaims[i].topPos - this.subClaimMarginTop - (personContainerHeight / 2)
-            + connectorWidth,
-          top: 30
-        };
-      } else {
-        subClaims[i].vertical = {
-          height: subClaims[i].topPos + this.subClaimMarginTop + (personContainerHeight / 2)
-            - halfHeight,
-          bottom: 33
-        };
-      }
-    }
+    // start!
+    update(root);
   }
 }

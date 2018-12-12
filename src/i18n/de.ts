@@ -77,12 +77,16 @@ export const de = {
         "valid": "valide",
         "validPath": "gültige Verifizierungskette"
       },
+      "reject": "verwerfen",
       "reject-claim": "Verwerfen",
       "reject-reason": "Ablehnungsgrund",
       "since": "seit",
+      "status": "Status",
       "subject": "Zugewiesener",
       "subject-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können für diese Identität keine Verifizierunge ausgestellt werden.",
       "topic": "Verifizierungspfad",
+      "trust-provider": "Aussteller",
+      "trust-taker": "Empfänger",
       "until": "bis",
       "warnings": {
         "expired": "ausgelaufen",
@@ -96,7 +100,8 @@ export const de = {
         "parentUntrusted": "Pfad nicht bestätigt",
         "rejected": "verworfen",
         "selfIssued": "selbst erstellt",
-        "title": "Warnungen"
+        "title": "Warnungen",
+        "undefined": "valide"
       }
     },
     "contract-members": {

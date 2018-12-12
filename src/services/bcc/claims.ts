@@ -545,4 +545,48 @@ export class EvanClaimService {
       return claims;
     }
   }
+
+  /**
+   * Load the topic details for specific claim topic.
+   *
+   * @param      {string}  topic   the topic
+   * @return     {any}     returns the ens domain, owner and minimal description
+   */
+  public async loadTopicDescription(topic: string) {
+    const activeAccount = this.core.activeAccount();
+
+    // map the topic to the claim ens name and extract the top level claims domain to check, if
+    // the user can set the claim tree
+    const ensDomain = this.getClaimEnsAddress(topic);
+    const topLevelDomain = ensDomain.split('.').splice(-3, 3).join('.');
+
+    // transform the ens domain into a namehash and load the ens top level topic owner
+    const namehash = this.bcc.nameResolver.namehash(topLevelDomain);
+    const [ owner, loadedDesc ] = await Promise.all([
+      this.bcc.executor.executeContractCall(
+        this.bcc.nameResolver.ensContract, 'owner', namehash),
+      this.bcc.description.getDescription(ensDomain, activeAccount)
+    ]);
+
+    const topicDetails = {
+      ensDomain: ensDomain,
+      owner: owner,
+      description: loadedDesc ? loadedDesc.public : {
+        author: activeAccount,
+        dbcpVersion: 1,
+        description: topic,
+        name: topic,
+        version: '1.0.0',
+      },
+      image: [ ],
+    };
+
+    // fill empty i18n object
+    const description = topicDetails.description;
+    description.i18n = description.i18n || { };
+    description.i18n.name = description.i18n.name || { };
+    description.i18n.name.en = description.i18n.name.en || topic.split('/').pop();
+
+    return topicDetails;
+  }
 }
