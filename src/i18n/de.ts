@@ -35,9 +35,15 @@ export const de = {
       "accept": "bestätigen",
       "all-issuers": "Alle Verifizierungen den diesen Verifizierungspfad und Nutzer betreffen.",
       "cancel": "abbrechen",
+      "claim-description": "Verifizierungsbeschreibung",
       "close-details": "schließen",
       "creation-date": "Erstelldatum",
       "delete": "löschen",
+      "descName": {
+        "desc": "Bitte geben Sie einen Verifizierungsnamen ein.",
+        "error": "Sie müssen einen Namen angeben, um die Beschreibung zu speichern!",
+        "title": "Verifizierungsname"
+      },
       "details": "Verifizierungsdetails",
       "details-desc": "Übersicht über Verifizierunge und deren genaue Statusinformationen.",
       "dispatcher": {
@@ -51,6 +57,11 @@ export const de = {
           "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> löschen?",
           "ok": "löschen",
           "title": "Verifizierung löschen"
+        },
+        "descriptionDispatcher": {
+          "description": "Möchten Sie die Metadaten dieses Verifizierungspfades speichern?",
+          "ok": "speichern",
+          "title": "Verifizierungspfad Anpassungen"
         },
         "rejectDispatcher": {
           "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> verwerfen?",
@@ -79,7 +90,14 @@ export const de = {
       },
       "reject": "verwerfen",
       "reject-claim": "Verwerfen",
+      "reject-date": "Ablehungsdatum",
       "reject-reason": "Ablehnungsgrund",
+      "rejector": "Ablehnender",
+      "select-desc-img": {
+        "select": "Bild auswählen",
+        "title": "Verifizierungsbild"
+      },
+      "set-description": "Beschreibung speichern",
       "since": "seit",
       "status": "Status",
       "subject": "Zugewiesener",

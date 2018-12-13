@@ -65,6 +65,11 @@ export class EvanClaimService {
   public claimDescriptions: any = { };
 
   /**
+   * cache all the ens owners
+   */
+  public ensOwners: any = { };
+
+  /**
    * make it standalone and load dependency services
    */
   constructor(
@@ -408,10 +413,13 @@ export class EvanClaimService {
    * @param      {any}     claim   the claim that should be checked
    */
   public async ensureClaimDescription(claim: any) {
+    // map the topic to the claim ens name and extract the top level claims domain to check, if
+    // the user can set the claim tree
+    const ensAddress = this.getClaimEnsAddress(claim.name);
+    const topLevelDomain = ensAddress.split('.').splice(-3, 3).join('.');
+
     // if no description was set, use the latest one or load it
     if (!claim.description) {
-      const ensAddress = this.getClaimEnsAddress(claim.name);
-
       // if the description could not be loaded, the cache will set to false, so we do not need to load again
       if (this.claimDescriptions[ensAddress] !== false) {
         this.claimDescriptions[ensAddress] = (async () => {
@@ -437,12 +445,37 @@ export class EvanClaimService {
       if (claim.description.imgSquare) {
         claim.icon = claim.description.imgSquare;
       }
-
-      // try to load a clear name
-      try {
-        claim.displayName = claim.description.i18n.name.en;
-      } catch (ex) { }
+    } else {
+      claim.description = {
+        author: this.core.activeAccount(),
+        dbcpVersion: 1,
+        description: claim.name,
+        name: claim.name,
+        version: '1.0.0',
+      };
     }
+
+    claim.description.i18n = claim.description.i18n || { };
+    claim.description.i18n.name = claim.description.i18n.name || { };
+    claim.description.i18n.name.en = claim.description.i18n.name.en || claim.name.split('/').pop();
+
+    // try to load a clear name
+    try {
+      claim.displayName = claim.description.i18n.name.en;
+    } catch (ex) { }
+
+    // if the top level ens owner was not loaded before, load it!
+    if (!this.ensOwners[topLevelDomain]) {
+      this.ensOwners[topLevelDomain] = (async () => {
+        // transform the ens domain into a namehash and load the ens top level topic owner
+        const namehash = this.bcc.nameResolver.namehash(topLevelDomain);
+        return await this.bcc.executor.executeContractCall(
+          this.bcc.nameResolver.ensContract, 'owner', namehash);
+      })();
+    }
+
+    claim.ensAddress = ensAddress;
+    claim.topLevelEnsOwner = await this.ensOwners[topLevelDomain];
   }
 
   /**
@@ -544,49 +577,5 @@ export class EvanClaimService {
     } else {
       return claims;
     }
-  }
-
-  /**
-   * Load the topic details for specific claim topic.
-   *
-   * @param      {string}  topic   the topic
-   * @return     {any}     returns the ens domain, owner and minimal description
-   */
-  public async loadTopicDescription(topic: string) {
-    const activeAccount = this.core.activeAccount();
-
-    // map the topic to the claim ens name and extract the top level claims domain to check, if
-    // the user can set the claim tree
-    const ensDomain = this.getClaimEnsAddress(topic);
-    const topLevelDomain = ensDomain.split('.').splice(-3, 3).join('.');
-
-    // transform the ens domain into a namehash and load the ens top level topic owner
-    const namehash = this.bcc.nameResolver.namehash(topLevelDomain);
-    const [ owner, loadedDesc ] = await Promise.all([
-      this.bcc.executor.executeContractCall(
-        this.bcc.nameResolver.ensContract, 'owner', namehash),
-      this.bcc.description.getDescription(ensDomain, activeAccount)
-    ]);
-
-    const topicDetails = {
-      ensDomain: ensDomain,
-      owner: owner,
-      description: loadedDesc ? loadedDesc.public : {
-        author: activeAccount,
-        dbcpVersion: 1,
-        description: topic,
-        name: topic,
-        version: '1.0.0',
-      },
-      image: [ ],
-    };
-
-    // fill empty i18n object
-    const description = topicDetails.description;
-    description.i18n = description.i18n || { };
-    description.i18n.name = description.i18n.name || { };
-    description.i18n.name.en = description.i18n.name.en || topic.split('/').pop();
-
-    return topicDetails;
   }
 }

@@ -35,9 +35,15 @@ export const en = {
       "accept": "accept",
       "all-issuers": "All verifications related to this verification path and user.",
       "cancel": "cancel",
+      "claim-description": "Verification description",
       "close-details": "close",
       "creation-date": "Creation date",
       "delete": "delete",
+      "descName": {
+        "desc": "Please enter a verification name.",
+        "error": "You have to enter a name to save the description!",
+        "title": "Verification name"
+      },
       "details": "Verification detail",
       "details-desc": "Overview of verifications and their exact status information.",
       "dispatcher": {
@@ -51,6 +57,11 @@ export const en = {
           "description": "Do you want to delete the verification \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
           "ok": "delete",
           "title": "Delete verification"
+        },
+        "descriptionDispatcher": {
+          "description": "Would you like to save the metadata of this verification path?",
+          "ok": "save",
+          "title": "Verification path adjustments"
         },
         "rejectDispatcher": {
           "description": "Do you want to discard the verification \"<b>{{ topic }}}</b>\" of the user <b>{{ to }}</b>?",
@@ -79,7 +90,14 @@ export const en = {
       },
       "reject": "reject",
       "reject-claim": "reject",
-      "reject-reason": "Reason",
+      "reject-date": "Reject date",
+      "reject-reason": "Reject Reason",
+      "rejector": "Rejector",
+      "select-desc-img": {
+        "select": "Select image",
+        "title": "Verification image"
+      },
+      "set-description": "Save verification description",
       "since": "expired",
       "status": "Status",
       "subject": "Subject",
