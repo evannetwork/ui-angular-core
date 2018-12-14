@@ -273,7 +273,16 @@ export class EvanClaimService {
 
     // only load claims for correct contract / accoun id's
     if (isValidAddress) {
-      claims = await this.bcc.claims.getClaims(topic, address, isIdentity);
+      try {
+        const identity = await this.bcc.executor.executeContractCall(
+          this.bcc.claims.contracts.storage, 'users', address);
+
+        if (identity !== '0x0000000000000000000000000000000000000000') {
+          claims = await this.bcc.claims.getClaims(topic, address, isIdentity);
+        }
+      } catch (ex) {
+        claims = [ ];
+      }
     }
 
     if (claims.length > 0) {

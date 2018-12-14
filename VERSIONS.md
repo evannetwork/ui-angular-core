@@ -2,6 +2,11 @@
 
 ## Next Version
 ### Features
+### Fixes
+### Deprecations
+
+## Version 1.6.0
+### Features
 - claims
   - Remove automated root evan claim checking, so it needs to be specified within the claim check
   - new claim tree styling using svg
