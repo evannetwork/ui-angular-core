@@ -130,7 +130,7 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   @Input() enableReject: boolean = true;
 
-  /*****************    letiables    *****************/
+  /*****************    variables    *****************/
   /**
    * available display modes
    */
