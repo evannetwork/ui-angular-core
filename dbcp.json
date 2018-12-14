@@ -4,7 +4,7 @@
     "dapp": {
       "dependencies": {
         "angular-libs": "^1.3.0",
-        "bcc": "^1.6.0",
+        "bcc": "^1.6.1",
         "smart-contracts": "^1.4.0"
       },
       "entrypoint": "angularcore.js",
