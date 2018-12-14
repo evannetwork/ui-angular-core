@@ -151,7 +151,7 @@ export class EvanDescriptionService {
 
       this.descriptions[ensAddress] = description;
     } catch (ex) {
-      return this.translate.getTranslatedDescription({
+      description = this.translate.getTranslatedDescription({
         status: 'invalid',
         name: ensAddress,
         ensAddress: ensAddress,
@@ -160,7 +160,7 @@ export class EvanDescriptionService {
     }
 
     if (clearDescription) {
-      const copy = JSON.parse(JSON.stringify(this.descriptions[ensAddress]));
+      const copy = JSON.parse(JSON.stringify(description));
 
       // remove not allowed values
       delete copy.ensAddress;
@@ -171,7 +171,7 @@ export class EvanDescriptionService {
 
       return copy;
     } else {
-      return this.descriptions[ensAddress];
+      return description;
     }
   }
 

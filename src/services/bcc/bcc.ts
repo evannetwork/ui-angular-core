@@ -201,7 +201,7 @@ export class EvanBCCService {
       signer = new ProfileBundle.SignerExternal({
         logLog: CoreBundle.logLog,
         logLogLevel: CoreBundle.logLogLevel
-      })
+      });
     }
 
     return signer;
@@ -258,6 +258,10 @@ export class EvanBCCService {
           signer: this.getSigner(provider),
           SmartContracts: SmartContracts
         };
+
+        // use account store from signer or use a new one
+        bccProfileOptions.accountStore = bccProfileOptions.signer.accountStore ||
+          new AccountStore();
   
         // if we are loading all data via an smart-agent, we need to create a new ExecutorAgent
         if (provider === 'agent-executor') {

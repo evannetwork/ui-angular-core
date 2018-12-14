@@ -26,9 +26,20 @@
 */
 
 import {
-  Component, OnInit, Input, AfterViewInit, // @angular/core
-  ElementRef, OnDestroy
+  logLog
+} from 'bcc';
+
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
 } from 'angular-libs';
+
+import { AsyncComponent } from '../../classes/AsyncComponent';
+import { EvanMailboxService } from '../../services/bcc/mailbox';
+import { EvanQueue } from '../../services/bcc/queue';
+import { EvanUtilService } from '../../services/utils';
 
 /**************************************************************************************************/
 
@@ -44,20 +55,63 @@ import {
   selector: 'dashboard-top-buttons',
   templateUrl: 'dashboard-top-buttons.html'
 })
-export class DashboardTopButtons implements AfterViewInit, OnDestroy {
+export class DashboardTopButtons extends AsyncComponent {
+  /**
+   * event handler that watches for queue updates
+   */
+  private onQueueButtonChange: Function;
+
   /***************** initialization  *****************/
   constructor(
     private element: ElementRef,
-  ) {  }
+    private mailboxService: EvanMailboxService,
+    private queue: EvanQueue,
+    private ref: ChangeDetectorRef,
+    private utilService: EvanUtilService,
+  ) {
+    super(ref, false);
+  }
 
   /**
    * TODO: Optionally it can be move to body level to handle fixed containing elements
    */
-  ngAfterViewInit() {
-    // document.body.querySelector('ion-app').appendChild(this.element.nativeElement);
+  async _ngAfterViewInit() {
+    this.onQueueButtonChange = this.utilService.onEvent('evan-queue-button-count', async () => {
+      this.setQueueButtonCount();
+      this.ref.detectChanges();
+    });
+
+    document.body.querySelector('ion-app').appendChild(this.element.nativeElement);
+    this.setQueueButtonCount();
   }
 
-  ngOnDestroy() {
-    // document.body.querySelector('ion-app').removeChild(this.element.nativeElement);
+  async _ngOnDestroy() {
+    const ionApps = document.body.querySelectorAll('ion-app');
+
+    for (let i = 0; i < ionApps.length; i++) {
+      ionApps[i].removeChild(this.element.nativeElement);
+    }
+
+    this.onQueueButtonChange();
+  }
+
+  /**
+   * Return the count of top right buttons that should be displayed (queue, mail, log)
+   *
+   * @return     {number}  Number of buttons to show
+   */
+  setQueueButtonCount() {
+    const logErrors = logLog.filter(entry => entry.level === 'error');
+    const nativeElement = this.element.nativeElement;
+
+    // remove the previous added queue button active class
+    nativeElement.className = nativeElement.className.replace(/ queue-button-active-*/g, '');
+
+    // add the new queue button active class
+    nativeElement.className += ' queue-button-active-' + ([
+      this.queue.queue.entries.length > 0,
+      this.mailboxService.newMailCount > 0,
+      logErrors.length > 0 && !this.queue.exception
+    ].filter(check => check === true).length);
   }
 }

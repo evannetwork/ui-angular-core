@@ -5,6 +5,18 @@
 ### Fixes
 ### Deprecations
 
+## Version 1.6.0
+### Features
+- claims
+  - Remove automated root evan claim checking, so it needs to be specified within the claim check
+  - new claim tree styling using svg
+
+### Fixes
+- `evan-claim`: add checks if subject or issuer identity does not exists, display notification text if not
+- `dashboard-top-buttons`: move the component everytime to the most top level ion-app to fix eventually appearing position containing bugs
+
+### Deprecations
+
 ## Version 1.5.0
 ### Features
 - add `includeActiveAccount` to `contract-members` component

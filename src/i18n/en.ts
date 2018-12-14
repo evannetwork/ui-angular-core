@@ -32,42 +32,94 @@ export const en = {
     "camera": "Camera",
     "cancel": "Cancel",
     "claims": {
-      "accept": "accept claim",
-      "all-issuers": "All claims related to this claim path and user.",
+      "accept": "accept",
+      "all-issuers": "All verifications related to this verification path and user.",
       "cancel": "cancel",
+      "claim-description": "Verification description",
       "close-details": "close",
       "creation-date": "Creation date",
-      "delete": "decline claim",
-      "details": "Claim detail",
-      "details-desc": "Overview of claims and their exact status information.",
+      "delete": "delete",
+      "descName": {
+        "desc": "Please enter a verification name.",
+        "error": "You have to enter a name to save the description!",
+        "title": "Verification name"
+      },
+      "details": "Verification detail",
+      "details-desc": "Overview of verifications and their exact status information.",
+      "dispatcher": {
+        "acceptDispatcher": {
+          "description": "Do you want to accept the verification \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
+          "ok": "accept",
+          "title": "Accept verification"
+        },
+        "cancel": "cancel",
+        "deleteDispatcher": {
+          "description": "Do you want to delete the verification \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
+          "ok": "delete",
+          "title": "Delete verification"
+        },
+        "descriptionDispatcher": {
+          "description": "Would you like to save the metadata of this verification path?",
+          "ok": "save",
+          "title": "Verification path adjustments"
+        },
+        "rejectDispatcher": {
+          "description": "Do you want to discard the verification \"<b>{{ topic }}}</b>\" of the user <b>{{ to }}</b>?",
+          "ok": "reject",
+          "rejected-description": "The verification <b>{{ topic }}</b> by the user <b>{{ from }}</b> to <b>{{ to }}</b> was rejected by <b>{{ rejector }}</b>: ",
+          "title": "Reject verification"
+        }
+      },
       "done": "ok",
       "enable-expiration-date": "Use expiration date",
       "expiration-date": "Expiration date",
-      "issue": "issue claim",
+      "interactions": "Editing",
+      "issue": "issue",
       "issue-claim": "Issue Claim",
+      "issue-claim-description": "Do you want to issue the verification \"<b>{{ topic }}</b>\" to the user <b>{{ to }}</b>?",
       "issued-by": "issued by",
       "issuer": "Issuer",
+      "issuer-no-identity": "No verification administration has yet been created for this account, so you cannot issue verifications. Please visit the verification management application to set it up.",
+      "not-set": "Not issued",
+      "not-set-desc": "...",
       "okays": {
         "confirmed": "confirmed",
         "notExpired": "not expired",
         "valid": "valid",
-        "validPath": "valid claim chain"
+        "validPath": "valid verification chain"
       },
+      "reject": "reject",
+      "reject-claim": "reject",
+      "reject-date": "Reject date",
+      "reject-reason": "Reject Reason",
+      "rejector": "Rejector",
+      "select-desc-img": {
+        "select": "Select image",
+        "title": "Verification image"
+      },
+      "set-description": "Save verification description",
       "since": "expired",
+      "status": "Status",
       "subject": "Subject",
+      "subject-no-identity": "No verification administration has been created for this account yet, so no verifications can be issued for this identity.",
       "topic": "Claim path",
+      "trust-provider": "Trust provider",
+      "trust-taker": "Trust taker",
       "until": "expires",
       "warnings": {
         "expired": "expired",
         "invalid": "manipulated",
-        "invalidPath": "Invalid claim chain",
-        "issued": "not confirmed",
+        "invalidPath": "Invalid verification chain",
+        "issued": "not accepted",
         "missing": "Claim does not exists.",
-        "notEnsRootOwner": "Invalid root claim",
+        "noIdentity": "Claim management missing",
+        "notEnsRootOwner": "Invalid root verification",
         "parentMissing": "Path does not exist",
-        "parentUntrusted": "Path not confirmed",
+        "parentUntrusted": "path invalid",
+        "rejected": "rejected",
         "selfIssued": "self created",
-        "title": "Warnings"
+        "title": "Warnings",
+        "undefined": "valid"
       }
     },
     "contract-members": {
@@ -146,12 +198,12 @@ export const en = {
     "warnings": {
       "dont-show-again": "Don't show again",
       "eve-empty": {
-        "body": "You have used up your complete condingent of Eve's ({{ value }} Eve's). It is no longer possible to create contracts or send transactions.",
-        "title": "Eve's are used up"
+        "body": "You have used up your complete condingent of EVEs ({{ value }} EVEs). It is no longer possible to create contracts or send transactions.",
+        "title": "EVEs are used up"
       },
       "eve-low": {
-        "body": "You have almost used up your complete condingent of Eve's ({{ value }} Eve's). It's possible that special actions (contract creation, storage transactions) will fail if the Eve value is too low.",
-        "title": "Eve's are almost used up"
+        "body": "You have almost used up your complete condingent of EVEs ({{ value }} EVEs). It's possible that special actions (contract creation, storage transactions) will fail if the EVE value is too low.",
+        "title": "EVEs are almost used up"
       },
       "indexdb-not-available": {
         "body": "The browser you are using does not support local caching of data, which can lead to runtime problems. Please use one of the following browsers: <b>Chrome, Firefox Safari, Edge</b>.<br><br><b>Hint</b>: Some browsers have limited memory in a private mode.",

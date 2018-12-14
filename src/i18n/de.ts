@@ -32,42 +32,94 @@ export const de = {
     "camera": "Kamera",
     "cancel": "Abbrechen",
     "claims": {
-      "accept": "Zertifikat bestätigen",
-      "all-issuers": "Alle Zertifikate den diesen Zertifikatspfad und Nutzer betreffen.",
+      "accept": "bestätigen",
+      "all-issuers": "Alle Verifizierungen den diesen Verifizierungspfad und Nutzer betreffen.",
       "cancel": "abbrechen",
+      "claim-description": "Verifizierungsbeschreibung",
       "close-details": "schließen",
       "creation-date": "Erstelldatum",
-      "delete": "Zertifikat ablehnen",
-      "details": "Zertifikatsdetails",
-      "details-desc": "Übersicht über Zertifikate und deren genaue Statusinformationen.",
+      "delete": "löschen",
+      "descName": {
+        "desc": "Bitte geben Sie einen Verifizierungsnamen ein.",
+        "error": "Sie müssen einen Namen angeben, um die Beschreibung zu speichern!",
+        "title": "Verifizierungsname"
+      },
+      "details": "Verifizierungsdetails",
+      "details-desc": "Übersicht über Verifizierunge und deren genaue Statusinformationen.",
+      "dispatcher": {
+        "acceptDispatcher": {
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> bestätigen?",
+          "ok": "bestätigen",
+          "title": "Verifizierung bestätigen"
+        },
+        "cancel": "abbrechen",
+        "deleteDispatcher": {
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> löschen?",
+          "ok": "löschen",
+          "title": "Verifizierung löschen"
+        },
+        "descriptionDispatcher": {
+          "description": "Möchten Sie die Metadaten dieses Verifizierungspfades speichern?",
+          "ok": "speichern",
+          "title": "Verifizierungspfad Anpassungen"
+        },
+        "rejectDispatcher": {
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> verwerfen?",
+          "ok": "verwerfen",
+          "rejected-description": "Die Verifizierung <b>{{ topic }}</b> von dem Nutzer <b>{{ from }}</b> an <b>{{ to }}</b> wurde von <b>{{ rejector }}</b> verworfen: ",
+          "title": "Verifizierung verwerfen"
+        }
+      },
       "done": "ok",
       "enable-expiration-date": "Ablaufdatum benutzen",
       "expiration-date": "Ablaufdatum",
-      "issue": "Zertifikat ausstellen",
-      "issue-claim": "Zertifikat ausstellen",
+      "interactions": "Bearbeitung",
+      "issue": "ausstellen",
+      "issue-claim": "Verifizierung ausstellen",
+      "issue-claim-description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" für den Nutzer <b>{{ to }}</b> ausstellen?",
       "issued-by": "ausgestellt von",
       "issuer": "Aussteller",
+      "issuer-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können Sie keine Verifizierunge ausstellen. Bitte besuchen die Zertifikasverwaltung Anwendung, um die diese einzurichten.",
+      "not-set": "Nicht ausgestellt",
+      "not-set-desc": "...",
       "okays": {
         "confirmed": "bestätigt",
         "notExpired": "gültig",
         "valid": "valide",
-        "validPath": "gültige Zertifikatskette"
+        "validPath": "gültige Verifizierungskette"
       },
+      "reject": "verwerfen",
+      "reject-claim": "Verwerfen",
+      "reject-date": "Ablehungsdatum",
+      "reject-reason": "Ablehnungsgrund",
+      "rejector": "Ablehnender",
+      "select-desc-img": {
+        "select": "Bild auswählen",
+        "title": "Verifizierungsbild"
+      },
+      "set-description": "Beschreibung speichern",
       "since": "seit",
+      "status": "Status",
       "subject": "Zugewiesener",
-      "topic": "Zertifikatspfad",
+      "subject-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können für diese Identität keine Verifizierunge ausgestellt werden.",
+      "topic": "Verifizierungspfad",
+      "trust-provider": "Aussteller",
+      "trust-taker": "Empfänger",
       "until": "bis",
       "warnings": {
         "expired": "ausgelaufen",
         "invalid": "manipuliert",
-        "invalidPath": "Ungültige Zertifikatskette",
-        "issued": "bestätigt",
-        "missing": "Zertifikat existiert nicht.",
+        "invalidPath": "Ungültige Verifizierungskette",
+        "issued": "nicht bestätigt",
+        "missing": "Verifizierung existiert nicht.",
+        "noIdentity": "Verifizierungsverwaltung fehlt",
         "notEnsRootOwner": "Ungültiges Stammzertifikat",
         "parentMissing": "Pfad nicht existent",
         "parentUntrusted": "Pfad nicht bestätigt",
+        "rejected": "verworfen",
         "selfIssued": "selbst erstellt",
-        "title": "Warnungen"
+        "title": "Warnungen",
+        "undefined": "valide"
       }
     },
     "contract-members": {
@@ -123,6 +175,7 @@ export const de = {
     },
     "refresh": "Aktualisieren...",
     "refreshing": "Aktualisiere...",
+    "reject-reason": "Begründung",
     "requests-permissions": "benötigt Rechte auf",
     "smart-agent": {
       "created-at": "Erstellt am",
@@ -146,12 +199,12 @@ export const de = {
     "warnings": {
       "dont-show-again": "Meldung nicht mehr anzeigen",
       "eve-empty": {
-        "body": "Sie haben ihr vollständiges Kondingent an Eve's aufgebraucht ({{ value }} Eves). Es ist nicht mehr möglich, Verträge zu erstellen oder Transaktionen zu senden.",
-        "title": "Eve's sind aufgebraucht"
+        "body": "Sie haben ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist nicht mehr möglich, Verträge zu erstellen oder Transaktionen zu senden.",
+        "title": "EVEs sind aufgebraucht"
       },
       "eve-low": {
-        "body": "Sie haben fast ihr vollständiges Kondingent an Eve's aufgebraucht ({{ value }} Eves). Es ist möglich, dass spezielle Aktionen (Vertragserstellungen, Speichertransaktionen) bei einem zu geringen Eve Wert fehlschlagen.",
-        "title": "Eve's sind fast aufgebraucht"
+        "body": "Sie haben fast ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist möglich, dass spezielle Aktionen (Vertragserstellungen, Speichertransaktionen) bei einem zu geringen EVE Wert fehlschlagen.",
+        "title": "EVEs sind fast aufgebraucht"
       },
       "indexdb-not-available": {
         "body": "Der von Ihnen genutzte Browser unterstützt nicht das lokale zwischenspeichern von Daten, was zu Laufzeitproblemen führen kann.Bitte benutzen Sie einen der folgenden Browsern: <b>Chrome, Firefox Safari, Edge</b>.<br><br><b>Hinweis</b>: Einige Browser besitzen in einem privaten Modus eingeschränkte Speicherkapazitäten.",
