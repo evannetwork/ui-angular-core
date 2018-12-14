@@ -4,7 +4,7 @@
 ### Features
 - claims
   - Remove automated root evan claim checking, so it needs to be specified within the claim check
-  - new claim tree styling
+  - new claim tree styling using svg
 
 ### Fixes
 - `evan-claim`: add checks if subject or issuer identity does not exists, display notification text if not
