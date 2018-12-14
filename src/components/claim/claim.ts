@@ -352,6 +352,9 @@ export class EvanClaimComponent extends AsyncComponent {
 
     await this.core.utils.timeout(0);
 
+    // move the modal to the next ion-app container
+    this.moveModalsToClosestIonApp();
+
     claim.showModal = true;
     this.ref.detectChanges();
 
@@ -778,9 +781,9 @@ export class EvanClaimComponent extends AsyncComponent {
     // calculate height of the container (check if we are within the claims dapp, so size it for a
     // perfect view)
     let fullHeight = 500;
-    const modalContainer = document.querySelectorAll('.evan-modal.show-modal')[0];
-    const parentContentContainer: any = this.core.utils.getParentByClassName(
-      modalContainer || this.element.nativeElement, 'evan-content');
+    const modalContainer = document.querySelectorAll('.evan-modal.show-modal .evan-content')[0];
+    const parentContentContainer: any = modalContainer || this.core.utils.getParentByClassName(
+      this.element.nativeElement, 'evan-content');
 
     // when we are running within a modal, size it to 80% of the current screen and reduce it by the amount of height of the headelines
     if (!modalContainer) {
@@ -880,7 +883,33 @@ export class EvanClaimComponent extends AsyncComponent {
         + "H" + targetY;
     }
 
-    const update = async (source) => {
+    /**
+     * Use an element and extract it's current transform
+     *
+     * @param      {any}  element  the element that should be analyzed
+     * @return     {any}  {scale: .., translate: { x: ..., y:...}}
+     */
+    function getTransformFromElement(element: any) {
+      let splitTransform = element.getAttribute('transform').split('scale');
+      let scale: any = 1;
+      let translate = splitTransform[0].replace(/translate\(|\)/g, '').split(',');
+      if (splitTransform.length > 1) {
+        scale = splitTransform[1].replace(/\(|\)/g, '');
+      }
+
+      return {
+        scale: parseFloat(scale),
+        translate: {
+          x: parseFloat(translate[0]),
+          y: parseFloat(translate[1])
+        }
+      };
+    }
+
+    /**
+     * Updates the current svg elements position
+     */
+    const update = async () => {
       // Assigns the x and y position for the nodes
       let treeData = treemap(root);
 
@@ -903,7 +932,7 @@ export class EvanClaimComponent extends AsyncComponent {
           }
 
           // update node positions
-          update(node);
+          update();
 
           // deactivate hover
           delete this.activeDetailHover;
@@ -920,41 +949,38 @@ export class EvanClaimComponent extends AsyncComponent {
             this.activeDetailHover = node;
           }
 
-          // TODO: implement scroll to element on opening hover
-          /*// scroll to node
-          let splitTransform = svgZoomContainer.getAttribute('transform').split('scale');
-          let scale: any = 1;
-          if (splitTransform.length > 1) {
-            scale = splitTransform[1].replace(/\(|\)/g, '');
-          }
-
+          // scroll to node
+          const nodeElement = this.core.utils.getParentByClassName($event.target, 'evan-claim')
+            .parentElement.parentElement; 
+          const nodeTransform = getTransformFromElement(nodeElement);
           const zoomBox = d3.select(svgZoomContainer).node().getBBox();
-          const vx = zoomBox.x;    // container x co-ordinate
-          const vy = zoomBox.y;    // container y co-ordinate
-          const vw = zoomBox.width;  // container width
-          const vh = zoomBox.height;  // container height
+          const bbox = d3.select(nodeElement).node().getBBox();
 
-          const bbox = d3.select(this.core.utils.getParentByClassName($event.target, 'evan-claim').parentElement.parentElement).node().getBBox();
-          const bx = bbox.x;
-          const by = bbox.y;
-          const bw = bbox.width;
-          const bh = bbox.height;
-          const tx = (-bx * scale + vx + vw / 2 - bw * scale / 2);
-          const ty = (-by * scale + vy + vh / 2 - bh * scale / 2);
-          
+          // center the current element container half - zoombox half -
+          // (node.x / 2 - node.width / 2)          
+          const tx = (containerWidth / 2) - (zoomBox.width / 2) -
+            ((nodeTransform.translate.x / 2) - (bbox.width / 2));
+          // move it to the top and a bit down
+          const ty = -zoomBox.y + 100;
+
+          // move the zoom container to the caluculated position 
           d3.select(svgZoomContainer)
             .transition()
             .duration(1000)
-            .attr('transform', `translate(${ tx }, ${ ty }) scale(${ scale })`);
+            .attr('transform', `translate(${ tx }, ${ ty }) scale(1)`);
 
+          // update the zoom component position to prevent back moving by click
           d3.select(svg)
             .call(
               zoom.transform,
-              d3.zoomIdentity.translate(tx, ty).scale(scale)
-            );*/
+              d3.zoomIdentity.translate(tx, ty).scale(1)
+            );
 
+          // update the ref and stop the event bubbling
           this.ref.detectChanges();
-          return this.core.utils.stopEventBubbling($event);
+          if (!$event.disableEventBubbling) {
+            return this.core.utils.stopEventBubbling($event);
+          }
         }).bind(this);
 
         node.transform = `translate(${ node.y },${ node.x })`;
@@ -995,11 +1021,18 @@ export class EvanClaimComponent extends AsyncComponent {
       } else {
         nodes = nodes.filter((d) => d.depth === 0);
         links = [ ];
+
+        setTimeout(() => {
+          nodes[0].toggleDetail({
+            disableEventBubbling: true,
+            target: svg.querySelectorAll('.tree-container foreignObject .evan-claim .claim-label')[0],
+          });
+        });
       }
 
       // update current d3 object
       this.d3 = {
-        nodes, links, source, root,
+        nodes, links, root,
         dimensions: {
           boxHeight,
           boxWidth,
@@ -1014,17 +1047,9 @@ export class EvanClaimComponent extends AsyncComponent {
       };
 
       this.ref.detectChanges();
-/*
-      await this.core.utils.timeout(0);
-
-      // set the zoomBox
-      const zoomBox = d3.select(svgZoomContainer).node().getBBox();
-      d3.select(svg)  
-        .attr("viewBox", 0 + " " + 0 + " " + width + " " + height)  
-        .attr("preserveAspectRatio", "xMidYMid meet");*/
     }
 
     // start!
-    update(root);
+    update();
   }
 }

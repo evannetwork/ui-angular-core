@@ -379,7 +379,7 @@
 
       <div margin-top text-center>
         <button ion-button icon-left color="medium-gray" round outline
-          (click)="closepopupClaim($event)">
+          (click)="removeClaimModal(popupClaim, 'popupClaim', $event)">
           <ion-icon name="close"></ion-icon>
           <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
         </button>
@@ -514,7 +514,7 @@
     </div>
   </div>
 
-  <div class="evan-modal"
+  <div class="evan-modal claim-dbcp-edit"
     *ngIf="editDBCPClaim"
     [class.show-modal]="editDBCPClaim.showModal"
     [class.disable-scrolling]="disableScrolling">
