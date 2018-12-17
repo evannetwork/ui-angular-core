@@ -64,7 +64,7 @@ export const en = {
           "title": "Verification path adjustments"
         },
         "rejectDispatcher": {
-          "description": "Do you want to discard the verification \"<b>{{ topic }}}</b>\" of the user <b>{{ to }}</b>?",
+          "description": "Do you want to reject the verification \"<b>{{ topic }}</b>\" of the user <b>{{ to }}</b>?",
           "ok": "reject",
           "rejected-description": "The verification <b>{{ topic }}</b> by the user <b>{{ from }}</b> to <b>{{ to }}</b> was rejected by <b>{{ rejector }}</b>: ",
           "title": "Reject verification"
