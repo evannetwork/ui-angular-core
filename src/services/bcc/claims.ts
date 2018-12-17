@@ -365,6 +365,11 @@ export class EvanClaimService {
           claim.status = claim.warnings.length > 0 ? 0 : 1;
         }
       }));
+
+      // calculate the computed level around all claims, so we can check all claims for this user
+      // (used for issueing)
+      const computed = await this.getComputedClaim(topic, claims);
+      claims.forEach(claim => claim.levelComputed = computed);
     }
 
     // if no claims are available the status would be "no claim issued"

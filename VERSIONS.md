@@ -5,6 +5,10 @@
 ### Fixes
 ### Deprecations
 
+## Version 1.6.1
+### Features
+- use `dapp-browser` `routing.getQueryParameters` for extracting query params
+
 ## Version 1.6.0
 ### Features
 - claims

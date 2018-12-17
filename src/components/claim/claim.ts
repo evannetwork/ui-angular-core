@@ -614,21 +614,25 @@ export class EvanClaimComponent extends AsyncComponent {
    * @return     {boolean}  True if able to issue claim, False otherwise
    */
   private canIssueClaim(claim: any) {
-    if (claim.warnings.indexOf('noIdentity') !== -1) {
+    if (!this.activeIdentity || !this.enableIssue || claim.warnings.indexOf('noIdentity') !== -1) {
       return false;
-    }
-
-    if (claim.warnings.indexOf('missing') !== -1 || claim.warnings.indexOf('rejected') !== -1) {
+    } else if (claim.warnings.indexOf('missing') !== -1) {
       return true;
     }
 
-    if (this.activeIdentity && claim.claims && this.enableIssue) {
-      // only allow claim issue for computed claims
-      return claim.claims
-        .filter(subClaim => subClaim.issuerAccount === this.activeAccount).length === 0;
-    } else {
-      return false;
-    }
+    // check all claims on the same level
+    const levelClaims = claim.levelComputed && claim.levelComputed.claims ?
+      claim.levelComputed.claims : claim.claims;
+    // only allow claim issue for computed claims
+    return levelClaims
+      .filter(subClaim => {
+        if (subClaim.issuerAccount === this.activeAccount &&
+            subClaim.warnings.indexOf('rejected') === -1) {
+          return true;
+        } else {
+          return false;
+        }
+      }).length === 0;
   }
 
   /**

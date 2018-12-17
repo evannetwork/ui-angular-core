@@ -86,10 +86,8 @@ export class DashboardTopButtons extends AsyncComponent {
   }
 
   async _ngOnDestroy() {
-    const ionApps = document.body.querySelectorAll('ion-app');
-
-    for (let i = 0; i < ionApps.length; i++) {
-      ionApps[i].removeChild(this.element.nativeElement);
+    if (this.element.nativeElement && this.element.nativeElement.parentElement) {
+      this.element.nativeElement.parentElement.removeChild(this.element.nativeElement);
     }
 
     this.onQueueButtonChange();

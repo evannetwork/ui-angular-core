@@ -3,8 +3,8 @@
     "author": "evan GmbH",
     "dapp": {
       "dependencies": {
-        "angular-libs": "^1.3.0",
-        "bcc": "^1.6.0",
+        "angular-libs": "^1.3.1",
+        "bcc": "^1.6.1",
         "smart-contracts": "^1.4.0"
       },
       "entrypoint": "angularcore.js",
@@ -12,7 +12,7 @@
         "angularcore.js",
         "angularcore.css"
       ],
-      "origin": "QmbNESXtyLJuBEgRoPDtw7nf9GdCMjH8BihypyguNkDexJ",
+      "origin": "QmV1h8xDkQ9pwEcS6A7VdWFZji88C6y5Lz5akpC4rJxrid",
       "type": "library"
     },
     "dbcpVersion": 1,
@@ -22,7 +22,7 @@
       "contractus",
       "library"
     ],
-    "version": "1.6.0",
+    "version": "1.6.1",
     "versions": {
       "0.1.0": "QmbWyV5nby2Sy1oTQ8yJFy3gMmCH8Knz4u94JPrChEqYUT",
       "0.9.0": "QmYAWXwey3t8i9YM3LJ5vjkd7t7TyY8FTyuZGsafMzW9vt",
@@ -35,7 +35,7 @@
       "1.3.0": "QmNQo8jE33VWyNpPT71q3gBs3tUeH8iwah6ypNaDW7UMUh",
       "1.4.0": "QmUDJrSdZSwwqApBcDZ6fbD3U1BCZ72oQTp1rXquwEQ6Xb",
       "1.5.0": "QmVgUrsYhVF4t1rngY3HgNq5ebF9xDJNVodUC97HN8hTTS",
-      "1.6.0": "QmY13m7oWY8dh1fdVhLrqnZoAkjxBmFRHYEXRZDPUa5PVb"
+      "1.6.0": "QmYGvZ6GtB2bxB518sZEqY3S3HxSuREBJgxTNa1cyCEgCf"
     }
   }
 }
