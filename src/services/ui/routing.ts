@@ -584,9 +584,7 @@ export class EvanRoutingService {
    * @return     {any}  deep copy of the current query params
    */
   getQueryparams(): any {
-    return this.utils.deepCopy(
-      (<any>this.activeRoute.queryParams)._value
-    );
+    return routing.getQueryParameters(window.location.hash);
   }
 
   /**
