@@ -294,8 +294,10 @@
       </g>
 
       <foreignObject class="evan-detail-hover"
+        height="1000"
+        width="500"
         *ngIf="activeDetailHover"
-        [attr.transform]="activeDetailHover.transform"
+        [attr.transform]="activeDetailHover.hoverTransform"
         [@opacityTransition]>
         <ng-container
           *ngTemplateOutlet="claimDetailHover;context:{ node: activeDetailHover }">

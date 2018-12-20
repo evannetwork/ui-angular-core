@@ -988,6 +988,7 @@ export class EvanClaimComponent extends AsyncComponent {
         }).bind(this);
 
         node.transform = `translate(${ node.y },${ node.x })`;
+        node.hoverTransform = `translate(${ node.y - 250 }, ${ node.x + 30 })`;
       });
 
       // create the link elbow connectors
@@ -1054,6 +1055,8 @@ export class EvanClaimComponent extends AsyncComponent {
     }
 
     // start!
+    update();
+    await this.core.utils.timeout(0);
     update();
   }
 }
