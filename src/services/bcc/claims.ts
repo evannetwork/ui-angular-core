@@ -271,6 +271,8 @@ export class EvanClaimService {
       topic = '/' + topic;
     }
 
+    await this.bcc.claims.ensureStorage();
+
     // only load claims for correct contract / accoun id's
     if (isValidAddress) {
       try {
