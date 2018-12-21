@@ -815,7 +815,7 @@ export class EvanClaimComponent extends AsyncComponent {
     const boxWidth =  250 + connectorDot; 
     const boxHeight = 55;
     const svg = parentContentContainer.querySelectorAll('.evan-detailed-claim svg')[0];
-    const svgZoomContainer = svg.children[0];
+    const svgZoomContainer = svg.childNodes[1];
 
     // declares a tree layout and assigns the size
     let treemap = d3.tree()
@@ -843,7 +843,7 @@ export class EvanClaimComponent extends AsyncComponent {
       .scaleExtent([.1,1])
       .on('zoom', () => {
         const transform = d3.event.transform;
-        svg.children[0].setAttribute(
+        svgZoomContainer.setAttribute(
           'transform',
           `translate(${ transform.x }, ${ transform.y }) scale(${ transform.k })`
         );
