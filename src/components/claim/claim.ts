@@ -396,6 +396,7 @@ export class EvanClaimComponent extends AsyncComponent {
    * @return     {Promise<void>}  resolved when done
    */
   private async loadClaims() {
+    console.time(`Load claims ${ this.topic }`);
     this.loadingClaims = true;
     this.ref.detectChanges();
 
@@ -412,7 +413,11 @@ export class EvanClaimComponent extends AsyncComponent {
     // load claims and the computed status to be able to display a combined view for all claims of a
     // specific topic
     this.claims = await this.claimService.getClaims(this.address, this.topic);
+    // set loading status for the claims
+    this.claimService.setClaimsLoading(this.claims);
+    // load addressbook
     this.addressbook = await this.addressBookService.loadAccounts();
+    // reset claims loading status, could be old within cached values
     this.computed = await this.claimService.getComputedClaim(this.topic, this.claims);
 
     this.loadingClaims = false;
@@ -422,6 +427,8 @@ export class EvanClaimComponent extends AsyncComponent {
     if (this.mode === 'detail') {
       this.renderDetail(this.computed);
     }
+
+    console.timeEnd(`Load claims ${ this.topic }`);
   }
 
   /**
@@ -461,13 +468,13 @@ export class EvanClaimComponent extends AsyncComponent {
     this.queue.addQueueData(
       this.claimService.getQueueId(type),
       {
-        address: this.address,
+        address: claim.subjects ? claim.subjects[0] : claim.subject,
         description: claim.description,
         ensAddress: claim.ensAddress,
         expirationDate: claim.enableExpirationDate ? claim.expirationDate : null,
         id: claim.id,
         issuer: claim.issuerAccount,
-        rejectReason: claim.enableReason ? claim.rejectReason : null,
+        rejectReason: claim.rejectReason,
         topic: claim.name,
       }
     );
@@ -476,6 +483,7 @@ export class EvanClaimComponent extends AsyncComponent {
     if (this.rejectClaim) {
       this.removeClaimModal(this.rejectClaim, 'rejectClaim');
     }
+    // show modals
     [ 'issueClaim', 'rejectClaim', 'popupClaim', 'editDBCPClaim' ]
       .forEach(modalType => this.removeClaimModal(this[modalType], modalType))
 
@@ -953,32 +961,32 @@ export class EvanClaimComponent extends AsyncComponent {
             this.activeDetailHover = node;
           }
 
-          // scroll to node
-          const nodeElement = this.core.utils.getParentByClassName($event.target, 'evan-claim')
-            .parentElement.parentElement; 
-          const nodeTransform = getTransformFromElement(nodeElement);
-          const zoomBox = d3.select(svgZoomContainer).node().getBBox();
-          const bbox = d3.select(nodeElement).node().getBBox();
+          // // scroll to node
+          // const nodeElement = this.core.utils.getParentByClassName($event.target, 'evan-claim')
+          //   .parentElement.parentElement; 
+          // const nodeTransform = getTransformFromElement(nodeElement);
+          // const zoomBox = d3.select(svgZoomContainer).node().getBBox();
+          // const bbox = d3.select(nodeElement).node().getBBox();
 
-          // center the current element container half - zoombox half -
-          // (node.x / 2 - node.width / 2)          
-          const tx = (containerWidth / 2) - (zoomBox.width / 2) -
-            ((nodeTransform.translate.x / 2) - (bbox.width / 2));
-          // move it to the top and a bit down
-          const ty = -zoomBox.y + 100;
+          // // center the current element container half - zoombox half -
+          // // (node.x / 2 - node.width / 2)          
+          // const tx = (containerWidth / 2) - (zoomBox.width / 2) -
+          //   ((nodeTransform.translate.x / 2) - (bbox.width / 2));
+          // // move it to the top and a bit down
+          // const ty = -zoomBox.y + 100;
 
-          // move the zoom container to the caluculated position 
-          d3.select(svgZoomContainer)
-            .transition()
-            .duration(1000)
-            .attr('transform', `translate(${ tx }, ${ ty }) scale(1)`);
+          // // move the zoom container to the caluculated position 
+          // d3.select(svgZoomContainer)
+          //   .transition()
+          //   .duration(1000)
+          //   .attr('transform', `translate(${ tx }, ${ ty }) scale(1)`);
 
-          // update the zoom component position to prevent back moving by click
-          d3.select(svg)
-            .call(
-              zoom.transform,
-              d3.zoomIdentity.translate(tx, ty).scale(1)
-            );
+          // // update the zoom component position to prevent back moving by click
+          // d3.select(svg)
+          //   .call(
+          //     zoom.transform,
+          //     d3.zoomIdentity.translate(tx, ty).scale(1)
+          //   );
 
           // update the ref and stop the event bubbling
           this.ref.detectChanges();
@@ -1018,23 +1026,6 @@ export class EvanClaimComponent extends AsyncComponent {
       // Normalize for fixed-depth.
       nodes.forEach((d) => d.y = d.depth * 180);
 
-      // filter first element, without removing initial missing elements
-      if (claim.status !== -1) {
-        nodes = nodes.filter((d) => d.depth !== 0);
-        links = links.filter((d) => d.depth !== 1);
-      // if the root claim is missing, show only this element
-      } else {
-        nodes = nodes.filter((d) => d.depth === 0);
-        links = [ ];
-
-        setTimeout(() => {
-          nodes[0].toggleDetail({
-            disableEventBubbling: true,
-            target: svg.querySelectorAll('.tree-container foreignObject .evan-claim .claim-label')[0],
-          });
-        });
-      }
-
       // update current d3 object
       this.d3 = {
         nodes, links, root,
@@ -1058,5 +1049,15 @@ export class EvanClaimComponent extends AsyncComponent {
     update();
     await this.core.utils.timeout(0);
     update();
+
+    // collapse missing popover automatically
+    if (claim.status === -1) {
+      setTimeout(() => {
+        this.d3.nodes[1].toggleDetail({
+          disableEventBubbling: true,
+          target: svg.querySelectorAll('.tree-container foreignObject .evan-claim .claim-label')[1],
+        });
+      });
+    }
   }
 }

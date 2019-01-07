@@ -411,10 +411,13 @@ export class EvanUtilService implements OnDestroy {
    * @return     {Element}  parent element that should be searched
    */
   getParentByClassName(element: any, className: string): Element {
-    if (element.parentElement.className.indexOf(className) === -1 && element !== document.body) {
+    if (element !== document.body && element.parentElement && element.parentElement.className &&
+        element.parentElement.className.indexOf(className) === -1) {
       return this.getParentByClassName(element.parentElement, className);
-    } else {
+    } else if (element.parentElement) {
       return element.parentElement;
+    } else {
+      return document.body;
     }
   }
 
