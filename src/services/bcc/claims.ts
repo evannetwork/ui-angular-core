@@ -292,7 +292,6 @@ export class EvanClaimService {
     if (!this.claimCache[topic][address]) {
       // load the claims and store promise within the claim cache object
       this.claimCache[topic][address] = (async () => {
-        console.time(`Tracking time for: ${ topic }-${ address }`);
         const isValidAddress = this.bcc.web3.utils.isAddress(address);
         let claims = [ ];
 
@@ -421,8 +420,6 @@ export class EvanClaimService {
 
           await this.ensureClaimDescription(claims[0]);
         }
-
-        console.timeEnd(`Tracking time for: ${ topic }-${ address }`);
 
         return claims;
       })();

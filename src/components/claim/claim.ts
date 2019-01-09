@@ -396,7 +396,6 @@ export class EvanClaimComponent extends AsyncComponent {
    * @return     {Promise<void>}  resolved when done
    */
   private async loadClaims() {
-    console.time(`Load claims ${ this.topic }`);
     this.loadingClaims = true;
     this.ref.detectChanges();
 
@@ -427,8 +426,6 @@ export class EvanClaimComponent extends AsyncComponent {
     if (this.mode === 'detail') {
       this.renderDetail(this.computed);
     }
-
-    console.timeEnd(`Load claims ${ this.topic }`);
   }
 
   /**
