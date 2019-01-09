@@ -9,14 +9,18 @@
       },
       "entrypoint": "angularcore.js",
       "files": [
-        "angularcore.js",
-        "angularcore.css"
+        "angularcore.css",
+        "angularcore.js"
       ],
       "origin": "QmTzs2Am8seHjRX7xSuXXqoRDNveiswE8vVHH7vTRh51BY",
       "type": "library"
     },
-    "dbcpVersion": 1,
+    "dbcpVersion": 2,
     "description": "Contractus core angular modules & components.",
+    "license": {
+      "file": "https://ipfs.evan.network/ipns/QmT1FwnYyURjLj7nKMwEuTPUBc5uJ6z1zAVsYnKfUL1X1q/AGPL-3.0-only.txt",
+      "type": "AGPL-3.0-only"
+    },
     "name": "angularcore",
     "tags": [
       "contractus",
