@@ -149,13 +149,7 @@
     [class.active]="getMemberState(member) === '4'"
     [class.rejected]="getMemberState(member) === '3'"
     [class.closed]="getMemberState(member) === '5'">
-    <span *ngIf="isMyAccount(member)">
-      {{ '_angularcore.contract-members.i' | translate }}
-    </span>
-
-    <span *ngIf="!isMyAccount(member)">
-      {{ contacts[member]?.alias || contacts[member]?.email || member }}
-    </span>
+    {{ contacts[member]?.alias || contacts[member]?.email || member }}
 
     <ion-icon name="close"
       (click)="removeMember(member)"
