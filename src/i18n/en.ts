@@ -198,11 +198,11 @@ export const en = {
     "warnings": {
       "dont-show-again": "Don't show again",
       "eve-empty": {
-        "body": "You have used up your complete condingent of EVEs ({{ value }} EVEs). It is no longer possible to create contracts or send transactions.",
+        "body": "You have used up your complete contingent of EVEs ({{ value }} EVEs). It is no longer possible to create contracts or send transactions.",
         "title": "EVEs are used up"
       },
       "eve-low": {
-        "body": "You have almost used up your complete condingent of EVEs ({{ value }} EVEs). It's possible that special actions (contract creation, storage transactions) will fail if the EVE value is too low.",
+        "body": "You have almost used up your complete contingent of EVEs ({{ value }} EVEs). It's possible that special actions (contract creation, storage transactions) will fail if the EVE value is too low.",
         "title": "EVEs are almost used up"
       },
       "indexdb-not-available": {
