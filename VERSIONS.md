@@ -2,6 +2,11 @@
 
 ## Next Version
 ### Features
+### Fixes
+### Deprecations
+
+## Version 1.7.0
+### Features
 - add salting for encryptionKeys accountId + password
 - add missing dbcpVersion to dbcp files
 - add licenses to dbcp files
@@ -10,8 +15,6 @@
 - Issue sub claim issued to selected account instead of receiver
 - set claim description claims parent domains
 - optimize claims performance
-
-### Deprecations
 
 ## Version 1.6.1
 ### Features
