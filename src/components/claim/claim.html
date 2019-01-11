@@ -121,6 +121,22 @@
   </div>
 </ng-template>
 
+<ng-template #claimPersonDisplay let-claim="claim" let-mode="mode">
+  <div class="evan-person-claim">
+    <div class="claim-person-icon">
+      <ion-icon class="display-flex-justify" name="person"></ion-icon>
+    </div>
+    <div [class]="'evan-claim mode-' + mode + ' status-' + claim.status"
+         [title]="getAddressbookName(claim.subjects ? claim.subjects[0] : claim.subject)">
+      <div class="claim-label">
+        <div>
+          <ng-container *ngTemplateOutlet="userAliasMulti;context:{ address:claim.subjects ? claim.subjects[0] : claim.subject }"></ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
 <ng-template #claimDetailHover let-node="node">
   <div>
     <div class="header">
@@ -269,9 +285,9 @@
           [attr.marker-start]="link.markerStart">
         </svg:path>
         <g class="node"
-          *ngFor="let node of d3.nodes"
+          *ngFor="let node of d3.nodes; let i = index"
           [attr.transform]="node.transform">
-          <ng-container *ngIf="getClaimsOrParents(node.data).length > 0 && !(node.depth === 0 && node.data.status === -1)">
+          <ng-container *ngIf="getClaimsOrParents(node.data).length > 0">
             <circle cx="122" cy="0" r="10"
               [class.active]="node.children"
               (click)="node.toggle($event)">
@@ -282,20 +298,29 @@
             </text>
           </ng-container>
           <foreignObject
-            [attr.height]="d3.dimensions.boxHeight"
+            [attr.height]="d3.dimensions.boxHeight + (i === 0 ? 50 : 0)"
             [attr.width]="d3.dimensions.boxWidth - d3.dimensions.connectorDot"
             [attr.x]="-(d3.dimensions.boxWidth / 2)"
-            [attr.y]="-(d3.dimensions.boxHeight / 2)">
-            <ng-container
-              *ngTemplateOutlet="claimDisplay;context:{ claim: node.data, mode: 'detail', action: node.toggleDetail }">
+            [attr.y]="-(d3.dimensions.boxHeight / 2) - (i === 0 ? 50 : 0)">
+            <ng-container *ngIf="i === 0">
+              <ng-container
+                *ngTemplateOutlet="claimPersonDisplay;context:{ claim: node.data, mode: 'detail' }">
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="i !== 0">
+              <ng-container
+                *ngTemplateOutlet="claimDisplay;context:{ claim: node.data, mode: 'detail', action: node.toggleDetail }">
+              </ng-container>
             </ng-container>
           </foreignObject>
         </g>
       </g>
 
       <foreignObject class="evan-detail-hover"
+        height="1000"
+        width="500"
         *ngIf="activeDetailHover"
-        [attr.transform]="activeDetailHover.transform"
+        [attr.transform]="activeDetailHover.hoverTransform"
         [@opacityTransition]>
         <ng-container
           *ngTemplateOutlet="claimDetailHover;context:{ node: activeDetailHover }">

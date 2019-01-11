@@ -5,6 +5,17 @@
 ### Fixes
 ### Deprecations
 
+## Version 1.7.0
+### Features
+- add salting for encryptionKeys accountId + password
+- add missing dbcpVersion to dbcp files
+- add licenses to dbcp files
+
+### Fixes
+- Issue sub claim issued to selected account instead of receiver
+- set claim description claims parent domains
+- optimize claims performance
+
 ## Version 1.6.1
 ### Features
 - use `dapp-browser` `routing.getQueryParameters` for extracting query params

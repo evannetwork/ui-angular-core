@@ -65,9 +65,20 @@ export class EvanClaimService {
   public claimDescriptions: any = { };
 
   /**
+   * cache all the claims using an object of promises, to be sure, that the claim is loaded only
+   * once
+   */
+  public claimCache: any = { };
+
+  /**
    * cache all the ens owners
    */
   public ensOwners: any = { };
+
+  /**
+   * only run ensure storage once, to improve load speed (will be an promise)
+   */
+  public ensureStorage: any;
 
   /**
    * make it standalone and load dependency services
@@ -263,141 +274,175 @@ export class EvanClaimService {
    *   }
    */
   public async getClaims(address: string, topic: string, isIdentity?: boolean) {
-    const isValidAddress = this.bcc.web3.utils.isAddress(address);
-    let claims = [ ];
-
     // prepent starting slash if it does not exists
     if (topic.indexOf('/') !== 0) {
       topic = '/' + topic;
     }
 
-    // only load claims for correct contract / accoun id's
-    if (isValidAddress) {
-      try {
-        const identity = await this.bcc.executor.executeContractCall(
-          this.bcc.claims.contracts.storage, 'users', address);
-
-        if (identity !== '0x0000000000000000000000000000000000000000') {
-          claims = await this.bcc.claims.getClaims(topic, address, isIdentity);
-        }
-      } catch (ex) {
-        claims = [ ];
-      }
+    // if no storage was ensured before, run it only once
+    if (!this.ensureStorage) {
+      this.ensureStorage = this.bcc.claims.ensureStorage();
     }
 
-    if (claims.length > 0) {
-      // build display name for claims and apply computed states for ui status
-      await prottle(10, claims.map(claim => async () => {
-        const splitName = claim.name.split('/');
+    // wait for ensure storage to be finished
+    await this.ensureStorage;
 
-        claim.displayName = splitName.pop();
-        claim.parent = splitName.join('/');
-        claim.warnings = [ ];
-        claim.creationDate = claim.creationDate * 1000;
+    // if no cache is found, set it
+    this.claimCache[topic] = this.claimCache[topic] || { };
+    if (!this.claimCache[topic][address]) {
+      // load the claims and store promise within the claim cache object
+      this.claimCache[topic][address] = (async () => {
+        const isValidAddress = this.bcc.web3.utils.isAddress(address);
+        let claims = [ ];
 
-        // if expiration date is given, format the unix timestamp
-        if (claim.expirationDate) {
-          claim.expirationDate = claim.expirationDate * 1000;
-        }
+        // only load claims for correct contract / accoun id's
+        if (isValidAddress) {
+          try {
+            const identity = await this.bcc.executor.executeContractCall(
+              this.bcc.claims.contracts.storage, 'users', address);
 
-        // recover the original account id for the identity issuer
-        claim.subjectIdentity = await this.bcc.executor.executeContractCall(
-          this.bcc.claims.contracts.storage, 'users', claim.subject);
-        const dataHash = this.bcc.nameResolver
-          .soliditySha3(claim.subjectIdentity, claim.topic, claim.data).replace('0x', '');
-        claim.issuerAccount = this.bcc.executor.web3.eth.accounts
-          .recover(dataHash, claim.signature);
-
-        // ensure, that the description was loaded
-        await this.ensureClaimDescription(claim);
-
-        // check if anything is loading for the claim (accept, issue, delete)
-        claim.loading = this.isClaimLoading(claim);
-
-        if (claim.status === 0) {
-          claim.warnings.push('issued');
-        }
-
-        if (claim.status === 2) {
-          claim.warnings.unshift('rejected');
-        }
-
-        // if signature is not valid
-        if (!claim.valid) {
-          claim.warnings.push('invalid');
-        }
-
-        // if isser === subject and only if a parent is passed, so if the root one is empty and no
-        // slash is available
-        if (claim.issuerAccount === claim.subject && claim.parent) {
-          claim.warnings.push('selfIssued');
-        }
-
-        if (claim.expirationDate && claim.expirationDate < Date.now()) {
-          claim.warnings.push('expired');
-        }
-
-        if (claim.parent) {
-          // load all sub claims
-          claim.parents = await this.getClaims(claim.issuerAccount, claim.parent, false);
-
-          // load the computed status of all parent claims, to check if the parent tree is valid
-          claim.parentComputed = await this.getComputedClaim(claim.parent, claim.parents);
-          if (claim.parentComputed.status === -1) {
-            claim.warnings.push('parentMissing');
-          } else if (claim.parentComputed.status === 0) {
-            claim.warnings.push('parentUntrusted');
+            if (identity !== '0x0000000000000000000000000000000000000000') {
+              claims = await this.bcc.claims.getClaims(address, topic, isIdentity);
+            }
+          } catch (ex) {
+            claims = [ ];
           }
-        } else {
-          claim.parents = [ ];
+        }
 
-          if (claim.name === '/evan' &&
-             (claim.issuerAccount !== this.ensRootOwner || claim.subject !== this.ensRootOwner)) {
-            claim.warnings = [ 'notEnsRootOwner' ];
-          } else {
-            claim.status = 1;
+        if (claims.length > 0) {
+          // build display name for claims and apply computed states for ui status
+          await prottle(10, claims.map(claim => async () => {
+            const splitName = claim.name.split('/');
+
+            claim.displayName = splitName.pop();
+            claim.parent = splitName.join('/');
             claim.warnings = [ ];
+            claim.creationDate = claim.creationDate * 1000;
+
+            // if expiration date is given, format the unix timestamp
+            if (claim.expirationDate) {
+              claim.expirationDate = claim.expirationDate * 1000;
+            }
+
+            // recover the original account id for the identity issuer
+            claim.subjectIdentity = await this.bcc.executor.executeContractCall(
+              this.bcc.claims.contracts.storage, 'users', claim.subject);
+            const dataHash = this.bcc.nameResolver
+              .soliditySha3(claim.subjectIdentity, claim.topic, claim.data).replace('0x', '');
+            claim.issuerAccount = this.bcc.executor.web3.eth.accounts
+              .recover(dataHash, claim.signature);
+
+            // ensure, that the description was loaded
+            await this.ensureClaimDescription(claim);
+
+            // check if anything is loading for the claim (accept, issue, delete)
+            claim.loading = this.isClaimLoading(claim);
+
+            if (claim.status === 0) {
+              claim.warnings.push('issued');
+            }
+
+            if (claim.status === 2) {
+              claim.warnings.unshift('rejected');
+            }
+
+            // if signature is not valid
+            if (!claim.valid) {
+              claim.warnings.push('invalid');
+            }
+
+            // if isser === subject and only if a parent is passed, so if the root one is empty and no
+            // slash is available
+            if (claim.issuerAccount === claim.subject && claim.parent) {
+              claim.warnings.push('selfIssued');
+            }
+
+            if (claim.expirationDate && claim.expirationDate < Date.now()) {
+              claim.warnings.push('expired');
+            }
+
+            if (claim.parent) {
+              // load all sub claims
+              claim.parents = await this.getClaims(claim.issuerAccount, claim.parent, false);
+
+              // load the computed status of all parent claims, to check if the parent tree is valid
+              claim.parentComputed = await this.getComputedClaim(claim.parent, claim.parents);
+              if (claim.parentComputed.status === -1) {
+                claim.warnings.push('parentMissing');
+              } else if (claim.parentComputed.status === 0) {
+                claim.warnings.push('parentUntrusted');
+              }
+            } else {
+              claim.parents = [ ];
+
+              if (claim.name === '/evan' &&
+                 (claim.issuerAccount !== this.ensRootOwner || claim.subject !== this.ensRootOwner)) {
+                claim.warnings = [ 'notEnsRootOwner' ];
+              } else {
+                claim.status = 1;
+                claim.warnings = [ ];
+              }
+            }
+
+            if (claim.status !== 2) {
+              // set computed status
+              claim.status = claim.warnings.length > 0 ? 0 : 1;
+            }
+          }));
+
+          // calculate the computed level around all claims, so we can check all claims for this user
+          // (used for issueing)
+          const computed = await this.getComputedClaim(topic, claims);
+          claims.forEach(claim => claim.levelComputed = computed);
+        }
+
+        // if no claims are available the status would be "no claim issued"
+        if (claims.length === 0) {
+          claims.push({
+            displayName: topic.split('/').pop() || 'evan',
+            loading: this.isClaimLoading({ address, topic }),
+            name: topic,
+            parents: [ ],
+            status: -1,
+            subject: address,
+            tree: [ ],
+            warnings: [ 'missing' ],
+            subjectIdentity: isValidAddress ?
+              await this.bcc.executor.executeContractCall(
+                this.bcc.claims.contracts.storage, 'users', address) :
+              '0x0000000000000000000000000000000000000000',
+          });
+
+          if (!claims[0].subjectIdentity ||
+              claims[0].subjectIdentity === '0x0000000000000000000000000000000000000000') {
+            claims[0].warnings.unshift('noIdentity');
           }
+
+          await this.ensureClaimDescription(claims[0]);
         }
 
-        if (claim.status !== 2) {
-          // set computed status
-          claim.status = claim.warnings.length > 0 ? 0 : 1;
-        }
-      }));
-
-      // calculate the computed level around all claims, so we can check all claims for this user
-      // (used for issueing)
-      const computed = await this.getComputedClaim(topic, claims);
-      claims.forEach(claim => claim.levelComputed = computed);
+        return claims;
+      })();
     }
 
-    // if no claims are available the status would be "no claim issued"
-    if (claims.length === 0) {
-      claims.push({
-        displayName: topic.split('/').pop() || 'evan',
-        loading: this.isClaimLoading({ address, topic }),
-        name: topic,
-        parents: [ ],
-        status: -1,
-        subject: address,
-        tree: [ ],
-        warnings: [ 'missing' ],
-        subjectIdentity: isValidAddress ?
-          await this.bcc.executor.executeContractCall(
-            this.bcc.claims.contracts.storage, 'users', address) :
-          '0x0000000000000000000000000000000000000000',
-      });
+    return await this.claimCache[topic][address];
+  }
 
-      if (!claims[0].subjectIdentity ||
-          claims[0].subjectIdentity === '0x0000000000000000000000000000000000000000') {
-        claims[0].warnings.unshift('noIdentity');
+  /**
+   * Set the loading status for all claims, sub claims and parentComputed claims. Use it to reset
+   * cache loading states.
+   *
+   * @param      {Array<any>}  claims  the claims that should be computed
+   */
+  public setClaimsLoading(claims: Array<any>) {
+    for (let i = 0; i < claims.length; i++) {
+      claims[i].loading = this.isClaimLoading(claims[i]);
+
+      if (claims[i].parentComputed) {
+        claims[i].parentComputed.loading = claims[i].parentComputed.claims
+          .filter(claim => claim.loading).length > 0;
       }
-
-      await this.ensureClaimDescription(claims[0]);
     }
-
-    return claims;
   }
 
   /**
@@ -435,7 +480,7 @@ export class EvanClaimService {
     // if no description was set, use the latest one or load it
     if (!claim.description) {
       // if the description could not be loaded, the cache will set to false, so we do not need to load again
-      if (this.claimDescriptions[ensAddress] !== false) {
+      if (!this.claimDescriptions[ensAddress] && this.claimDescriptions[ensAddress] !== false) {
         this.claimDescriptions[ensAddress] = (async () => {
           try {
             // load the description
@@ -556,12 +601,13 @@ export class EvanClaimService {
 
     // use the latest creationDate for the specific status
     if (creationDates[computed.status].length > 0) {
-      computed.creationDate = creationDates[computed.status].sort().pop();
+      computed.creationDate = creationDates[computed.status].sort()[0];
     }
 
     // use the latest creationDate for the specific status
     if (expirationDates[computed.status].length > 0) {
-      computed.expirationDate = creationDates[computed.status].sort().pop();
+      const curExpiration = expirationDates[computed.status].sort();
+      computed.expirationDate = curExpiration[curExpiration.length - 1];
     }
 
     return computed;
@@ -591,5 +637,37 @@ export class EvanClaimService {
     } else {
       return claims;
     }
+  }
+
+  /**
+   * Delete a single entry from the claim cache object using address and topic
+   *
+   * @param      {string}  address  the address that should be removed
+   * @param      {string}  topic    the topic that should be removed
+   * @return     {void}  
+   */
+  public deleteFromClaimCache(address: string, topic: string) {
+    // prepent starting slash if it does not exists
+    if (topic.indexOf('/') !== 0) {
+      topic = '/' + topic;
+    }
+
+    // search for all parents, that could have links to the topic, so remove them
+    Object.keys(this.claimCache).forEach(key => {
+      // if the key is equal to the topic that should be checked, delete only the cache for the
+      // given address
+      if (key === topic) {
+        // delete all related addresses for the given topic, or remove all, when address is a
+        // wildcard
+        if (this.claimCache[topic] && (this.claimCache[topic][address] || address === '*')) {
+          delete this.claimCache[topic][address];
+        }
+
+        return;
+      // else remove all child topics
+      } else if (key.indexOf(topic) !== -1) {
+        delete this.claimCache[key];
+      }
+    });
   }
 }

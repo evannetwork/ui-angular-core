@@ -411,10 +411,13 @@ export class EvanUtilService implements OnDestroy {
    * @return     {Element}  parent element that should be searched
    */
   getParentByClassName(element: any, className: string): Element {
-    if (element.parentElement.className.indexOf(className) === -1 && element !== document.body) {
+    if (element !== document.body && element.parentElement && element.parentElement.className &&
+        element.parentElement.className.indexOf(className) === -1) {
       return this.getParentByClassName(element.parentElement, className);
-    } else {
+    } else if (element.parentElement) {
       return element.parentElement;
+    } else {
+      return document.body;
     }
   }
 
@@ -682,5 +685,30 @@ export class EvanUtilService implements OnDestroy {
     }
 
     return false;
+  }
+
+  /**
+   * Checks if a form property is touched and invalid.
+   *
+   * @param      {any}      form       the form that should be checked
+   * @param      {string}   paramName  name of the form property that should be checked
+   * @return     {boolean}  true if touched and invalid, else false
+   */
+  showError(form: any, paramName: string) {
+    if (form && form.controls[paramName]) {
+      return form.controls[paramName].invalid &&
+        form.controls[paramName].touched;
+    }
+  }
+
+  /**
+   * Run detectChanges directly and after and timeout again, to update select fields.
+   *
+   * @param      {any}     ref     the component element ref
+   */
+  detectTimeout(ref: any) {
+    ref.detectChanges();
+
+    setTimeout(() => ref.detectChanges());
   }
 }

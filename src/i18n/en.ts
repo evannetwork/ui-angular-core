@@ -64,7 +64,7 @@ export const en = {
           "title": "Verification path adjustments"
         },
         "rejectDispatcher": {
-          "description": "Do you want to discard the verification \"<b>{{ topic }}}</b>\" of the user <b>{{ to }}</b>?",
+          "description": "Do you want to reject the verification \"<b>{{ topic }}</b>\" of the user <b>{{ to }}</b>?",
           "ok": "reject",
           "rejected-description": "The verification <b>{{ topic }}</b> by the user <b>{{ from }}</b> to <b>{{ to }}</b> was rejected by <b>{{ rejector }}</b>: ",
           "title": "Reject verification"
@@ -198,11 +198,11 @@ export const en = {
     "warnings": {
       "dont-show-again": "Don't show again",
       "eve-empty": {
-        "body": "You have used up your complete condingent of EVEs ({{ value }} EVEs). It is no longer possible to create contracts or send transactions.",
+        "body": "You have used up your complete contingent of EVEs ({{ value }} EVEs). It is no longer possible to create contracts or send transactions.",
         "title": "EVEs are used up"
       },
       "eve-low": {
-        "body": "You have almost used up your complete condingent of EVEs ({{ value }} EVEs). It's possible that special actions (contract creation, storage transactions) will fail if the EVE value is too low.",
+        "body": "You have almost used up your complete contingent of EVEs ({{ value }} EVEs). It's possible that special actions (contract creation, storage transactions) will fail if the EVE value is too low.",
         "title": "EVEs are almost used up"
       },
       "indexdb-not-available": {

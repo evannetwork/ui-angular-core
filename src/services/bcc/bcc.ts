@@ -335,9 +335,8 @@ export class EvanBCCService {
     //              set it by yourself
     keyProvider.setKeysForAccount(
       accountId,
-      lightwallet.getEncryptionKeyFromPassword('unencrypted')
+      lightwallet.getEncryptionKeyFromPassword(accountId, 'unencrypted')
     );
-
 
     const ipldInstance = new ProfileBundle.Ipld({
       'ipfs': CoreBundle.CoreRuntime.dfs,
