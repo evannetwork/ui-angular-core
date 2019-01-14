@@ -45,7 +45,7 @@ export const de = {
         "title": "Verifizierungsname"
       },
       "details": "Verifizierungsdetails",
-      "details-desc": "Übersicht über Verifizierunge und deren genaue Statusinformationen.",
+      "details-desc": "Übersicht über Verifizierungen und deren genaue Statusinformationen.",
       "dispatcher": {
         "acceptDispatcher": {
           "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> bestätigen?",
@@ -79,7 +79,7 @@ export const de = {
       "issue-claim-description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" für den Nutzer <b>{{ to }}</b> ausstellen?",
       "issued-by": "ausgestellt von",
       "issuer": "Aussteller",
-      "issuer-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können Sie keine Verifizierunge ausstellen. Bitte besuchen die Zertifikasverwaltung Anwendung, um die diese einzurichten.",
+      "issuer-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können Sie keine Verifizierungen ausstellen. Bitte besuchen die Zertifikasverwaltung Anwendung, um die diese einzurichten.",
       "not-set": "Nicht ausgestellt",
       "not-set-desc": "...",
       "okays": {
@@ -101,7 +101,7 @@ export const de = {
       "since": "seit",
       "status": "Status",
       "subject": "Zugewiesener",
-      "subject-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können für diese Identität keine Verifizierunge ausgestellt werden.",
+      "subject-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können für diese Identität keine Verifizierungen ausgestellt werden.",
       "topic": "Verifizierungspfad",
       "trust-provider": "Aussteller",
       "trust-taker": "Empfänger",

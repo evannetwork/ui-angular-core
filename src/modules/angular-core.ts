@@ -102,7 +102,9 @@ import { ObjectKeysPipe } from '../pipes/object-keys';
 import { OneTimeDirective } from '../directives/oneTime';
 
 /**************************************************************************************************/
-enableProdMode();
+try {
+  enableProdMode();
+} catch (ex) { }
 
 /**
  * angular-core module configuration
