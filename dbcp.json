@@ -12,7 +12,7 @@
         "angularcore.css",
         "angularcore.js"
       ],
-      "origin": "QmaGU9sTRhKhwHZo7q2bokewGkbb9C1MqsgVDVJmpF5dv6",
+      "origin": "QmQkduy8cFwwNKMAnXTwMxG2eFpdALQ3AiQPCNSK37xr9o",
       "type": "library"
     },
     "dbcpVersion": 2,
@@ -26,7 +26,7 @@
       "contractus",
       "library"
     ],
-    "version": "2.0.0",
+    "version": "1.6.1",
     "versions": {
       "0.1.0": "QmbWyV5nby2Sy1oTQ8yJFy3gMmCH8Knz4u94JPrChEqYUT",
       "0.9.0": "QmYAWXwey3t8i9YM3LJ5vjkd7t7TyY8FTyuZGsafMzW9vt",
@@ -40,8 +40,7 @@
       "1.4.0": "QmUDJrSdZSwwqApBcDZ6fbD3U1BCZ72oQTp1rXquwEQ6Xb",
       "1.5.0": "QmVgUrsYhVF4t1rngY3HgNq5ebF9xDJNVodUC97HN8hTTS",
       "1.6.0": "QmYGvZ6GtB2bxB518sZEqY3S3HxSuREBJgxTNa1cyCEgCf",
-      "1.6.1": "Qmder5bqp9jvKi1q1Hvgx4JPvBeG2HXDU3cpaEM7XsRFCV",
-      "2.0.0": "QmSjZCvK5LTxsaPBzz7wqttw7JgDo7ABAudaM57YBQsagG"
+      "1.6.1": "QmQkduy8cFwwNKMAnXTwMxG2eFpdALQ3AiQPCNSK37xr9o"
     }
   }
 }
