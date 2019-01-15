@@ -58,11 +58,14 @@ routing.updateHistory = routing.updateHistory || function() {
 
 /********************************* Overwrites *****************************************************/
 /**
- * Overwrite some original Router functions to replace the normale angular
- * "routing" call with an window.location.hash = "...", so each router change,
- * in each angular instance, gets triggered
+ * Overwrite some original Router functions to replace the normale angular "routing" call with an
+ * window.location.hash = "...", so each router change, in each angular instance, gets triggered
+ *
+ * use Router.prototype.originNavigateByUrl to be sure, that it does not gets overwritten mutliple
+ * times, by loading angular-core multiple times
  */
-const originNavigateByUrl = Router.prototype.navigateByUrl;
+const originNavigateByUrl = Router.prototype.originNavigateByUrl || Router.prototype.navigateByUrl;
+Router.prototype.originNavigateByUrl = Router.prototype.navigateByUrl;
 
 /**
  * Used to handle one back button action for latest opened appication => navigate back
