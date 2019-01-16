@@ -817,8 +817,10 @@ export class EvanClaimComponent extends AsyncComponent {
     const height = fullHeight - margin.top - margin.bottom;
     // claim width + width of connector dot
     const connectorDot = 20;
-    const boxWidth =  250 + connectorDot; 
     const boxHeight = 55;
+    const boxWidth =  250 + connectorDot;
+    const nodeHeight = 70;
+    const nodeWidth = 300 + connectorDot;
     const svg = parentContentContainer.querySelectorAll('.evan-detailed-claim svg')[0];
     const svgZoomContainer = svg.childNodes[1];
 
@@ -829,7 +831,7 @@ export class EvanClaimComponent extends AsyncComponent {
       // the size parameter instead then d3 would
       // calculate the separation dynamically to fill
       // the available space.
-      .nodeSize([ 70, 300 + connectorDot ])
+      .nodeSize([ nodeHeight, nodeWidth ])
   
       // By default, cousins are drawn further apart than siblings.
       // By returning the same value in all cases, we draw cousins
@@ -882,14 +884,14 @@ export class EvanClaimComponent extends AsyncComponent {
      */
     function elbow(d) {
       var sourceX = d.parent.x,
-          sourceY = d.parent.y + (boxWidth / 2),
+          sourceY = d.parent.y - (boxWidth / 2) - connectorDot,
           targetX = d.x,
-          targetY = d.y - (boxWidth / 2);
+          targetY = d.y + (boxWidth / 2) - connectorDot;
           
-      return "M" + sourceY + "," + sourceX
-        + "H" + (sourceY + (targetY-sourceY)/2)
-        + "V" + targetX 
-        + "H" + targetY;
+      return 'M' + sourceY + ',' + sourceX
+        + 'H' + (sourceY + (targetY-sourceY)/2)
+        + 'V' + targetX 
+        + 'H' + targetY;
     }
 
     /**
@@ -925,6 +927,12 @@ export class EvanClaimComponent extends AsyncComponent {
       // Compute the new tree layout.
       let nodes = treeData.descendants(),
           links = treeData.descendants().slice(1);
+
+      // Normalize for fixed-depth.
+      //  => from left to right
+      // nodes.forEach((d) => d.y = d.depth * 180);
+      //  => from right to left
+      nodes.forEach((d) => d.y = svg.clientWidth - (d.depth * nodeWidth));
 
       // bind special function handlers for each node
       nodes.forEach((node, index) => {
@@ -1019,9 +1027,6 @@ export class EvanClaimComponent extends AsyncComponent {
           }
         }
       });
-
-      // Normalize for fixed-depth.
-      nodes.forEach((d) => d.y = d.depth * 180);
 
       // update current d3 object
       this.d3 = {

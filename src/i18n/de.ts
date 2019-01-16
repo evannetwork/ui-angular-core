@@ -36,6 +36,7 @@ export const de = {
       "all-issuers": "Alle Verifizierungen den diesen Verifizierungspfad und Nutzer betreffen.",
       "cancel": "abbrechen",
       "claim-description": "Verifizierungsbeschreibung",
+      "claim-hover": "Verifizierung {{ displayName }} ausgestellt von {{ from }}",
       "close-details": "schließen",
       "creation-date": "Erstelldatum",
       "delete": "löschen",
@@ -107,7 +108,7 @@ export const de = {
       "trust-taker": "Empfänger",
       "until": "bis",
       "warnings": {
-        "expired": "ausgelaufen",
+        "expired": "abgelaufen",
         "invalid": "manipuliert",
         "invalidPath": "Ungültige Verifizierungskette",
         "issued": "nicht bestätigt",

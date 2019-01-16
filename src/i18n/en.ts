@@ -36,6 +36,7 @@ export const en = {
       "all-issuers": "All verifications related to this verification path and user.",
       "cancel": "cancel",
       "claim-description": "Verification description",
+      "claim-hover": "Verification {{ displayName }} issued by {{ from }}",
       "close-details": "close",
       "creation-date": "Creation date",
       "delete": "delete",

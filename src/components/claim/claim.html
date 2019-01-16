@@ -93,7 +93,7 @@
 <!---------------------------------------- claim display ------------------------------------------>
 <ng-template #claimDisplay let-claim="claim" let-mode="mode" let-action="action">
   <div [class]="'evan-claim mode-' + mode + ' status-' + claim.status"
-    [title]="claim.displayName + ' (' + claim.name + ') '"
+    [title]="'_angularcore.claims.claim-hover' | translate:{ displayName: claim.displayName, from: addressBookService.getNameForAccountSync(addressBook, claim.issuerAccount) }"
     (click)="action ? action($event) : openClaimPopup(claim, $event)">
     <ng-container *ngTemplateOutlet="claimIcon;context:{ claim: claim, mode: mode }"></ng-container>
     <ng-container *ngIf="!loadingClaims && mode != 'icon'">
@@ -288,11 +288,11 @@
           *ngFor="let node of d3.nodes; let i = index"
           [attr.transform]="node.transform">
           <ng-container *ngIf="getClaimsOrParents(node.data).length > 0">
-            <circle cx="122" cy="0" r="10"
+            <circle cx="-142" cy="0" r="10"
               [class.active]="node.children"
               (click)="node.toggle($event)">
             </circle>
-            <text x="122" y="5" text-anchor="middle" stroke-width="1px"
+            <text x="-143" y="5" text-anchor="middle" stroke-width="1px"
               (click)="node.toggle($event)">
               {{ node.children ? '<' : '>' }}
             </text>

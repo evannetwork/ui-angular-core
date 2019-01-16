@@ -248,4 +248,20 @@ export class EvanAddressBookService {
       return accountId;
     }
   }
+
+    /**
+     * Gets the name for a account from the addressbook synchroniously by providing an already
+     * loaded addressbook.
+     *
+     * @param      {any}  addressbook  The addressbook
+     * @param      {string}  accountId    account id to load the alias for
+     * @return     {string}  The name / email for account. Default is the account id.
+     */
+  getNameForAccountSync(addressbook: any, accountId: string) {
+    if (addressbook && addressbook[accountId]) {
+      return addressbook[accountId].alias || addressbook[accountId].email || accountId;
+    } else {
+      return accountId;
+    }
+  }
 }
