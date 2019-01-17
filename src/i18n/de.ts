@@ -31,12 +31,12 @@ export const de = {
     "account-changed-description": "Sie haben Ihren aktiven Account geändert.<br> Die Seite / Applikation muss <b>neu geladen werden</b>.",
     "camera": "Kamera",
     "cancel": "Abbrechen",
-    "claims": {
+    "verifications": {
       "accept": "bestätigen",
       "all-issuers": "Alle Verifizierungen den diesen Verifizierungspfad und Nutzer betreffen.",
       "cancel": "abbrechen",
-      "claim-description": "Verifizierungsbeschreibung",
-      "claim-hover": "Verifizierung {{ displayName }} ausgestellt von {{ from }}",
+      "verification-description": "Verifizierungsbeschreibung",
+      "verification-hover": "Verifizierung {{ displayName }} ausgestellt von {{ from }}",
       "close-details": "schließen",
       "creation-date": "Erstelldatum",
       "delete": "löschen",
@@ -76,8 +76,8 @@ export const de = {
       "expiration-date": "Ablaufdatum",
       "interactions": "Bearbeitung",
       "issue": "ausstellen",
-      "issue-claim": "Verifizierung ausstellen",
-      "issue-claim-description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" für den Nutzer <b>{{ to }}</b> ausstellen?",
+      "issue-verification": "Verifizierung ausstellen",
+      "issue-verification-description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" für den Nutzer <b>{{ to }}</b> ausstellen?",
       "issued-by": "ausgestellt von",
       "issuer": "Aussteller",
       "issuer-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können Sie keine Verifizierungen ausstellen. Bitte besuchen die Zertifikasverwaltung Anwendung, um die diese einzurichten.",
@@ -90,8 +90,8 @@ export const de = {
         "validPath": "gültige Verifizierungskette"
       },
       "reject": "verwerfen",
-      "reject-claim": "Verwerfen",
-      "reject-date": "Ablehungsdatum",
+      "reject-verification": "Verwerfen",
+      "reject-date": "Ablehnungsdatum",
       "reject-reason": "Ablehnungsgrund",
       "rejector": "Ablehnender",
       "select-desc-img": {

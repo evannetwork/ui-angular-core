@@ -55,7 +55,7 @@ import { AsyncComponent } from '../../classes/AsyncComponent';
 import { EvanAddressBookService } from '../../services/bcc/address-book';
 import { EvanAlertService, } from '../../services/ui/alert';
 import { EvanBCCService } from '../../services/bcc/bcc';
-import { EvanClaimService } from '../../services/bcc/claims';
+import { EvanVerificationService } from '../../services/bcc/verifications';
 import { EvanCoreService } from '../../services/bcc/core';
 import { EvanQueue } from '../../services/bcc/queue';
 import { EvanTranslationService } from '../../services/ui/translate';
@@ -69,13 +69,13 @@ import { createGrowTransition } from '../../animations/grow';
 /**************************************************************************************************/
 
 /**
- * Display a all claims for a specific topic using the api-blockchain-core claims service.
+ * Display a all verifications for a specific topic using the api-blockchain-core verifications service.
  *
- * @class      Component EvanClaimComponent
+ * @class      Component EvanVerificationComponent
  */
 @Component({
-  selector: 'evan-claim',
-  templateUrl: 'claim.html',
+  selector: 'evan-verification',
+  templateUrl: 'verification.html',
   animations: [
     createGrowTransition(),
     createOpacityTransition(),
@@ -92,15 +92,15 @@ import { createGrowTransition } from '../../animations/grow';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class EvanClaimComponent extends AsyncComponent {
+export class EvanVerificationComponent extends AsyncComponent {
   /***************** inputs & outpus *****************/
   /**
-   * address that for that the claims should be checked
+   * address that for that the verifications should be checked
    */
   @Input() address: string
 
   /**
-   * the topic to load the claims for (/test/test2)
+   * the topic to load the verifications for (/test/test2)
    */
   @Input() topic: string;
 
@@ -110,13 +110,13 @@ export class EvanClaimComponent extends AsyncComponent {
   @Input() mode: string;
 
   /**
-   * use computed view and only one claim instead of all possible ones (will display a small claim
+   * use computed view and only one verification instead of all possible ones (will display a small verification
    * count at the right of the card)
    */
   @Input() compute: boolean = true;
 
   /**
-   * is the component allowed to issue claims?
+   * is the component allowed to issue verifications?
    */
   @Input() enableIssue: boolean = true;
 
@@ -136,24 +136,24 @@ export class EvanClaimComponent extends AsyncComponent {
    */
   private availableModes = [
     'icon', // only circle that displays the icon
-    'normal', // icon, displayname, creation date, sub claim count
+    'normal', // icon, displayname, creation date, sub verification count
     'detail', // normal + from / to, issued + valid until + status
   ];
 
   /**
-   * All available claims for the given topic
+   * All available verifications for the given topic
    */
-  private claims: Array<any> = [ { loading: true } ];
+  private verifications: Array<any> = [ { loading: true } ];
   
   /**
-   * concadinated claim including computed status
+   * concadinated verification including computed status
    */
   private computed: any = { loading: true };
 
   /**
-   * Are currently the claims loading?
+   * Are currently the verifications loading?
    */
-  private loadingClaims: boolean
+  private loadingVerifications: boolean
 
   /**
    * Function to unsubscribe from queue results.
@@ -176,9 +176,9 @@ export class EvanClaimComponent extends AsyncComponent {
   private subjectIdentity: any;
 
   /**
-   * activate the detail popup when a claim was clicked 
+   * activate the detail popup when a verification was clicked 
    */
-  private popupClaim: any;
+  private popupVerification: any;
 
   /**
    * current addressbook contact
@@ -202,19 +202,19 @@ export class EvanClaimComponent extends AsyncComponent {
   private maxDate = new Date().getFullYear() + 5;
 
   /**
-   * new claim that should be issued
+   * new verification that should be issued
    */
-  private issueClaim: any;
+  private issueVerification: any;
 
   /**
-   * claim that should be rejected
+   * verification that should be rejected
    */
-  private rejectClaim: any;
+  private rejectVerification: any;
 
   /**
-   * claim that should be rejected
+   * verification that should be rejected
    */
-  private editDBCPClaim: any;
+  private editDBCPVerification: any;
 
   /**
    * parent containing ion app contaioner
@@ -222,19 +222,19 @@ export class EvanClaimComponent extends AsyncComponent {
   private closestIonApp: any;
 
   /**
-   * for the current profile activated claims
+   * for the current profile activated verifications
    */
-  private profileClaims: Array<string> = [ ];
+  private profileVerifications: Array<string> = [ ];
 
   /**
-   * Function to unsubscribe from profile claims watcher queue results.
+   * Function to unsubscribe from profile verifications watcher queue results.
    */
-  private profileClaimsWatcher: Function;
+  private profileVerificationsWatcher: Function;
 
   /**
-   * menu value, when a claim menu entry was clicked
+   * menu value, when a verification menu entry was clicked
    */
-  private claimMenuValue: string;
+  private verificationMenuValue: string;
 
   /**
    * contains all current d3 specific variables
@@ -253,7 +253,7 @@ export class EvanClaimComponent extends AsyncComponent {
   /**
    * current detail container for auto scroll
    */
-  @ViewChild('evanDetailClaim') evanDetailClaim: any;
+  @ViewChild('evanDetailVerification') evanDetailVerification: any;
 
   /***************** initialization  *****************/
   constructor(
@@ -261,7 +261,7 @@ export class EvanClaimComponent extends AsyncComponent {
     private addressBookService: EvanAddressBookService,
     private alertService: EvanAlertService,
     private bcc: EvanBCCService,
-    private claimService: EvanClaimService,
+    private verificationService: EvanVerificationService,
     private core: EvanCoreService,
     private element: ElementRef,
     private fileService: EvanFileService,
@@ -275,7 +275,7 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /**
-   * Set initial, bind queue watchers and load the claims.
+   * Set initial, bind queue watchers and load the verifications.
    */
   async _ngOnInit() {
     // set now date for expiration date selection
@@ -283,25 +283,25 @@ export class EvanClaimComponent extends AsyncComponent {
 
     // check for a valid and available mode 
     if (this.availableModes.indexOf(this.mode) === -1) {
-      console.error(`EvanClaimComponent: ${ this.mode } is not a valid display mode.`);
+      console.error(`EvanVerificationComponent: ${ this.mode } is not a valid display mode.`);
       this.mode = 'normal';
     }
 
-    // load profile active claims
-    this.profileClaimsWatcher = await this.queue.onQueueFinish(
+    // load profile active verifications
+    this.profileVerificationsWatcher = await this.queue.onQueueFinish(
       new QueueId(`profile.${ getDomainName() }`, '*'),
       async (reload, results) => {
         reload && await this.core.utils.timeout(0);
-        this.profileClaims = await this.claimService.getProfileActiveClaims();
+        this.profileVerifications = await this.verificationService.getProfileActiveVerifications();
         this.ref.detectChanges();
       }
     );
 
-    // watch for any claim updates
+    // watch for any verification updates
     this.queueWatcher = await this.queue.onQueueFinish(
-      this.claimService.getQueueId(),
+      this.verificationService.getQueueId(),
       async (reload, results) => {
-        this.loadClaims();
+        this.loadVerifications();
       }
     );
   }
@@ -341,13 +341,13 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /**
-   * Takes a claim that was passed to specific status variable, renders the modal, shows it and
+   * Takes a verification that was passed to specific status variable, renders the modal, shows it and
    * moves it to the next ion-app
    *
-   * @param      {any}     claim   the claim that should be opened within a modal
+   * @param      {any}     verification   the verification that should be opened within a modal
    */
-  private async enableClaimModal(claim: any) {
-    claim.showModal = false;
+  private async enableVerificationModal(verification: any) {
+    verification.showModal = false;
     this.ref.detectChanges();
 
     await this.core.utils.timeout(0);
@@ -355,7 +355,7 @@ export class EvanClaimComponent extends AsyncComponent {
     // move the modal to the next ion-app container
     this.moveModalsToClosestIonApp();
 
-    claim.showModal = true;
+    verification.showModal = true;
     this.ref.detectChanges();
 
     // scrolling fix
@@ -369,14 +369,14 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /**
-   * Closes a claim modal using a smooth hide.
+   * Closes a verification modal using a smooth hide.
    *
-   * @param      {any}     claim   the claim that should be close
-   * @param      {string}  type    the type of the modal to close (popupClaim, issueClaim, ...)
+   * @param      {any}     verification   the verification that should be close
+   * @param      {string}  type    the type of the modal to close (popupVerification, issueVerification, ...)
    */
-  private async removeClaimModal(claim: any, type: string, $event?: any) {
+  private async removeVerificationModal(verification: any, type: string, $event?: any) {
     if (this[type]) {
-      claim.showModal = false;
+      verification.showModal = false;
       this.ref.detectChanges();
 
       await this.core.utils.timeout(400);
@@ -391,17 +391,17 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /**
-   * Load all claims for the current topic.
+   * Load all verifications for the current topic.
    *
    * @return     {Promise<void>}  resolved when done
    */
-  private async loadClaims() {
-    this.loadingClaims = true;
+  private async loadVerifications() {
+    this.loadingVerifications = true;
     this.ref.detectChanges();
 
     // if issue identity could be loaded, extract the contract address
     this.activeAccount = this.core.activeAccount();
-    this.activeIdentity = await this.bcc.claims.getIdentityForAccount(this.activeAccount);
+    this.activeIdentity = await this.bcc.verifications.getIdentityForAccount(this.activeAccount);
     if (this.activeIdentity && this.activeIdentity.options &&
       this.activeIdentity.options.address !== '0x0000000000000000000000000000000000000000') {
       this.activeIdentity = this.activeIdentity.options.address;
@@ -409,52 +409,52 @@ export class EvanClaimComponent extends AsyncComponent {
       this.activeIdentity = null;
     }
 
-    // load claims and the computed status to be able to display a combined view for all claims of a
+    // load verifications and the computed status to be able to display a combined view for all verifications of a
     // specific topic
-    this.claims = await this.claimService.getClaims(this.address, this.topic);
-    // set loading status for the claims
-    this.claimService.setClaimsLoading(this.claims);
+    this.verifications = await this.verificationService.getVerifications(this.address, this.topic);
+    // set loading status for the verifications
+    this.verificationService.setVerificationsLoading(this.verifications);
     // load addressbook
     this.addressbook = await this.addressBookService.loadAccounts();
-    // reset claims loading status, could be old within cached values
-    this.computed = await this.claimService.getComputedClaim(this.topic, this.claims);
+    // reset verifications loading status, could be old within cached values
+    this.computed = await this.verificationService.getComputedVerification(this.topic, this.verifications);
 
-    this.loadingClaims = false;
+    this.loadingVerifications = false;
     this.ref.detectChanges();
 
-    // if the detail mode is selected, activate the sub claims and set the positions
+    // if the detail mode is selected, activate the sub verifications and set the positions
     if (this.mode === 'detail') {
       this.renderDetail(this.computed);
     }
   }
 
   /**
-   * Issue a new claim the current opened topic and the subject.
+   * Issue a new verification the current opened topic and the subject.
    *
-   * @param      {any}      claim   the claim for that the action should be triggerd
+   * @param      {any}      verification   the verification for that the action should be triggerd
    * @param      {string}   type    type of the dispatcher (issueDispatcher, acceptDispatcher,
    *                                deleteDispatcher)
    * @param      {any}      $event  the click event
    * @return     {boolean}  false to break the event bubbling
    */
-  private async triggerDispatcher(claim: any, type: string, $event: any) {
+  private async triggerDispatcher(verification: any, type: string, $event: any) {
     if (type !== 'issueDispatcher' && type !== 'rejectDispatcher') {
       try {
-        const from = await this.addressBookService.getNameForAccount(claim.issuerAccount);
-        const to = await this.addressBookService.getNameForAccount(claim.subject);
+        const from = await this.addressBookService.getNameForAccount(verification.issuerAccount);
+        const to = await this.addressBookService.getNameForAccount(verification.subject);
 
         await this.alertService.showSubmitAlert(
-          `_angularcore.claims.dispatcher.${ type }.title`,
+          `_angularcore.verifications.dispatcher.${ type }.title`,
           {
-            key: `_angularcore.claims.dispatcher.${ type }.description`,
+            key: `_angularcore.verifications.dispatcher.${ type }.description`,
             translateOptions: {
-              topic: claim.name,
+              topic: verification.name,
               from: from,
               to: to,
             }
           },
-          `_angularcore.claims.dispatcher.cancel`,
-          `_angularcore.claims.dispatcher.${ type }.ok`
+          `_angularcore.verifications.dispatcher.cancel`,
+          `_angularcore.verifications.dispatcher.${ type }.ok`
         );
       } catch (ex) {
         return this.core.utils.stopEventBubbling($event);
@@ -463,53 +463,53 @@ export class EvanClaimComponent extends AsyncComponent {
 
     // trigger the queue data
     this.queue.addQueueData(
-      this.claimService.getQueueId(type),
+      this.verificationService.getQueueId(type),
       {
-        address: claim.subjects ? claim.subjects[0] : claim.subject,
-        description: claim.description,
-        ensAddress: claim.ensAddress,
-        expirationDate: claim.enableExpirationDate ? claim.expirationDate : null,
-        id: claim.id,
-        issuer: claim.issuerAccount,
-        rejectReason: claim.rejectReason,
-        topic: claim.name,
+        address: verification.subjects ? verification.subjects[0] : verification.subject,
+        description: verification.description,
+        ensAddress: verification.ensAddress,
+        expirationDate: verification.enableExpirationDate ? verification.expirationDate : null,
+        id: verification.id,
+        issuer: verification.issuerAccount,
+        rejectReason: verification.rejectReason,
+        topic: verification.name,
       }
     );
 
     // hide all modals
-    if (this.rejectClaim) {
-      this.removeClaimModal(this.rejectClaim, 'rejectClaim');
+    if (this.rejectVerification) {
+      this.removeVerificationModal(this.rejectVerification, 'rejectVerification');
     }
     // show modals
-    [ 'issueClaim', 'rejectClaim', 'popupClaim', 'editDBCPClaim' ]
-      .forEach(modalType => this.removeClaimModal(this[modalType], modalType))
+    [ 'issueVerification', 'rejectVerification', 'popupVerification', 'editDBCPVerification' ]
+      .forEach(modalType => this.removeVerificationModal(this[modalType], modalType))
 
     // show the loading symbol
-    claim.loading = true;
+    verification.loading = true;
     this.computed.loading = true;
     this.ref.detectChanges();
   }
 
   /**
-   * Show details for a claim or computed one.
+   * Show details for a verification or computed one.
    *
-   * @param      {any}     claimToActivate  computed / normal claim
+   * @param      {any}     verificationToActivate  computed / normal verification
    */
-  private async openClaimPopup(claimToActivate: any, $event: any) {
+  private async openVerificationPopup(verificationToActivate: any, $event: any) {
     // run asynchroniously but break event bubbeling
     (async () => {
-      if (!this.popupClaim) {
-        if (claimToActivate.claims) {
-          this.popupClaim = this.core.utils.deepCopy(claimToActivate);
+      if (!this.popupVerification) {
+        if (verificationToActivate.verifications) {
+          this.popupVerification = this.core.utils.deepCopy(verificationToActivate);
         } else {
-          this.popupClaim = await this.claimService
-            .getComputedClaim(claimToActivate.name, [ claimToActivate ]);
+          this.popupVerification = await this.verificationService
+            .getComputedVerification(verificationToActivate.name, [ verificationToActivate ]);
         }
 
-        await this.enableClaimModal(this.popupClaim);
+        await this.enableVerificationModal(this.popupVerification);
 
-        // enable correct positioning of the detail claim view
-        this.renderDetail(this.popupClaim);
+        // enable correct positioning of the detail verification view
+        this.renderDetail(this.popupVerification);
       }
     })();
 
@@ -518,121 +518,121 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /**
-   * Check if a warning for a claim exists
+   * Check if a warning for a verification exists
    *
-   * @param      {any}      claim    the claim that should be checked
+   * @param      {any}      verification    the verification that should be checked
    * @param      {any}      warning  the name of the warning that should be checked
    * @return     {boolean}  True if warning exists, False otherwise
    */
-  private isWarning(claim: any, warning: string) {
-    return claim.warnings.indexOf(warning) !== -1;
+  private isWarning(verification: any, warning: string) {
+    return verification.warnings.indexOf(warning) !== -1;
   }
 
   /**
-   * Opens the issue claim popup, when the user is able to open the issue claim.
+   * Opens the issue verification popup, when the user is able to open the issue verification.
    *
-   * @param      {any}    claim   the claim that should be opened
+   * @param      {any}    verification   the verification that should be opened
    * @param      {any}    $event  the click event
    * @return     {false}  break the event bubbling
    */
-  private async openIssueClaim(claim: any, $event) {
-    if (this.canIssueClaim(claim)) {
-      this.issueClaim = claim;
+  private async openIssueVerification(verification: any, $event) {
+    if (this.canIssueVerification(verification)) {
+      this.issueVerification = verification;
 
-      this.enableClaimModal(claim);
+      this.enableVerificationModal(verification);
 
       return this.core.utils.stopEventBubbling($event);
     }
   }
 
   /**
-   * Opens the issue claim popup, when the user is able to open the issue claim.
+   * Opens the issue verification popup, when the user is able to open the issue verification.
    *
-   * @param      {any}    claim   the claim that should be opened
+   * @param      {any}    verification   the verification that should be opened
    * @param      {any}    $event  the click event
    * @return     {false}  break the event bubbling
    */
-  private async openRejectClaim(claim: any, $event) {
-    if (this.canRejectClaim(claim) || claim.warnings.indexOf('rejected') !== -1) {
-      this.rejectClaim = claim;
-      this.rejectClaim.rejectReason = this.rejectClaim.rejectReason || { reason: '', };
+  private async openRejectVerification(verification: any, $event) {
+    if (this.canRejectVerification(verification) || verification.warnings.indexOf('rejected') !== -1) {
+      this.rejectVerification = verification;
+      this.rejectVerification.rejectReason = this.rejectVerification.rejectReason || { reason: '', };
 
-      this.enableClaimModal(claim);
-
-      return this.core.utils.stopEventBubbling($event);
-    }
-  }
-
-  /**
-   * Opens the dbcp edit for a specific claim.
-   *
-   * @param      {any}     claim   the claim for that the topic description should be updated
-   */
-  private async openDBCPEdit(claim: any, $event: any) {
-    if (claim.topLevelEnsOwner === this.activeAccount) {
-      this.editDBCPClaim = claim;
-      claim.selectedImages = [ ];
-
-      this.enableClaimModal(claim);
+      this.enableVerificationModal(verification);
 
       return this.core.utils.stopEventBubbling($event);
     }
   }
 
   /**
-   * Determines if the user is allowed to delete a claim.
+   * Opens the dbcp edit for a specific verification.
    *
-   * @param      {any}      claim   the claim
-   * @return     {boolean}  True if able to delete claim, False otherwise
+   * @param      {any}     verification   the verification for that the topic description should be updated
    */
-  private canDeleteClaim(claim: any) {
-    return this.enableDelete && claim.status !== -1 &&
-      (this.activeAccount === claim.subject || this.activeAccount === claim.issuerAccount);
+  private async openDBCPEdit(verification: any, $event: any) {
+    if (verification.topLevelEnsOwner === this.activeAccount) {
+      this.editDBCPVerification = verification;
+      verification.selectedImages = [ ];
+
+      this.enableVerificationModal(verification);
+
+      return this.core.utils.stopEventBubbling($event);
+    }
   }
 
   /**
-   * Determines if the user is allowed to delete a claim.
+   * Determines if the user is allowed to delete a verification.
    *
-   * @param      {any}      claim   the claim
-   * @return     {boolean}  True if able to delete claim, False otherwise
+   * @param      {any}      verification   the verification
+   * @return     {boolean}  True if able to delete verification, False otherwise
    */
-  private canRejectClaim(claim: any) {
-    return this.enableReject && claim.status !== -1 && claim.warnings.indexOf('rejected') === -1 &&
-      (this.activeAccount === claim.subject || this.activeAccount === claim.issuerAccount);
+  private canDeleteVerification(verification: any) {
+    return this.enableDelete && verification.status !== -1 &&
+      (this.activeAccount === verification.subject || this.activeAccount === verification.issuerAccount);
   }
 
   /**
-   * Determines if the user is allowed to accept a claim.
+   * Determines if the user is allowed to delete a verification.
    *
-   * @param      {any}      claim   the claim
-   * @return     {boolean}  True if able to accept claim, False otherwise
+   * @param      {any}      verification   the verification
+   * @return     {boolean}  True if able to delete verification, False otherwise
    */
-  private canAcceptClaim(claim: any) {
-    return claim.status === 0 && this.activeAccount === claim.subject &&
-      claim.warnings.indexOf('issued') !== -1;
+  private canRejectVerification(verification: any) {
+    return this.enableReject && verification.status !== -1 && verification.warnings.indexOf('rejected') === -1 &&
+      (this.activeAccount === verification.subject || this.activeAccount === verification.issuerAccount);
   }
 
   /**
-   * Determines if the user is allowed to issue a claim. (only allow computed claims)
+   * Determines if the user is allowed to accept a verification.
    *
-   * @param      {any}      claim   the claim
-   * @return     {boolean}  True if able to issue claim, False otherwise
+   * @param      {any}      verification   the verification
+   * @return     {boolean}  True if able to accept verification, False otherwise
    */
-  private canIssueClaim(claim: any) {
-    if (!this.activeIdentity || !this.enableIssue || claim.warnings.indexOf('noIdentity') !== -1) {
+  private canAcceptVerification(verification: any) {
+    return verification.status === 0 && this.activeAccount === verification.subject &&
+      verification.warnings.indexOf('issued') !== -1;
+  }
+
+  /**
+   * Determines if the user is allowed to issue a verification. (only allow computed verifications)
+   *
+   * @param      {any}      verification   the verification
+   * @return     {boolean}  True if able to issue verification, False otherwise
+   */
+  private canIssueVerification(verification: any) {
+    if (!this.activeIdentity || !this.enableIssue || verification.warnings.indexOf('noIdentity') !== -1) {
       return false;
-    } else if (claim.warnings.indexOf('missing') !== -1) {
+    } else if (verification.warnings.indexOf('missing') !== -1) {
       return true;
     }
 
-    // check all claims on the same level
-    const levelClaims = claim.levelComputed && claim.levelComputed.claims ?
-      claim.levelComputed.claims : claim.claims;
-    // only allow claim issue for computed claims
-    return levelClaims
-      .filter(subClaim => {
-        if (subClaim.issuerAccount === this.activeAccount &&
-            subClaim.warnings.indexOf('rejected') === -1) {
+    // check all verifications on the same level
+    const levelVerifications = verification.levelComputed && verification.levelComputed.verifications ?
+      verification.levelComputed.verifications : verification.verifications;
+    // only allow verification issue for computed verifications
+    return levelVerifications
+      .filter(subVerification => {
+        if (subVerification.issuerAccount === this.activeAccount &&
+            subVerification.warnings.indexOf('rejected') === -1) {
           return true;
         } else {
           return false;
@@ -641,17 +641,17 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /**
-   * Return the amount of interactions that the current user can trigger on a specific claim.
+   * Return the amount of interactions that the current user can trigger on a specific verification.
    *
-   * @param      {any}     claim   the claim that should be checked
+   * @param      {any}     verification   the verification that should be checked
    * @return     {number}  amount of interactions (0 - 3)
    */
-  private claimInteractionCount(claim: any) {
+  private verificationInteractionCount(verification: any) {
     return [
-      this.canAcceptClaim(claim),
-      this.canDeleteClaim(claim),
-      this.canIssueClaim(claim),
-      this.canRejectClaim(claim),
+      this.canAcceptVerification(verification),
+      this.canDeleteVerification(verification),
+      this.canIssueVerification(verification),
+      this.canRejectVerification(verification),
     ].filter(interaction => !!interaction).length;
   }
 
@@ -670,13 +670,13 @@ export class EvanClaimComponent extends AsyncComponent {
   }
 
   /**
-   * Return the claims array or the parents object of an claim.
+   * Return the verifications array or the parents object of an verification.
    *
-   * @param      {any}         claim   the claim that should be analyzed
-   * @return     {Array<any>}  claims || parents
+   * @param      {any}         verification   the verification that should be analyzed
+   * @return     {Array<any>}  verifications || parents
    */
-  private getClaimsOrParents(claim: any) {
-      return claim.claims || claim.parents || [ ];
+  private getVerificationsOrParents(verification: any) {
+      return verification.verifications || verification.parents || [ ];
    
   }
 
@@ -696,65 +696,65 @@ export class EvanClaimComponent extends AsyncComponent {
   /**
    * Transform the file input result for the description img into an single value.
    *
-   * @param      {any}     claim   the topic detail for that the img was changed
+   * @param      {any}     verification   the topic detail for that the img was changed
    * @return     {<type>}  { description_of_the_return_value }
    */
-  async descriptionImgChanged(claim: any) {
-    if (claim.selectedImages.length > 0) {
+  async descriptionImgChanged(verification: any) {
+    if (verification.selectedImages.length > 0) {
       const urlCreator = (<any>window).URL || (<any>window).webkitURL;
-      const blobURI = urlCreator.createObjectURL(claim.selectedImages[0]);
+      const blobURI = urlCreator.createObjectURL(verification.selectedImages[0]);
       // transform to array buffer so we can save it within the queue
       const arrayBuffer = await this.fileService.readFilesAsArrayBuffer(
-        [ claim.selectedImages[0] ]);
+        [ verification.selectedImages[0] ]);
 
       // transform file object
-      claim.selectedImages[0] = {
+      verification.selectedImages[0] = {
         blobURI: this._DomSanitizer.bypassSecurityTrustUrl(blobURI),
         file: arrayBuffer[0].file,
         fileType: arrayBuffer[0].type,
         name: arrayBuffer[0].name,
-        base64: await this.pictureService.blobToDataURI(claim.selectedImages[0]),
+        base64: await this.pictureService.blobToDataURI(verification.selectedImages[0]),
       };
 
-      claim.description.imgSquare = claim.selectedImages[0].base64;
+      verification.description.imgSquare = verification.selectedImages[0].base64;
     }
 
     this.ref.detectChanges();
   }
 
   /**
-   * Return the status color for a claim and its taker
+   * Return the status color for a verification and its taker
    *
-   * @param      {any}     claim   the claim that should be analysed
+   * @param      {any}     verification   the verification that should be analysed
    * @return     {string}  the class status (status-0, status-1, status-2)
    */
-  trustTakerStatusClass(claim: any) {
+  trustTakerStatusClass(verification: any) {
     // yellow color
-    if (claim.warnings.indexOf('issued') !== -1 || claim.warnings.indexOf('selfCreated') !== -1) {
+    if (verification.warnings.indexOf('issued') !== -1 || verification.warnings.indexOf('selfCreated') !== -1) {
       return 'status-0';
     } 
 
     // red color
-    if (claim.warnings.indexOf('rejected') !== -1 && claim.rejectReason &&
-        claim.rejectReason.rejector === claim.subject) {
+    if (verification.warnings.indexOf('rejected') !== -1 && verification.rejectReason &&
+        verification.rejectReason.rejector === verification.subject) {
       return 'status-2';
     }
 
     // green color
-    if (claim.status === 1) {
+    if (verification.status === 1) {
       return 'status-1';
     }
   }
 
   /**
-   * Return the status color for a claim and its taker
+   * Return the status color for a verification and its taker
    *
-   * @param      {any}     claim   the claim that should be analysed
+   * @param      {any}     verification   the verification that should be analysed
    * @return     {string}  the class status (status-0, status-1, status-2)
    */
-  trustProviderStatusClass(claim: any) {
-    if (claim.parentComputed) {
-      const parent = claim.parentComputed;
+  trustProviderStatusClass(verification: any) {
+    if (verification.parentComputed) {
+      const parent = verification.parentComputed;
 
       // yellow color
       if (parent.status === 0) {
@@ -763,8 +763,8 @@ export class EvanClaimComponent extends AsyncComponent {
 
       // red color
       if (parent.status === -1 || parent.status === 2 ||
-          (claim.warnings.indexOf('rejected') !== -1 && claim.rejectReason &&
-          claim.rejectReason.rejector === claim.issuerAccount)) {
+          (verification.warnings.indexOf('rejected') !== -1 && verification.rejectReason &&
+          verification.rejectReason.rejector === verification.issuerAccount)) {
         return 'status-2';
       }
 
@@ -772,7 +772,7 @@ export class EvanClaimComponent extends AsyncComponent {
       if (parent.status === 1) {
         return 'status-1';
       }
-    } else if (claim.issuerAccount === this.claimService.ensRootOwner) {
+    } else if (verification.issuerAccount === this.verificationService.ensRootOwner) {
       return 'status-1';
     }
   }
@@ -781,13 +781,13 @@ export class EvanClaimComponent extends AsyncComponent {
   /**
    * Render the detail svg using d3.js.
    *
-   * @param      {any}     claim   the claim for that the detail should be displayed
+   * @param      {any}     verification   the verification for that the detail should be displayed
    */
-  private async renderDetail(claim: any) {
+  private async renderDetail(verification: any) {
     // wait for finish render process
     await this.core.utils.timeout(0);
 
-    // calculate height of the container (check if we are within the claims dapp, so size it for a
+    // calculate height of the container (check if we are within the verifications dapp, so size it for a
     // perfect view)
     let fullHeight = 500;
     const modalContainer = document.querySelectorAll('.evan-modal.show-modal .evan-content')[0];
@@ -815,13 +815,13 @@ export class EvanClaimComponent extends AsyncComponent {
     const margin = {top: 50, right: 90, bottom: 50, left: 90};
     const width = containerWidth - margin.left - margin.right;
     const height = fullHeight - margin.top - margin.bottom;
-    // claim width + width of connector dot
+    // verification width + width of connector dot
     const connectorDot = 20;
     const boxHeight = 55;
     const boxWidth =  250 + connectorDot;
     const nodeHeight = 70;
     const nodeWidth = 300 + connectorDot;
-    const svg = parentContentContainer.querySelectorAll('.evan-detailed-claim svg')[0];
+    const svg = parentContentContainer.querySelectorAll('.evan-detailed-verification svg')[0];
     const svgZoomContainer = svg.childNodes[1];
 
     // declares a tree layout and assigns the size
@@ -841,8 +841,8 @@ export class EvanClaimComponent extends AsyncComponent {
       })
 
     // Assigns parent, children, height, depth
-    const root = d3.hierarchy(claim, (d) => {
-      return this.getClaimsOrParents(d);
+    const root = d3.hierarchy(verification, (d) => {
+      return this.getVerificationsOrParents(d);
     });
 
     // initialize zooming of the element
@@ -854,13 +854,42 @@ export class EvanClaimComponent extends AsyncComponent {
           'transform',
           `translate(${ transform.x }, ${ transform.y }) scale(${ transform.k })`
         );
-      });
+      })
+
+    // levels and their counts of nodes for initially positioning
+    const nodes = treemap(root).descendants();
+    let levels = { };
+    let xDepth = 0;
+    let yDepth = 0;
+
+    nodes.forEach(node => {
+      xDepth = xDepth < node.y ? node.y : xDepth;
+      yDepth = yDepth < node.x ? node.x : yDepth;
+    });
+
+    // calculate the initial width and height of the svg zoom container
+    let svgZoomContainerWidth = xDepth + boxWidth;
+    let svgZoomContainerHeight = yDepth + boxHeight;
+
+    // calculate the initial position of the svg zoom container
+    let initialX;
+    let initialY = fullHeight / 2 - svgZoomContainerHeight / 2;
+
+    // if the svg size is greater than the zoomContainer width, center the zoomContainer, else place
+    // it on the right side
+    if (width < svgZoomContainerWidth) {
+      initialX = (width - svgZoomContainerWidth - 100);
+    } else {
+      initialX = -(width - svgZoomContainerWidth);
+    }
 
     d3.select(svg)
       .call(zoom)
       .call(
         zoom.transform,
-        d3.zoomIdentity.translate(margin.left + margin.right, fullHeight / 2).scale(1)
+        d3.zoomIdentity
+          .translate(initialX, initialY)
+          .scale(1)
       );
 
     // Collapse the node and all it's children
@@ -966,33 +995,6 @@ export class EvanClaimComponent extends AsyncComponent {
             this.activeDetailHover = node;
           }
 
-          // // scroll to node
-          // const nodeElement = this.core.utils.getParentByClassName($event.target, 'evan-claim')
-          //   .parentElement.parentElement; 
-          // const nodeTransform = getTransformFromElement(nodeElement);
-          // const zoomBox = d3.select(svgZoomContainer).node().getBBox();
-          // const bbox = d3.select(nodeElement).node().getBBox();
-
-          // // center the current element container half - zoombox half -
-          // // (node.x / 2 - node.width / 2)          
-          // const tx = (containerWidth / 2) - (zoomBox.width / 2) -
-          //   ((nodeTransform.translate.x / 2) - (bbox.width / 2));
-          // // move it to the top and a bit down
-          // const ty = -zoomBox.y + 100;
-
-          // // move the zoom container to the caluculated position 
-          // d3.select(svgZoomContainer)
-          //   .transition()
-          //   .duration(1000)
-          //   .attr('transform', `translate(${ tx }, ${ ty }) scale(1)`);
-
-          // // update the zoom component position to prevent back moving by click
-          // d3.select(svg)
-          //   .call(
-          //     zoom.transform,
-          //     d3.zoomIdentity.translate(tx, ty).scale(1)
-          //   );
-
           // update the ref and stop the event bubbling
           this.ref.detectChanges();
           if (!$event.disableEventBubbling) {
@@ -1049,15 +1051,15 @@ export class EvanClaimComponent extends AsyncComponent {
 
     // start!
     update();
-    await this.core.utils.timeout(0);
+    await this.core.utils.timeout(500);
     update();
 
     // collapse missing popover automatically
-    if (claim.status === -1) {
+    if (verification.status === -1) {
       setTimeout(() => {
         this.d3.nodes[1].toggleDetail({
           disableEventBubbling: true,
-          target: svg.querySelectorAll('.tree-container foreignObject .evan-claim .claim-label')[1],
+          target: svg.querySelectorAll('.tree-container foreignObject .evan-verification .verification-label')[1],
         });
       });
     }

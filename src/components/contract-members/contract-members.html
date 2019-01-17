@@ -81,13 +81,13 @@
               <h2>{{ getContactAlias(suggestion) }}</h2>
               <span>{{ suggestion }}</span>
               <div class="display-flex-justify" item-end>
-                <evan-claim
-                  *ngFor="let claim of claims"
-                  [topic]="claim"
+                <evan-verification
+                  *ngFor="let verification of verifications"
+                  [topic]="verification"
                   [address]="suggestion"
                   [mode]="'icon'"
                   [compute]="true">
-                </evan-claim>
+                </evan-verification>
                 <button ion-button item-end icon-only clear *ngIf="canAddMember()">
                   <ion-icon name="add"></ion-icon>
                 </button>
@@ -108,13 +108,13 @@
             <span> {{ member }} </span>
 
             <div class="display-flex-justify" item-end>
-              <evan-claim
-                *ngFor="let claim of claims"
-                [topic]="claim"
+              <evan-verification
+                *ngFor="let verification of verifications"
+                [topic]="verification"
                 [address]="member"
                 [mode]="'icon'"
                 [compute]="true">
-              </evan-claim>
+              </evan-verification>
           
               <button ion-button item-end icon-only clear
                 (click)="removeMember(member)"

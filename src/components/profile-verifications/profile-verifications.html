@@ -25,10 +25,10 @@
   https://evan.network/license/
 -->
 
-<evan-claim
-  *ngFor="let claim of claims"
-  [topic]="claim"
+<evan-verification
+  *ngFor="let verification of verifications"
+  [topic]="verification"
   [address]="account"
   [mode]="'icon'"
   [compute]="true">
-</evan-claim>
+</evan-verification>

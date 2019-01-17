@@ -25,26 +25,26 @@
   https://evan.network/license/
 -->
 
-<!----------------------------------- claim user alias--------------------------------------------->
+<!----------------------------------- verification user alias--------------------------------------------->
 <ng-template #userAlias let-address="address">
   <ng-container *ngIf="address">
-    <ng-container *ngIf="address === claimService.ensRootOwner">
-      evan ({{ claimService.ensRootOwner }})
+    <ng-container *ngIf="address === verificationService.ensRootOwner">
+      evan ({{ verificationService.ensRootOwner }})
     </ng-container>
-    <ng-container *ngIf="address !== claimService.ensRootOwner">
+    <ng-container *ngIf="address !== verificationService.ensRootOwner">
       {{ (addressbook[address]?.alias || addressbook[address]?.email) ? (addressbook[address]?.alias || addressbook[address]?.email) + ' (' + address + ')' : address }}
     </ng-container>
   </ng-container>
 </ng-template>
 
-<!----------------------------- claim alias multiline --------------------------------------------->
+<!----------------------------- verification alias multiline --------------------------------------------->
 <ng-template #userAliasMulti let-address="address">
   <ng-container *ngIf="address">
-    <ng-container *ngIf="address === claimService.ensRootOwner">
+    <ng-container *ngIf="address === verificationService.ensRootOwner">
       <b>evan</b>
-      <p>{{ claimService.ensRootOwner }}</p>
+      <p>{{ verificationService.ensRootOwner }}</p>
     </ng-container>
-    <ng-container *ngIf="address !== claimService.ensRootOwner">
+    <ng-container *ngIf="address !== verificationService.ensRootOwner">
       <b>
         {{ addressbook[address]?.alias || addressbook[address]?.email || ('_angularcore.no-alias' | translate) }}
       </b>
@@ -55,12 +55,12 @@
   </ng-container>
 </ng-template>
 
-<!---------------------------------------- claim icon --------------------------------------------->
-<ng-template #claimIcon let-claim="claim" let-mode="mode">
-  <div class="claim-icon">
-    <ion-spinner *ngIf="loadingClaims"></ion-spinner>
-    <ng-container *ngIf="!loadingClaims">
-      <svg *ngIf="!claim.icon" version="1.0" xmlns="http://www.w3.org/2000/svg"
+<!---------------------------------------- verification icon --------------------------------------------->
+<ng-template #verificationIcon let-verification="verification" let-mode="mode">
+  <div class="verification-icon">
+    <ion-spinner *ngIf="loadingVerifications"></ion-spinner>
+    <ng-container *ngIf="!loadingVerifications">
+      <svg *ngIf="!verification.icon" version="1.0" xmlns="http://www.w3.org/2000/svg"
          width="512.000000pt" height="512.000000pt" viewBox="0 0 512.000000 512.000000"
          preserveAspectRatio="xMidYMid meet">
           <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" stroke="none">
@@ -84,60 +84,60 @@
       </svg>
 
       <img
-        *ngIf="claim.icon"
-        [src]="_DomSanitizer.bypassSecurityTrustUrl(claim.icon)">
+        *ngIf="verification.icon"
+        [src]="_DomSanitizer.bypassSecurityTrustUrl(verification.icon)">
     </ng-container>
   </div>
 </ng-template>
 
-<!---------------------------------------- claim display ------------------------------------------>
-<ng-template #claimDisplay let-claim="claim" let-mode="mode" let-action="action">
-  <div [class]="'evan-claim mode-' + mode + ' status-' + claim.status"
-    [title]="'_angularcore.claims.claim-hover' | translate:{ displayName: claim.displayName, from: addressBookService.getNameForAccountSync(addressBook, claim.issuerAccount) }"
-    (click)="action ? action($event) : openClaimPopup(claim, $event)">
-    <ng-container *ngTemplateOutlet="claimIcon;context:{ claim: claim, mode: mode }"></ng-container>
-    <ng-container *ngIf="!loadingClaims && mode != 'icon'">
-      <div class="claim-label">
-        <b *ngIf="!claim.creationDate">
-          {{ claim.displayName }}
+<!---------------------------------------- verification display ------------------------------------------>
+<ng-template #verificationDisplay let-verification="verification" let-mode="mode" let-action="action">
+  <div [class]="'evan-verification mode-' + mode + ' status-' + verification.status"
+    [title]="'_angularcore.verifications.verification-hover' | translate:{ displayName: verification.displayName, from: addressBookService.getNameForAccountSync(addressBook, verification.issuerAccount) }"
+    (click)="action ? action($event) : openVerificationPopup(verification, $event)">
+    <ng-container *ngTemplateOutlet="verificationIcon;context:{ verification: verification, mode: mode }"></ng-container>
+    <ng-container *ngIf="!loadingVerifications && mode != 'icon'">
+      <div class="verification-label">
+        <b *ngIf="!verification.creationDate">
+          {{ verification.displayName }}
         </b>
-        <div *ngIf="claim.creationDate">
-          <b>{{ claim.displayName }}</b>
+        <div *ngIf="verification.creationDate">
+          <b>{{ verification.displayName }}</b>
           <p>
-            {{ claim.creationDate | date:'mediumDate':'':translate.translate.currentLang }}
+            {{ verification.creationDate | date:'mediumDate':'':translate.translate.currentLang }}
 
-            <ng-container *ngIf="claim.expirationDate">
-              - {{ claim.expirationDate | date:'mediumDate':'':translate.translate.currentLang }}
+            <ng-container *ngIf="verification.expirationDate">
+              - {{ verification.expirationDate | date:'mediumDate':'':translate.translate.currentLang }}
             </ng-container>
           </p>
         </div>
       </div>
 
-      <div class="claim-count" *ngIf="claim.claims && claim.claims.length > 1">
-        {{ claim.claims.length }} <ion-icon name="people"></ion-icon>
-        <ion-spinner *ngIf="claim.loading"></ion-spinner>
+      <div class="verification-count" *ngIf="verification.verifications && verification.verifications.length > 1">
+        {{ verification.verifications.length }} <ion-icon name="people"></ion-icon>
+        <ion-spinner *ngIf="verification.loading"></ion-spinner>
       </div>
     </ng-container>
   </div>
 </ng-template>
 
-<ng-template #claimPersonDisplay let-claim="claim" let-mode="mode">
-  <div class="evan-person-claim">
-    <div class="claim-person-icon">
+<ng-template #verificationPersonDisplay let-verification="verification" let-mode="mode">
+  <div class="evan-person-verification">
+    <div class="verification-person-icon">
       <ion-icon class="display-flex-justify" name="person"></ion-icon>
     </div>
-    <div [class]="'evan-claim mode-' + mode + ' status-' + claim.status"
-         [title]="getAddressbookName(claim.subjects ? claim.subjects[0] : claim.subject)">
-      <div class="claim-label">
+    <div [class]="'evan-verification mode-' + mode + ' status-' + verification.status"
+         [title]="getAddressbookName(verification.subjects ? verification.subjects[0] : verification.subject)">
+      <div class="verification-label">
         <div>
-          <ng-container *ngTemplateOutlet="userAliasMulti;context:{ address:claim.subjects ? claim.subjects[0] : claim.subject }"></ng-container>
+          <ng-container *ngTemplateOutlet="userAliasMulti;context:{ address:verification.subjects ? verification.subjects[0] : verification.subject }"></ng-container>
         </div>
       </div>
     </div>
   </div>
 </ng-template>
 
-<ng-template #claimDetailHover let-node="node">
+<ng-template #verificationDetailHover let-node="node">
   <div>
     <div class="header">
       <b>{{ node.data.displayName }}</b>
@@ -153,15 +153,15 @@
     <div class="body">
       <ion-row>
         <ion-col col-md-6>
-          <b>{{ '_angularcore.claims.status' | translate }}</b>
+          <b>{{ '_angularcore.verifications.status' | translate }}</b>
           <p [class]="'status-' + node.data.status">
-            {{ ('_angularcore.claims.warnings.' + node.data.warnings[0]) | translate }}
+            {{ ('_angularcore.verifications.warnings.' + node.data.warnings[0]) | translate }}
           </p>
         </ion-col>
       </ion-row>
       <ion-row>
         <ion-col col-md-6>
-          <b>{{ '_angularcore.claims.trust-taker' | translate }}</b>
+          <b>{{ '_angularcore.verifications.trust-taker' | translate }}</b>
           <p [class]="trustTakerStatusClass(node.data)">
             <ng-container
               *ngTemplateOutlet="userAlias;context:{ address: node.data.subjects ? node.data.subjects[0] : node.data.subject }">
@@ -169,7 +169,7 @@
           </p>
         </ion-col>
         <ion-col col-md-6>
-          <b>{{ '_angularcore.claims.trust-provider' | translate }}</b>
+          <b>{{ '_angularcore.verifications.trust-provider' | translate }}</b>
           <p
             *ngIf="node.data.issuerAccount"
             [class]="trustProviderStatusClass(node.data)">
@@ -182,7 +182,7 @@
       </ion-row>
       <ion-row>
         <ion-col col-12>
-          <b>{{ '_angularcore.claims.creation-date' | translate }}</b>
+          <b>{{ '_angularcore.verifications.creation-date' | translate }}</b>
           <p>
             <ng-container *ngIf="node.data.creationDate">
               {{ node.data.creationDate | date:'mediumDate':'':translate.translate.currentLang }}
@@ -193,7 +193,7 @@
           </p>
         </ion-col>
         <ion-col col-12 *ngIf="node.data.expirationDate">
-          <b>{{ '_angularcore.claims.expiration-date' | translate }}</b>
+          <b>{{ '_angularcore.verifications.expiration-date' | translate }}</b>
           <p [class]="node.data.warnings.indexOf('expired') === -1 ? 'status-1' : 'status--1'">
             {{ node.data.expirationDate | date:'mediumDate':'':translate.translate.currentLang }}
           </p>
@@ -201,7 +201,7 @@
       </ion-row>
       <ion-row class="rejected" *ngIf="node.data.rejectReason">
         <ion-col col-12 *ngIf="node.data.rejectReason.rejector">
-          <b>{{ '_angularcore.claims.rejector' | translate }}</b>
+          <b>{{ '_angularcore.verifications.rejector' | translate }}</b>
           <p class="status--1">
             <ng-container
               *ngTemplateOutlet="userAlias;context:{ address: node.data.rejectReason.rejector }">
@@ -209,13 +209,13 @@
           </p>
         </ion-col>
         <ion-col col-12>
-          <b>{{ '_angularcore.claims.reject-date' | translate }}</b>
+          <b>{{ '_angularcore.verifications.reject-date' | translate }}</b>
           <p>
             {{ node.data.rejectReason.date | date:'mediumDate':'':translate.translate.currentLang }}
           </p>
         </ion-col>
         <ion-col col-12>
-          <b>{{ '_angularcore.claims.reject-reason' | translate }}</b>
+          <b>{{ '_angularcore.verifications.reject-reason' | translate }}</b>
           <p class="multiline">
             {{ node.data.rejectReason.reason }}
           </p>
@@ -225,39 +225,39 @@
 
     <div class="footer">
       <button ion-button icon-left round outline color="danger"
-        [title]="'_angularcore.claims.dispatcher.deleteDispatcher.title' | translate"
+        [title]="'_angularcore.verifications.dispatcher.deleteDispatcher.title' | translate"
         [disabled]="computed.loading"
-        *ngIf="canDeleteClaim(node.data)"
+        *ngIf="canDeleteVerification(node.data)"
         (click)="triggerDispatcher(node.data, 'deleteDispatcher', $event)">
-        {{ '_angularcore.claims.delete' | translate }}
+        {{ '_angularcore.verifications.delete' | translate }}
       </button>
       <button ion-button icon-left round outline color="danger"
-        [title]="'_angularcore.claims.dispatcher.rejectDispatcher.title' | translate"
+        [title]="'_angularcore.verifications.dispatcher.rejectDispatcher.title' | translate"
         [disabled]="computed.loading"
-        *ngIf="canRejectClaim(node.data)"
-        (click)="openRejectClaim(node.data, $event)">
-        {{ '_angularcore.claims.reject' | translate }}
+        *ngIf="canRejectVerification(node.data)"
+        (click)="openRejectVerification(node.data, $event)">
+        {{ '_angularcore.verifications.reject' | translate }}
       </button>
       <button ion-button icon-left round outline
-        [title]="'_angularcore.claims.issue-claim' | translate"
+        [title]="'_angularcore.verifications.issue-verification' | translate"
         [disabled]="computed.loading"
-        *ngIf="canIssueClaim(node.data)"
-        (click)="openIssueClaim(node.data, $event)">
-        {{ '_angularcore.claims.issue' | translate }}
+        *ngIf="canIssueVerification(node.data)"
+        (click)="openIssueVerification(node.data, $event)">
+        {{ '_angularcore.verifications.issue' | translate }}
       </button>
       <button ion-button icon-left round outline color="success"
-        [title]="'_angularcore.claims.dispatcher.acceptDispatcher.title' | translate"
+        [title]="'_angularcore.verifications.dispatcher.acceptDispatcher.title' | translate"
         [disabled]="computed.loading"
-        *ngIf="canAcceptClaim(node.data)"
+        *ngIf="canAcceptVerification(node.data)"
         (click)="triggerDispatcher(node.data, 'acceptDispatcher', $event)">
-        {{ '_angularcore.claims.accept' | translate }}
+        {{ '_angularcore.verifications.accept' | translate }}
       </button>
     </div>
   </div>
 </ng-template>
 
-<!------------------------------------------ detailClaim ------------------------------------------>
-<ng-template #claimDetailDisplay let-detailClaim="detailClaim">
+<!------------------------------------------ detailVerification ------------------------------------------>
+<ng-template #verificationDetailDisplay let-detailVerification="detailVerification">
   <svg
     [style.height]="d3.dimensions.fullHeight + 'px'"
     (click)="activeDetailHover = null; ref.detectChanges();">
@@ -287,7 +287,7 @@
         <g class="node"
           *ngFor="let node of d3.nodes; let i = index"
           [attr.transform]="node.transform">
-          <ng-container *ngIf="getClaimsOrParents(node.data).length > 0">
+          <ng-container *ngIf="getVerificationsOrParents(node.data).length > 0">
             <circle cx="-142" cy="0" r="10"
               [class.active]="node.children"
               (click)="node.toggle($event)">
@@ -304,12 +304,12 @@
             [attr.y]="-(d3.dimensions.boxHeight / 2) - (i === 0 ? 50 : 0)">
             <ng-container *ngIf="i === 0">
               <ng-container
-                *ngTemplateOutlet="claimPersonDisplay;context:{ claim: node.data, mode: 'detail' }">
+                *ngTemplateOutlet="verificationPersonDisplay;context:{ verification: node.data, mode: 'detail' }">
               </ng-container>
             </ng-container>
             <ng-container *ngIf="i !== 0">
               <ng-container
-                *ngTemplateOutlet="claimDisplay;context:{ claim: node.data, mode: 'detail', action: node.toggleDetail }">
+                *ngTemplateOutlet="verificationDisplay;context:{ verification: node.data, mode: 'detail', action: node.toggleDetail }">
               </ng-container>
             </ng-container>
           </foreignObject>
@@ -323,7 +323,7 @@
         [attr.transform]="activeDetailHover.hoverTransform"
         [@opacityTransition]>
         <ng-container
-          *ngTemplateOutlet="claimDetailHover;context:{ node: activeDetailHover }">
+          *ngTemplateOutlet="verificationDetailHover;context:{ node: activeDetailHover }">
         </ng-container>
       </foreignObject>
     </g>
@@ -335,114 +335,114 @@
   <ng-container *ngIf="mode !== 'detail'">
     <ng-container *ngIf="compute">
       <ng-container
-        *ngTemplateOutlet="claimDisplay;context:{ claim: computed, mode: mode }">
+        *ngTemplateOutlet="verificationDisplay;context:{ verification: computed, mode: mode }">
       </ng-container>
     </ng-container>
     <ng-container *ngIf="!compute">
-      <ng-container *ngFor="let claim of claims">
+      <ng-container *ngFor="let verification of verifications">
         <ng-container
-          *ngTemplateOutlet="claimDisplay;context:{ claim: claim, mode: mode }">
+          *ngTemplateOutlet="verificationDisplay;context:{ verification: verification, mode: mode }">
         </ng-container>
       </ng-container>
     </ng-container>
   </ng-container>
 
-  <div class="evan-detailed-claim" #evanDetailClaim *ngIf="mode === 'detail'">
-    <ng-container col-12 col-xl-6 *ngIf="loadingClaims">
+  <div class="evan-detailed-verification" #evanDetailVerification *ngIf="mode === 'detail'">
+    <ng-container col-12 col-xl-6 *ngIf="loadingVerifications">
       <ng-container 
-        *ngTemplateOutlet="claimDisplay;context:{ claim: computed, mode: mode }">
+        *ngTemplateOutlet="verificationDisplay;context:{ verification: computed, mode: mode }">
       </ng-container>
     </ng-container>
-    <ng-container *ngIf="!loadingClaims">
+    <ng-container *ngIf="!loadingVerifications">
       <ng-container
-        *ngTemplateOutlet="claimDetailDisplay;context:{ detailClaim: computed }">
+        *ngTemplateOutlet="verificationDetailDisplay;context:{ detailVerification: computed }">
       </ng-container>
     </ng-container>
   </div>
 
-  <div class="evan-modal evan-claim-modal"
-    *ngIf="popupClaim"
-    [class.show-modal]="popupClaim.showModal"
+  <div class="evan-modal evan-verification-modal"
+    *ngIf="popupVerification"
+    [class.show-modal]="popupVerification.showModal"
     [class.disable-scrolling]="disableScrolling">
-    <div class="backdrop" (click)="removeClaimModal(popupClaim, 'popupClaim', $event)"></div>
+    <div class="backdrop" (click)="removeVerificationModal(popupVerification, 'popupVerification', $event)"></div>
 
     <div class="evan-content evan-small-content"
-      *ngIf="popupClaim">
+      *ngIf="popupVerification">
       <h3 class="content-header m-b-0 m-t-0">
-        {{ '_angularcore.claims.details' | translate }}
+        {{ '_angularcore.verifications.details' | translate }}
       </h3>
       <p ion-text class="m-b-0 m-t-0" *ngIf="!showAddressSelect">
-        {{ '_angularcore.claims.details-desc' | translate }}
+        {{ '_angularcore.verifications.details-desc' | translate }}
       </p>
 
       <ion-row margin-bottom>
         <ion-col margin-top col-12 col-md-6>
-          <b>{{ '_angularcore.claims.topic' | translate }}</b>
-          <p class="m-b-0 m-t-0">{{ popupClaim.name }}</p>
+          <b>{{ '_angularcore.verifications.topic' | translate }}</b>
+          <p class="m-b-0 m-t-0">{{ popupVerification.name }}</p>
         </ion-col>
         <ion-col margin-top col-12 col-md-6>
-          <b>{{ '_angularcore.claims.subject' | translate }}</b>
+          <b>{{ '_angularcore.verifications.subject' | translate }}</b>
           <p class="m-b-0 m-t-0">
-            <ng-container *ngIf="popupClaim.subjects">
-              <ng-container *ngFor="let subject of popupClaim.subjects; let i = index">
+            <ng-container *ngIf="popupVerification.subjects">
+              <ng-container *ngFor="let subject of popupVerification.subjects; let i = index">
                 <span *ngIf="i !== 0">, </span>
                 <ng-container *ngTemplateOutlet="userAlias;context:{ address:subject }"></ng-container>
               </ng-container>
             </ng-container>
-            <ng-container *ngIf="!popupClaim.subjects">
-              <ng-container *ngTemplateOutlet="userAlias;context:{ address:popupClaim.subject }"></ng-container>
+            <ng-container *ngIf="!popupVerification.subjects">
+              <ng-container *ngTemplateOutlet="userAlias;context:{ address:popupVerification.subject }"></ng-container>
             </ng-container>
           </p>
         </ion-col>
       </ion-row>
 
-      <div class="evan-detailed-claim" #evanDetailClaim>
+      <div class="evan-detailed-verification" #evanDetailVerification>
         <ng-container
-          *ngTemplateOutlet="claimDetailDisplay;context:{ detailClaim: popupClaim }">
+          *ngTemplateOutlet="verificationDetailDisplay;context:{ detailVerification: popupVerification }">
         </ng-container>
       </div>
 
       <div margin-top text-center>
         <button ion-button icon-left color="medium-gray" round outline
-          (click)="removeClaimModal(popupClaim, 'popupClaim', $event)">
+          (click)="removeVerificationModal(popupVerification, 'popupVerification', $event)">
           <ion-icon name="close"></ion-icon>
-          <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
+          <span color="light">{{ '_angularcore.verifications.close-details' | translate }}</span>
         </button>
       </div>
     </div>
   </div>
 
   <div class="evan-modal"
-    *ngIf="issueClaim"
-    [class.show-modal]="issueClaim.showModal"
+    *ngIf="issueVerification"
+    [class.show-modal]="issueVerification.showModal"
     [class.disable-scrolling]="disableScrolling">
-    <div class="backdrop" (click)="removeClaimModal(issueClaim, 'issueClaim', $event)"></div>
+    <div class="backdrop" (click)="removeVerificationModal(issueVerification, 'issueVerification', $event)"></div>
 
-    <div class="evan-content evan-small-content" *ngIf="issueClaim">
-      <h2 class="content-header">{{ '_angularcore.claims.issue-claim' | translate }}</h2>
+    <div class="evan-content evan-small-content" *ngIf="issueVerification">
+      <h2 class="content-header">{{ '_angularcore.verifications.issue-verification' | translate }}</h2>
 
       <span
-        [innerHTML]="'_angularcore.claims.issue-claim-description' | translate:{ topic: issueClaim.name, from: getAddressbookName(issueClaim.issuerAccount), to: getAddressbookName(issueClaim.subjects ? issueClaim.subjects[0] : issueClaim.subject) }">
+        [innerHTML]="'_angularcore.verifications.issue-verification-description' | translate:{ topic: issueVerification.name, from: getAddressbookName(issueVerification.issuerAccount), to: getAddressbookName(issueVerification.subjects ? issueVerification.subjects[0] : issueVerification.subject) }">
       </span>
 
       <div class="display-flex-justify">
         <ion-checkbox margin-right
-          [(ngModel)]="issueClaim.enableExpirationDate"
+          [(ngModel)]="issueVerification.enableExpirationDate"
           (ionChange)="ref.detectChanges()"
           (focusout)="ref.detectChanges()">
         </ion-checkbox>
         <ion-item>
           <ion-label stacked>
-            {{ '_angularcore.claims.expiration-date' | translate }}*
+            {{ '_angularcore.verifications.expiration-date' | translate }}*
           </ion-label>
           <ion-datetime
-            [disabled]="!issueClaim.enableExpirationDate"
+            [disabled]="!issueVerification.enableExpirationDate"
             displayFormat="DD-MM-YYYY H:mm"
             pickerFormat="DD-MMM-YYYY HH:mm"
-            [(ngModel)]="issueClaim.expirationDate"
-            [placeholder]="'_angularcore.claims.expiration-date' | translate"
-            [cancelText]="'_angularcore.claims.cancel' | translate"
-            [doneText]="'_angularcore.claims.done' | translate"
+            [(ngModel)]="issueVerification.expirationDate"
+            [placeholder]="'_angularcore.verifications.expiration-date' | translate"
+            [cancelText]="'_angularcore.verifications.cancel' | translate"
+            [doneText]="'_angularcore.verifications.done' | translate"
             minuteValues="0,15,30,45"
             [min]="now"
             [max]="maxDate"
@@ -455,122 +455,122 @@
 
       <div margin-top text-center>
         <button ion-button icon-left color="medium-gray" round outline
-          (click)="removeClaimModal(issueClaim, 'issueClaim', $event)">
+          (click)="removeVerificationModal(issueVerification, 'issueVerification', $event)">
           <ion-icon name="close"></ion-icon>
-          <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
+          <span color="light">{{ '_angularcore.verifications.close-details' | translate }}</span>
         </button>
 
         <button ion-button outline round icon-left
-          [disabled]="computed.loading || (issueClaim.enableExpirationDate ? !issueClaim.expirationDate : false)"
-          (click)="triggerDispatcher(issueClaim, 'issueDispatcher')">
+          [disabled]="computed.loading || (issueVerification.enableExpirationDate ? !issueVerification.expirationDate : false)"
+          (click)="triggerDispatcher(issueVerification, 'issueDispatcher')">
           <ion-spinner *ngIf="computed.loading"></ion-spinner>
-          {{ '_angularcore.claims.issue-claim' | translate }}
+          {{ '_angularcore.verifications.issue-verification' | translate }}
         </button>
       </div>
     </div>
   </div>
 
   <div class="evan-modal"
-    *ngIf="rejectClaim"
-    [class.show-modal]="rejectClaim.showModal"
+    *ngIf="rejectVerification"
+    [class.show-modal]="rejectVerification.showModal"
     [class.disable-scrolling]="disableScrolling">
-    <div class="backdrop" (click)="removeClaimModal(rejectClaim, 'rejectClaim', $event)"></div>
+    <div class="backdrop" (click)="removeVerificationModal(rejectVerification, 'rejectVerification', $event)"></div>
 
-    <div class="evan-content evan-small-content" *ngIf="rejectClaim">
-      <h2 class="content-header">{{ '_angularcore.claims.dispatcher.rejectDispatcher.title' | translate }}</h2>
+    <div class="evan-content evan-small-content" *ngIf="rejectVerification">
+      <h2 class="content-header">{{ '_angularcore.verifications.dispatcher.rejectDispatcher.title' | translate }}</h2>
 
       <ng-container
-        *ngIf="rejectClaim.warnings.indexOf('rejected') === -1">
+        *ngIf="rejectVerification.warnings.indexOf('rejected') === -1">
         <span
-          [innerHTML]="'_angularcore.claims.dispatcher.rejectDispatcher.description' | translate:{ topic: rejectClaim.name, from: getAddressbookName(rejectClaim.issuerAccount), to: getAddressbookName(rejectClaim.subjects ? rejectClaim.subjects[0] : rejectClaim.subject) }">
+          [innerHTML]="'_angularcore.verifications.dispatcher.rejectDispatcher.description' | translate:{ topic: rejectVerification.name, from: getAddressbookName(rejectVerification.issuerAccount), to: getAddressbookName(rejectVerification.subjects ? rejectVerification.subjects[0] : rejectVerification.subject) }">
         </span>
 
         <div class="display-flex-justify">
           <ion-checkbox margin-right
-            [(ngModel)]="rejectClaim.enableReason"
+            [(ngModel)]="rejectVerification.enableReason"
             (ionChange)="ref.detectChanges()"
             (focusout)="ref.detectChanges()">
           </ion-checkbox>
           <ion-item>
             <ion-label stacked>
-              {{ '_angularcore.claims.reject-reason' | translate }}*
+              {{ '_angularcore.verifications.reject-reason' | translate }}*
             </ion-label>
             <ion-textarea rows="6"
-              [disabled]="!rejectClaim.enableReason"
-              [(ngModel)]="rejectClaim.rejectReason.reason"
+              [disabled]="!rejectVerification.enableReason"
+              [(ngModel)]="rejectVerification.rejectReason.reason"
               (ionChange)="ref.detectChanges()">
             </ion-textarea>
           </ion-item>
         </div>
       </ng-container>
 
-      <ng-container *ngIf="rejectClaim.warnings.indexOf('rejected') !== -1">
+      <ng-container *ngIf="rejectVerification.warnings.indexOf('rejected') !== -1">
         <span
-          [innerHTML]="'_angularcore.claims.dispatcher.rejectDispatcher.rejected-description' | translate:{ topic: rejectClaim.name, from: getAddressbookName(rejectClaim.issuerAccount), to: getAddressbookName(rejectClaim.subjects ? rejectClaim.subjects[0] : rejectClaim.subject), rejector: getAddressbookName(rejectClaim.rejectReason.rejector) }">
+          [innerHTML]="'_angularcore.verifications.dispatcher.rejectDispatcher.rejected-description' | translate:{ topic: rejectVerification.name, from: getAddressbookName(rejectVerification.issuerAccount), to: getAddressbookName(rejectVerification.subjects ? rejectVerification.subjects[0] : rejectVerification.subject), rejector: getAddressbookName(rejectVerification.rejectReason.rejector) }">
         </span>
-        <b>{{ rejectClaim.rejectReason.date | date:'mediumDate':'':translate.translate.currentLang }}</b>.
+        <b>{{ rejectVerification.rejectReason.date | date:'mediumDate':'':translate.translate.currentLang }}</b>.
         <div class="display-flex-justify">
           <ion-item>
             <ion-label stacked>
-              {{ '_angularcore.claims.reject-reason' | translate }}
+              {{ '_angularcore.verifications.reject-reason' | translate }}
             </ion-label>
             <ion-textarea rows="6" readonly
-              [(ngModel)]="rejectClaim.rejectReason.reason"
+              [(ngModel)]="rejectVerification.rejectReason.reason"
               (ionChange)="ref.detectChanges()">
             </ion-textarea>
           </ion-item>
         </div>
       </ng-container>
 
-      <div margin-top text-center *ngIf="rejectClaim.warnings.indexOf('rejected') === -1">
+      <div margin-top text-center *ngIf="rejectVerification.warnings.indexOf('rejected') === -1">
         <button ion-button icon-left color="medium-gray" round outline
-          (click)="removeClaimModal(rejectClaim, 'rejectClaim', $event)">
+          (click)="removeVerificationModal(rejectVerification, 'rejectVerification', $event)">
           <ion-icon name="close"></ion-icon>
-          <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
+          <span color="light">{{ '_angularcore.verifications.close-details' | translate }}</span>
         </button>
 
         <button ion-button outline round icon-left
-          [disabled]="computed.loading || (rejectClaim.enableReason ? !rejectClaim.rejectReason.reason : false)"
-          (click)="triggerDispatcher(rejectClaim, 'rejectDispatcher')">
+          [disabled]="computed.loading || (rejectVerification.enableReason ? !rejectVerification.rejectReason.reason : false)"
+          (click)="triggerDispatcher(rejectVerification, 'rejectDispatcher')">
           <ion-spinner *ngIf="computed.loading"></ion-spinner>
-          {{ '_angularcore.claims.reject-claim' | translate }}
+          {{ '_angularcore.verifications.reject-verification' | translate }}
         </button>
       </div>
     </div>
   </div>
 
-  <div class="evan-modal claim-dbcp-edit"
-    *ngIf="editDBCPClaim"
-    [class.show-modal]="editDBCPClaim.showModal"
+  <div class="evan-modal verification-dbcp-edit"
+    *ngIf="editDBCPVerification"
+    [class.show-modal]="editDBCPVerification.showModal"
     [class.disable-scrolling]="disableScrolling">
-    <div class="backdrop" (click)="removeClaimModal(editDBCPClaim, 'editDBCPClaim', $event)"></div>
+    <div class="backdrop" (click)="removeVerificationModal(editDBCPVerification, 'editDBCPVerification', $event)"></div>
 
-    <div class="evan-content evan-small-content" margin-top *ngIf="editDBCPClaim">
+    <div class="evan-content evan-small-content" margin-top *ngIf="editDBCPVerification">
       <h3 class="content-header m-b-0 m-t-0">
-        {{ '_angularcore.claims.claim-description' | translate }}: {{ topic }}
+        {{ '_angularcore.verifications.verification-description' | translate }}: {{ topic }}
       </h3>
 
       <form no-margin #descForm="ngForm">
         <ion-item>
           <ion-label stacked>
-           {{ '_angularcore.claims.descName.title' | translate }}*
+           {{ '_angularcore.verifications.descName.title' | translate }}*
           </ion-label>
           <ion-input name="descName" required autofocus
-            [(ngModel)]="editDBCPClaim.description.i18n.name.en"
-            [placeholder]="'_angularcore.claims.descName.desc' | translate"
+            [(ngModel)]="editDBCPVerification.description.i18n.name.en"
+            [placeholder]="'_angularcore.verifications.descName.desc' | translate"
             (ionChange)="ref.detectChanges()"
             (focusout)="ref.detectChanges()">
           </ion-input>
         </ion-item>
         <ion-chip class="error-hint" *ngIf="showError(descForm, 'descName')" color="danger">
-          <ion-label>{{ '_angularcore.claims.descName.error' | translate }}</ion-label>
+          <ion-label>{{ '_angularcore.verifications.descName.error' | translate }}</ion-label>
         </ion-chip>
 
         <ion-label class="standalone">
-         {{ '_angularcore.claims.select-desc-img.title' | translate }}*
+         {{ '_angularcore.verifications.select-desc-img.title' | translate }}*
         </ion-label>
         <div text-center class="img-selector">
-          <svg *ngIf="!editDBCPClaim.description.imgSquare" version="1.0" xmlns="http://www.w3.org/2000/svg"
+          <svg *ngIf="!editDBCPVerification.description.imgSquare" version="1.0" xmlns="http://www.w3.org/2000/svg"
             width="512.000000pt" height="512.000000pt" viewBox="0 0 512.000000 512.000000"
             preserveAspectRatio="xMidYMid meet">
               <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" stroke="none">
@@ -593,22 +593,22 @@
             </g>
           </svg>
           <img
-            *ngIf="editDBCPClaim.description.imgSquare"
-            [src]="_DomSanitizer.bypassSecurityTrustUrl(editDBCPClaim.description.imgSquare)">
+            *ngIf="editDBCPVerification.description.imgSquare"
+            [src]="_DomSanitizer.bypassSecurityTrustUrl(editDBCPVerification.description.imgSquare)">
 
           <evan-file-select name="image" #imgFileSelect
             class="img-file-select"
-            [(ngModel)]="editDBCPClaim.selectedImages"
+            [(ngModel)]="editDBCPVerification.selectedImages"
             [accept]="'image/x-png,image/gif,image/jpeg'"
-            [buttonText]="'_angularcore.claims.select-desc-img.select' | translate"
+            [buttonText]="'_angularcore.verifications.select-desc-img.select' | translate"
             [multiple]="false"
-            (onChange)="descriptionImgChanged(editDBCPClaim)">
+            (onChange)="descriptionImgChanged(editDBCPVerification)">
           </evan-file-select>
 
           <div text-center>
             <button ion-button outline round margin-top icon-left
               (click)="imgFileSelect.selectFiles()">
-              {{ '_angularcore.claims.select-desc-img.select' | translate }}
+              {{ '_angularcore.verifications.select-desc-img.select' | translate }}
             </button>
           </div>
         </div>
@@ -616,17 +616,17 @@
 
       <div text-center margin-top>
         <button ion-button icon-left color="medium-gray" round outline
-          (click)="removeClaimModal(editDBCPClaim, 'editDBCPClaim', $event)">
+          (click)="removeVerificationModal(editDBCPVerification, 'editDBCPVerification', $event)">
           <ion-icon name="close"></ion-icon>
-          <span color="light">{{ '_angularcore.claims.close-details' | translate }}</span>
+          <span color="light">{{ '_angularcore.verifications.close-details' | translate }}</span>
         </button>
 
         <button ion-button outline round icon-left
-          [disabled]="!editDBCPClaim.description.i18n.name.en || computed.loading"
-          (click)="triggerDispatcher(editDBCPClaim, 'descriptionDispatcher', $event)">
+          [disabled]="!editDBCPVerification.description.i18n.name.en || computed.loading"
+          (click)="triggerDispatcher(editDBCPVerification, 'descriptionDispatcher', $event)">
           <ion-spinner *ngIf="computed.loading"></ion-spinner>
 
-          {{ '_angularcore.claims.set-description' | translate }}
+          {{ '_angularcore.verifications.set-description' | translate }}
         </button>
       </div>
     </div>

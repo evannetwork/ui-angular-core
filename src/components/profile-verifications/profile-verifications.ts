@@ -41,7 +41,7 @@ import {
 } from 'angular-libs';
 
 import { AsyncComponent } from '../../classes/AsyncComponent';
-import { EvanClaimService } from '../../services/bcc/claims';
+import { EvanVerificationService } from '../../services/bcc/verifications';
 import { EvanCoreService } from '../../services/bcc/core';
 import { EvanQueue, } from '../../services/bcc/queue';
 import { QueueId, } from '../../services/bcc/queue-utilities';
@@ -49,18 +49,18 @@ import { QueueId, } from '../../services/bcc/queue-utilities';
 /**************************************************************************************************/
 
 /**
- * Display all for the user configured active claims for a specific topic.
+ * Display all for the user configured active verifications for a specific topic.
  */
 @Component({
-  selector: 'evan-profile-claims',
-  templateUrl: 'profile-claims.html',
+  selector: 'evan-profile-verifications',
+  templateUrl: 'profile-verifications.html',
   animations: [  ]
 })
 
-export class EvanProfileClaimsComponent extends AsyncComponent {
+export class EvanProfileVerificationsComponent extends AsyncComponent {
   /***************** inputs & outpus *****************/
   /**
-   * address that for that the claims should be checked
+   * address that for that the verifications should be checked
    */
   @Input() address: string;
 
@@ -71,17 +71,17 @@ export class EvanProfileClaimsComponent extends AsyncComponent {
 
   /*****************    variables    *****************/
   /**
-   * for the current profile activated claims
+   * for the current profile activated verifications
    */
-  private claims: Array<string> = [ ];
+  private verifications: Array<string> = [ ];
 
   /**
-   * Function to unsubscribe from profile claims watcher queue results.
+   * Function to unsubscribe from profile verifications watcher queue results.
    */
-  private profileClaimsWatcher: Function;
+  private profileVerificationsWatcher: Function;
 
   constructor(
-    private claimsService: EvanClaimService,
+    private verificationsService: EvanVerificationService,
     private core: EvanCoreService,
     private queueService: EvanQueue,
     private ref: ChangeDetectorRef,
@@ -90,12 +90,12 @@ export class EvanProfileClaimsComponent extends AsyncComponent {
   }
 
   async _ngOnInit() {
-    // load profile active claims
-    this.profileClaimsWatcher = await this.queueService.onQueueFinish(
+    // load profile active verifications
+    this.profileVerificationsWatcher = await this.queueService.onQueueFinish(
       new QueueId(`profile.${ getDomainName() }`, '*'),
       async (reload, results) => {
         reload && await this.core.utils.timeout(0);
-        this.claims = await this.claimsService.getProfileActiveClaims();
+        this.verifications = await this.verificationsService.getProfileActiveVerifications();
         this.ref.detectChanges();
       }
     );
@@ -105,6 +105,6 @@ export class EvanProfileClaimsComponent extends AsyncComponent {
    * Clear the queue
    */
   async _ngOnDestroy() {
-    this.profileClaimsWatcher();
+    this.profileVerificationsWatcher();
   }
 }
