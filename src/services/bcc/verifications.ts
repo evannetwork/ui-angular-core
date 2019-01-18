@@ -130,9 +130,10 @@ export class EvanVerificationService {
   }
 
   /**
-   * Get all the verifications for a specific address.
+   * Get all the claims for a specific subject, including all nested verifications for a deep
+   * integrity check. (wrappper for api-blockchain-core getNestedVerifications)
    *
-   * @param      {string}      address     address to load the verifications for.
+   * @param      {string}      subject     subject to load the verifications for.
    * @param      {string}      topic       topic to load the verifications for.
    * @param      {boolean}     isIdentity  optional indicates if the subject is already a identity
    * @return     {Promise<Array<any>>}  all the verifications with the following properties.
@@ -147,7 +148,7 @@ export class EvanVerificationService {
    *     // 2: Rejected => reject by the creator / subject
    *     status: 2,
    *     // verification for account id / contract id
-   *     subject: address,
+   *     subject: subject,
    *     // ???
    *     value: '',
    *     // ???
@@ -167,13 +168,15 @@ export class EvanVerificationService {
    *       'parentMissing',  // parent path does not exists
    *       'parentUntrusted',  // root path (/) is not issued by evan
    *       'notEnsRootOwner' // invalid ens root owner when check topic is /
-   *     ]
+   *     ],
    *     // parent verifications not valid
+   *     parents: [ ... ],
+   *     parentComputed: [ ... ]
    *   }
    */
-  public async getVerifications(address: string, topic: string, isIdentity?: boolean) {
+  public async getVerifications(subject: string, topic: string, isIdentity?: boolean) {
     return await this.bcc.verifications.getNestedVerifications(
-      address,
+      subject,
       topic,
       isIdentity
     );
@@ -218,13 +221,13 @@ export class EvanVerificationService {
   }
 
   /**
-   * Delete a single entry from the verification cache object using address and topic
+   * Delete a single entry from the verification cache object using subject and topic
    *
-   * @param      {string}  address  the address that should be removed
+   * @param      {string}  subject  the subject that should be removed
    * @param      {string}  topic    the topic that should be removed
    * @return     {void}  
    */
-  public deleteFromVerificationCache(address: string, topic: string) {
-    this.bcc.verifications.computeVerifications(address, topic);
+  public deleteFromVerificationCache(subject: string, topic: string) {
+    this.bcc.verifications.computeVerifications(subject, topic);
   }
 }
