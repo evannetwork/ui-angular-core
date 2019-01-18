@@ -3,6 +3,7 @@
 ## Next Version
 ### Features
 - outsource deep verification check logic to `@evan.network/api-blockchain-core`
+- support verifications for contracts
 
 ### Fixes
 - fix initial routing of angular router

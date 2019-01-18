@@ -26,27 +26,33 @@
 -->
 
 <!----------------------------------- verification user alias--------------------------------------------->
-<ng-template #userAlias let-address="address">
+<ng-template #userAlias let-address="address" let-isContract="isContract">
   <span class="clickalbe" *ngIf="address" (click)="core.copyString(address)">
     <ng-container *ngIf="address === verificationService.ensRootOwner">
       evan ({{ verificationService.ensRootOwner }})
     </ng-container>
-    <ng-container *ngIf="address !== verificationService.ensRootOwner">
+    <ng-container *ngIf="address !== verificationService.ensRootOwner && !isContract">
       {{ (addressbook[address]?.alias || addressbook[address]?.email) ? (addressbook[address]?.alias || addressbook[address]?.email) + ' (' + address + ')' : address }}
+    </ng-container>
+    <ng-container *ngIf="isContract">
+      {{ ('_angularcore.verifications.contract' | translate) }} ({{ address }})
     </ng-container>
   </span>
 </ng-template>
 
 <!----------------------------- verification alias multiline --------------------------------------------->
-<ng-template #userAliasMulti let-address="address">
+<ng-template #userAliasMulti let-address="address" let-isContract="isContract">
   <ng-container *ngIf="address">
     <ng-container *ngIf="address === verificationService.ensRootOwner">
       <b>evan</b>
       <p>{{ verificationService.ensRootOwner }}</p>
     </ng-container>
     <ng-container *ngIf="address !== verificationService.ensRootOwner">
-      <b>
+      <b *ngIf="!isContract">
         {{ addressbook[address]?.alias || addressbook[address]?.email || ('_angularcore.no-alias' | translate) }}
+      </b>
+      <b *ngIf="isContract">
+        {{ ('_angularcore.verifications.contract' | translate) }}
       </b>
       <p class="clickalbe" (click)="core.copyString(address)">
         {{ address }}
@@ -130,7 +136,7 @@
          [title]="getAddressbookName(verification.subjects ? verification.subjects[0] : verification.subject)">
       <div class="verification-label">
         <div>
-          <ng-container *ngTemplateOutlet="userAliasMulti;context:{ address:verification.subjects ? verification.subjects[0] : verification.subject }"></ng-container>
+          <ng-container *ngTemplateOutlet="userAliasMulti;context:{ address:verification.subjects ? verification.subjects[0] : verification.subject, isContract: verification.subjectType === 'contract' }"></ng-container>
         </div>
       </div>
     </div>
@@ -175,7 +181,7 @@
           <b>{{ '_angularcore.verifications.trust-taker' | translate }}</b>
           <p [class]="'break-word ' + trustTakerStatusClass(node.data)">
             <ng-container
-              *ngTemplateOutlet="userAlias;context:{ address: node.data.subjects ? node.data.subjects[0] : node.data.subject }">
+              *ngTemplateOutlet="userAlias;context:{ address: node.data.subjects ? node.data.subjects[0] : node.data.subject, isContract: node.data.subjectType === 'contract' }">
             </ng-container>
           </p>
         </ion-col>
@@ -386,11 +392,11 @@
             <ng-container *ngIf="popupVerification.subjects">
               <ng-container *ngFor="let subject of popupVerification.subjects; let i = index">
                 <span *ngIf="i !== 0">, </span>
-                <ng-container *ngTemplateOutlet="userAlias;context:{ address:subject }"></ng-container>
+                <ng-container *ngTemplateOutlet="userAlias;context:{ address:subject, isContract: popupVerification.subjectType === 'contract' }"></ng-container>
               </ng-container>
             </ng-container>
             <ng-container *ngIf="!popupVerification.subjects">
-              <ng-container *ngTemplateOutlet="userAlias;context:{ address:popupVerification.subject }"></ng-container>
+              <ng-container *ngTemplateOutlet="userAlias;context:{ address:popupVerification.subject, isContract: popupVerification.subjectType === 'contract' }"></ng-container>
             </ng-container>
           </p>
         </ion-col>

@@ -31,98 +31,6 @@ export const en = {
     "account-changed-description": "You changed or locked your current account.<br> The page / application needs to be <b>refreshed</b>.",
     "camera": "Camera",
     "cancel": "Cancel",
-    "verifications": {
-      "accept": "accept",
-      "all-issuers": "All verifications related to this verification path and user.",
-      "cancel": "cancel",
-      "verification-description": "Verification description",
-      "verification-hover": "Verification {{ displayName }} issued by {{ from }}",
-      "close-details": "close",
-      "creation-date": "Creation date",
-      "delete": "delete",
-      "descName": {
-        "desc": "Please enter a verification name.",
-        "error": "You have to enter a name to save the description!",
-        "title": "Verification name"
-      },
-      "details": "Verification detail",
-      "details-desc": "Overview of verifications and their exact status information.",
-      "dispatcher": {
-        "acceptDispatcher": {
-          "description": "Do you want to accept the verification \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
-          "ok": "accept",
-          "title": "Accept verification"
-        },
-        "cancel": "cancel",
-        "deleteDispatcher": {
-          "description": "Do you want to delete the verification \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
-          "ok": "delete",
-          "title": "Delete verification"
-        },
-        "descriptionDispatcher": {
-          "description": "Would you like to save the metadata of this verification path?",
-          "ok": "save",
-          "title": "Verification path adjustments"
-        },
-        "rejectDispatcher": {
-          "description": "Do you want to reject the verification \"<b>{{ topic }}</b>\" of the user <b>{{ to }}</b>?",
-          "ok": "reject",
-          "rejected-description": "The verification <b>{{ topic }}</b> by the user <b>{{ from }}</b> to <b>{{ to }}</b> was rejected by <b>{{ rejector }}</b>: ",
-          "title": "Reject verification"
-        }
-      },
-      "done": "ok",
-      "enable-expiration-date": "Use expiration date",
-      "expiration-date": "Expiration date",
-      "interactions": "Editing",
-      "issue": "issue",
-      "issue-verification": "Issue Verification",
-      "issue-verification-description": "Do you want to issue the verification \"<b>{{ topic }}</b>\" to the user <b>{{ to }}</b>?",
-      "issued-by": "issued by",
-      "issuer": "Issuer",
-      "issuer-no-identity": "No verification administration has yet been created for this account, so you cannot issue verifications. Please visit the verification management application to set it up.",
-      "not-set": "Not issued",
-      "not-set-desc": "...",
-      "okays": {
-        "confirmed": "confirmed",
-        "notExpired": "not expired",
-        "valid": "valid",
-        "validPath": "valid verification chain"
-      },
-      "reject": "reject",
-      "reject-verification": "reject",
-      "reject-date": "Reject date",
-      "reject-reason": "Reject Reason",
-      "rejector": "Rejector",
-      "select-desc-img": {
-        "select": "Select image",
-        "title": "Verification image"
-      },
-      "set-description": "Save verification description",
-      "since": "expired",
-      "status": "Status",
-      "subject": "Subject",
-      "subject-no-identity": "No verification administration has been created for this account yet, so no verifications can be issued for this identity.",
-      "topic": "Verification path",
-      "trust-provider": "Trust provider",
-      "trust-taker": "Trust taker",
-      "until": "expires",
-      "warnings": {
-        "expired": "expired",
-        "invalid": "manipulated",
-        "invalidPath": "Invalid verification chain",
-        "issued": "not accepted",
-        "missing": "Verification does not exists.",
-        "noIdentity": "Verification management missing",
-        "notEnsRootOwner": "Invalid root verification",
-        "parentMissing": "Path does not exist",
-        "parentUntrusted": "path invalid",
-        "rejected": "rejected",
-        "selfIssued": "self created",
-        "title": "Warnings",
-        "undefined": "valid"
-      }
-    },
     "contract-members": {
       "add-members": "Add members",
       "i": "My Account",
@@ -196,6 +104,99 @@ export const en = {
     },
     "use-password": "Unlock",
     "user-locked": "Profile locked",
+    "verifications": {
+      "accept": "accept",
+      "all-issuers": "All verifications related to this verification path and user.",
+      "cancel": "cancel",
+      "close-details": "close",
+      "contract": "Contract",
+      "creation-date": "Creation date",
+      "delete": "delete",
+      "descName": {
+        "desc": "Please enter a verification name.",
+        "error": "You have to enter a name to save the description!",
+        "title": "Verification name"
+      },
+      "details": "Verification detail",
+      "details-desc": "Overview of verifications and their exact status information.",
+      "dispatcher": {
+        "acceptDispatcher": {
+          "description": "Do you want to accept the verification \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
+          "ok": "accept",
+          "title": "Accept verification"
+        },
+        "cancel": "cancel",
+        "deleteDispatcher": {
+          "description": "Do you want to delete the verification \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
+          "ok": "delete",
+          "title": "Delete verification"
+        },
+        "descriptionDispatcher": {
+          "description": "Would you like to save the metadata of this verification path?",
+          "ok": "save",
+          "title": "Verification path adjustments"
+        },
+        "rejectDispatcher": {
+          "description": "Do you want to reject the verification \"<b>{{ topic }}</b>\" of the user <b>{{ to }}</b>?",
+          "ok": "reject",
+          "rejected-description": "The verification <b>{{ topic }}</b> by the user <b>{{ from }}</b> to <b>{{ to }}</b> was rejected by <b>{{ rejector }}</b>: ",
+          "title": "Reject verification"
+        }
+      },
+      "done": "ok",
+      "enable-expiration-date": "Use expiration date",
+      "expiration-date": "Expiration date",
+      "interactions": "Editing",
+      "issue": "issue",
+      "issue-verification": "Issue Verification",
+      "issue-verification-description": "Do you want to issue the verification \"<b>{{ topic }}</b>\" to the user <b>{{ to }}</b>?",
+      "issued-by": "issued by",
+      "issuer": "Issuer",
+      "issuer-no-identity": "No verification administration has yet been created for this account, so you cannot issue verifications. Please visit the verification management application to set it up.",
+      "not-set": "Not issued",
+      "not-set-desc": "...",
+      "okays": {
+        "confirmed": "confirmed",
+        "notExpired": "not expired",
+        "valid": "valid",
+        "validPath": "valid verification chain"
+      },
+      "reject": "reject",
+      "reject-date": "Reject date",
+      "reject-reason": "Reject Reason",
+      "reject-verification": "reject",
+      "rejector": "Rejector",
+      "select-desc-img": {
+        "select": "Select image",
+        "title": "Verification image"
+      },
+      "set-description": "Save verification description",
+      "since": "expired",
+      "status": "Status",
+      "subject": "Subject",
+      "subject-no-identity": "No verification administration has been created for this account yet, so no verifications can be issued for this identity.",
+      "topic": "Verification path",
+      "trust-provider": "Trust provider",
+      "trust-taker": "Trust taker",
+      "until": "expires",
+      "verification-description": "Verification description",
+      "verification-hover": "Verification {{ displayName }} issued by {{ from }}",
+      "warnings": {
+        "expired": "expired",
+        "invalid": "manipulated",
+        "invalidPath": "Invalid verification chain",
+        "issued": "not accepted",
+        "missing": "Verification does not exists.",
+        "noIdentity": "Verification management missing",
+        "notEnsRootOwner": "Invalid root verification",
+        "parentMissing": "Path does not exist",
+        "parentUntrusted": "path invalid",
+        "rejected": "rejected",
+        "selfIssued": "self created",
+        "title": "Warnings",
+        "undefined": "valid"
+      }
+    },
     "warnings": {
       "dont-show-again": "Don't show again",
       "eve-empty": {

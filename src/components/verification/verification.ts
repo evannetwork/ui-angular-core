@@ -608,8 +608,11 @@ export class EvanVerificationComponent extends AsyncComponent {
    * @return     {boolean}  True if able to accept verification, False otherwise
    */
   private canAcceptVerification(verification: any) {
-    return verification.status === 0 && this.activeAccount === verification.subject &&
-      verification.warnings.indexOf('issued') !== -1;
+    return verification.status === 0 && verification.warnings.indexOf('issued') !== -1 &&
+      (this.activeAccount === verification.subject ||
+        (verification.subjectType === 'contract' &&
+         verification.subjectOwner === this.activeAccount)
+      );
   }
 
   /**
@@ -619,7 +622,16 @@ export class EvanVerificationComponent extends AsyncComponent {
    * @return     {boolean}  True if able to issue verification, False otherwise
    */
   private canIssueVerification(verification: any) {
-    if (!this.activeIdentity || !this.enableIssue || verification.warnings.indexOf('noIdentity') !== -1) {
+    if (verification.warnings.indexOf('noIdentity') !== -1 &&
+        verification.subjectType === 'contract' &&
+        verification.subjectOwner === this.core.activeAccount()) {
+      verification.warnings.splice(verification.warnings.indexOf('noIdentity'), 1);
+    }
+
+    // if the current user has no identity, enable issue is disabled or the subject has no identity,
+    // but the subject is no contract
+    if (!this.activeIdentity || !this.enableIssue ||
+        verification.warnings.indexOf('noIdentity') !== -1) {
       return false;
     } else if (verification.warnings.indexOf('missing') !== -1) {
       return true;

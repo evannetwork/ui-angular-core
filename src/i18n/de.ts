@@ -31,98 +31,6 @@ export const de = {
     "account-changed-description": "Sie haben Ihren aktiven Account geändert.<br> Die Seite / Applikation muss <b>neu geladen werden</b>.",
     "camera": "Kamera",
     "cancel": "Abbrechen",
-    "verifications": {
-      "accept": "bestätigen",
-      "all-issuers": "Alle Verifizierungen den diesen Verifizierungspfad und Nutzer betreffen.",
-      "cancel": "abbrechen",
-      "verification-description": "Verifizierungsbeschreibung",
-      "verification-hover": "Verifizierung {{ displayName }} ausgestellt von {{ from }}",
-      "close-details": "schließen",
-      "creation-date": "Erstelldatum",
-      "delete": "löschen",
-      "descName": {
-        "desc": "Bitte geben Sie einen Verifizierungsnamen ein.",
-        "error": "Sie müssen einen Namen angeben, um die Beschreibung zu speichern!",
-        "title": "Verifizierungsname"
-      },
-      "details": "Verifizierungsdetails",
-      "details-desc": "Übersicht über Verifizierungen und deren genaue Statusinformationen.",
-      "dispatcher": {
-        "acceptDispatcher": {
-          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> bestätigen?",
-          "ok": "bestätigen",
-          "title": "Verifizierung bestätigen"
-        },
-        "cancel": "abbrechen",
-        "deleteDispatcher": {
-          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> löschen?",
-          "ok": "löschen",
-          "title": "Verifizierung löschen"
-        },
-        "descriptionDispatcher": {
-          "description": "Möchten Sie die Metadaten dieses Verifizierungspfades speichern?",
-          "ok": "speichern",
-          "title": "Verifizierungspfad Anpassungen"
-        },
-        "rejectDispatcher": {
-          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> verwerfen?",
-          "ok": "verwerfen",
-          "rejected-description": "Die Verifizierung <b>{{ topic }}</b> von dem Nutzer <b>{{ from }}</b> an <b>{{ to }}</b> wurde von <b>{{ rejector }}</b> verworfen: ",
-          "title": "Verifizierung verwerfen"
-        }
-      },
-      "done": "ok",
-      "enable-expiration-date": "Ablaufdatum benutzen",
-      "expiration-date": "Ablaufdatum",
-      "interactions": "Bearbeitung",
-      "issue": "ausstellen",
-      "issue-verification": "Verifizierung ausstellen",
-      "issue-verification-description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" für den Nutzer <b>{{ to }}</b> ausstellen?",
-      "issued-by": "ausgestellt von",
-      "issuer": "Aussteller",
-      "issuer-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können Sie keine Verifizierungen ausstellen. Bitte besuchen die Zertifikasverwaltung Anwendung, um die diese einzurichten.",
-      "not-set": "Nicht ausgestellt",
-      "not-set-desc": "...",
-      "okays": {
-        "confirmed": "bestätigt",
-        "notExpired": "gültig",
-        "valid": "valide",
-        "validPath": "gültige Verifizierungskette"
-      },
-      "reject": "verwerfen",
-      "reject-verification": "Verwerfen",
-      "reject-date": "Ablehnungsdatum",
-      "reject-reason": "Ablehnungsgrund",
-      "rejector": "Ablehnender",
-      "select-desc-img": {
-        "select": "Bild auswählen",
-        "title": "Verifizierungsbild"
-      },
-      "set-description": "Beschreibung speichern",
-      "since": "seit",
-      "status": "Status",
-      "subject": "Zugewiesener",
-      "subject-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können für diese Identität keine Verifizierungen ausgestellt werden.",
-      "topic": "Verifizierungspfad",
-      "trust-provider": "Aussteller",
-      "trust-taker": "Empfänger",
-      "until": "bis",
-      "warnings": {
-        "expired": "abgelaufen",
-        "invalid": "manipuliert",
-        "invalidPath": "Ungültige Verifizierungskette",
-        "issued": "nicht bestätigt",
-        "missing": "Verifizierung existiert nicht.",
-        "noIdentity": "Verifizierungsverwaltung fehlt",
-        "notEnsRootOwner": "Ungültiges Stammzertifikat",
-        "parentMissing": "Pfad nicht existent",
-        "parentUntrusted": "Pfad nicht bestätigt",
-        "rejected": "verworfen",
-        "selfIssued": "selbst erstellt",
-        "title": "Warnungen",
-        "undefined": "valide"
-      }
-    },
     "contract-members": {
       "add-members": "Mitglieder hinzufügen",
       "i": "Mein Account",
@@ -197,6 +105,99 @@ export const de = {
     },
     "use-password": "Entsperren",
     "user-locked": "Profil gesperrt",
+    "verifications": {
+      "accept": "bestätigen",
+      "all-issuers": "Alle Verifizierungen den diesen Verifizierungspfad und Nutzer betreffen.",
+      "cancel": "abbrechen",
+      "close-details": "schließen",
+      "contract": "Vertrag",
+      "creation-date": "Erstelldatum",
+      "delete": "löschen",
+      "descName": {
+        "desc": "Bitte geben Sie einen Verifizierungsnamen ein.",
+        "error": "Sie müssen einen Namen angeben, um die Beschreibung zu speichern!",
+        "title": "Verifizierungsname"
+      },
+      "details": "Verifizierungsdetails",
+      "details-desc": "Übersicht über Verifizierungen und deren genaue Statusinformationen.",
+      "dispatcher": {
+        "acceptDispatcher": {
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> bestätigen?",
+          "ok": "bestätigen",
+          "title": "Verifizierung bestätigen"
+        },
+        "cancel": "abbrechen",
+        "deleteDispatcher": {
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> löschen?",
+          "ok": "löschen",
+          "title": "Verifizierung löschen"
+        },
+        "descriptionDispatcher": {
+          "description": "Möchten Sie die Metadaten dieses Verifizierungspfades speichern?",
+          "ok": "speichern",
+          "title": "Verifizierungspfad Anpassungen"
+        },
+        "rejectDispatcher": {
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> verwerfen?",
+          "ok": "verwerfen",
+          "rejected-description": "Die Verifizierung <b>{{ topic }}</b> von dem Nutzer <b>{{ from }}</b> an <b>{{ to }}</b> wurde von <b>{{ rejector }}</b> verworfen: ",
+          "title": "Verifizierung verwerfen"
+        }
+      },
+      "done": "ok",
+      "enable-expiration-date": "Ablaufdatum benutzen",
+      "expiration-date": "Ablaufdatum",
+      "interactions": "Bearbeitung",
+      "issue": "ausstellen",
+      "issue-verification": "Verifizierung ausstellen",
+      "issue-verification-description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" für den Nutzer <b>{{ to }}</b> ausstellen?",
+      "issued-by": "ausgestellt von",
+      "issuer": "Aussteller",
+      "issuer-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können Sie keine Verifizierungen ausstellen. Bitte besuchen die Zertifikasverwaltung Anwendung, um die diese einzurichten.",
+      "not-set": "Nicht ausgestellt",
+      "not-set-desc": "...",
+      "okays": {
+        "confirmed": "bestätigt",
+        "notExpired": "gültig",
+        "valid": "valide",
+        "validPath": "gültige Verifizierungskette"
+      },
+      "reject": "verwerfen",
+      "reject-date": "Ablehnungsdatum",
+      "reject-reason": "Ablehnungsgrund",
+      "reject-verification": "Verwerfen",
+      "rejector": "Ablehnender",
+      "select-desc-img": {
+        "select": "Bild auswählen",
+        "title": "Verifizierungsbild"
+      },
+      "set-description": "Beschreibung speichern",
+      "since": "seit",
+      "status": "Status",
+      "subject": "Zugewiesener",
+      "subject-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können für diese Identität keine Verifizierungen ausgestellt werden.",
+      "topic": "Verifizierungspfad",
+      "trust-provider": "Aussteller",
+      "trust-taker": "Empfänger",
+      "until": "bis",
+      "verification-description": "Verifizierungsbeschreibung",
+      "verification-hover": "Verifizierung {{ displayName }} ausgestellt von {{ from }}",
+      "warnings": {
+        "expired": "abgelaufen",
+        "invalid": "manipuliert",
+        "invalidPath": "Ungültige Verifizierungskette",
+        "issued": "nicht bestätigt",
+        "missing": "Verifizierung existiert nicht.",
+        "noIdentity": "Verifizierungsverwaltung fehlt",
+        "notEnsRootOwner": "Ungültiges Stammzertifikat",
+        "parentMissing": "Pfad nicht existent",
+        "parentUntrusted": "Pfad nicht bestätigt",
+        "rejected": "verworfen",
+        "selfIssued": "selbst erstellt",
+        "title": "Warnungen",
+        "undefined": "valide"
+      }
+    },
     "warnings": {
       "dont-show-again": "Meldung nicht mehr anzeigen",
       "eve-empty": {
