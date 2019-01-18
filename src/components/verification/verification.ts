@@ -997,8 +997,6 @@ export class EvanVerificationComponent extends AsyncComponent {
             this.activeDetailHover = node;
           }
 
-          setTimeout(() => d3.select('.evan-detail-hover > div').on('mousedown.drag', null));
-
           // update the ref and stop the event bubbling
           this.ref.detectChanges();
           if (!$event.disableEventBubbling) {
@@ -1055,7 +1053,7 @@ export class EvanVerificationComponent extends AsyncComponent {
 
     // start!
     update();
-    await this.core.utils.timeout(500);
+    await this.core.utils.timeout(0);
     update();
 
     // collapse missing popover automatically

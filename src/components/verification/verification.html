@@ -27,14 +27,14 @@
 
 <!----------------------------------- verification user alias--------------------------------------------->
 <ng-template #userAlias let-address="address">
-  <ng-container *ngIf="address">
+  <span class="clickalbe" *ngIf="address" (click)="core.copyString(address)">
     <ng-container *ngIf="address === verificationService.ensRootOwner">
       evan ({{ verificationService.ensRootOwner }})
     </ng-container>
     <ng-container *ngIf="address !== verificationService.ensRootOwner">
       {{ (addressbook[address]?.alias || addressbook[address]?.email) ? (addressbook[address]?.alias || addressbook[address]?.email) + ' (' + address + ')' : address }}
     </ng-container>
-  </ng-container>
+  </span>
 </ng-template>
 
 <!----------------------------- verification alias multiline --------------------------------------------->
@@ -48,7 +48,7 @@
       <b>
         {{ addressbook[address]?.alias || addressbook[address]?.email || ('_angularcore.no-alias' | translate) }}
       </b>
-      <p>
+      <p class="clickalbe" (click)="core.copyString(address)">
         {{ address }}
       </p>
     </ng-container>
