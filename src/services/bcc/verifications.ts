@@ -172,14 +172,11 @@ export class EvanVerificationService {
    *   }
    */
   public async getVerifications(address: string, topic: string, isIdentity?: boolean) {
-    const verifications = await this.bcc.verifications.getNestedVerifications(
-      this.core.activeAccount(),
+    return await this.bcc.verifications.getNestedVerifications(
       address,
       topic,
       isIdentity
     );
-
-    return verifications;
   }
 
   /**
@@ -190,12 +187,8 @@ export class EvanVerificationService {
    * @return     {any}         computed verification including latest creationDate, combined color,
    *                           displayName
    */
-  public async getComputedVerification(topic: string, verifications: Array<any>) {
-    return await this.bcc.verifications.getComputedVerification(
-      this.core.activeAccount(),
-      topic,
-      verifications
-    );
+  public async computeVerifications(topic: string, verifications: Array<any>) {
+    return await this.bcc.verifications.computeVerifications(topic, verifications);
   }
 
   /**
@@ -232,6 +225,6 @@ export class EvanVerificationService {
    * @return     {void}  
    */
   public deleteFromVerificationCache(address: string, topic: string) {
-    this.bcc.verifications.getComputedVerification(address, topic);
+    this.bcc.verifications.computeVerifications(address, topic);
   }
 }

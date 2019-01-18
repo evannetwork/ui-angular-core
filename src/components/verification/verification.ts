@@ -417,7 +417,7 @@ export class EvanVerificationComponent extends AsyncComponent {
     // load addressbook
     this.addressbook = await this.addressBookService.loadAccounts();
     // reset verifications loading status, could be old within cached values
-    this.computed = await this.verificationService.getComputedVerification(this.topic, this.verifications);
+    this.computed = await this.verificationService.computeVerifications(this.topic, this.verifications);
 
     this.loadingVerifications = false;
     this.ref.detectChanges();
@@ -503,7 +503,7 @@ export class EvanVerificationComponent extends AsyncComponent {
           this.popupVerification = this.core.utils.deepCopy(verificationToActivate);
         } else {
           this.popupVerification = await this.verificationService
-            .getComputedVerification(verificationToActivate.name, [ verificationToActivate ]);
+            .computeVerifications(verificationToActivate.name, [ verificationToActivate ]);
         }
 
         await this.enableVerificationModal(this.popupVerification);
@@ -772,6 +772,8 @@ export class EvanVerificationComponent extends AsyncComponent {
       if (parent.status === 1) {
         return 'status-1';
       }
+    } else if (verification.warnings.indexOf('notEnsRootOwner') !== -1) {
+      return 'status-0';
     } else if (verification.issuerAccount === this.verificationService.ensRootOwner) {
       return 'status-1';
     }
@@ -994,6 +996,8 @@ export class EvanVerificationComponent extends AsyncComponent {
           } else {
             this.activeDetailHover = node;
           }
+
+          setTimeout(() => d3.select('.evan-detail-hover > div').on('mousedown.drag', null));
 
           // update the ref and stop the event bubbling
           this.ref.detectChanges();

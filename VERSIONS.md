@@ -2,6 +2,8 @@
 
 ## Next Version
 ### Features
+- outsource deep verification check logic to `@evan.network/api-blockchain-core`
+
 ### Fixes
 - fix initial routing of angular router
   - Router.prototype.originNavigateByUrl was overwritten with a custom one of the angular-core. if the angular-core gets initialzed multiple times, the function will be more and more nested. But the origin one, that is needed initially, is not present. So backuped the function directly to the router prototype.
@@ -9,6 +11,8 @@
 - add `getNameForAccountSync` to `EvanAddressBookService`
 
 ### Deprecations
+- rename claims to verifications
+- rename `getComputedClaim` to `computeVerifications`
 
 ## Version 1.7.0
 ### Features

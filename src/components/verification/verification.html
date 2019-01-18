@@ -161,23 +161,23 @@
       </ion-row>
       <ion-row>
         <ion-col col-md-6>
-          <b>{{ '_angularcore.verifications.trust-taker' | translate }}</b>
-          <p [class]="trustTakerStatusClass(node.data)">
-            <ng-container
-              *ngTemplateOutlet="userAlias;context:{ address: node.data.subjects ? node.data.subjects[0] : node.data.subject }">
-            </ng-container>
-          </p>
-        </ion-col>
-        <ion-col col-md-6>
           <b>{{ '_angularcore.verifications.trust-provider' | translate }}</b>
           <p
             *ngIf="node.data.issuerAccount"
-            [class]="trustProviderStatusClass(node.data)">
+            [class]="'break-word ' + trustProviderStatusClass(node.data)">
             <ng-container
               *ngTemplateOutlet="userAlias;context:{ address: node.data.issuerAccount }">
             </ng-container>
           </p>
           <p *ngIf="!node.data.issuerAccount">---</p>
+        </ion-col>
+        <ion-col col-md-6>
+          <b>{{ '_angularcore.verifications.trust-taker' | translate }}</b>
+          <p [class]="'break-word ' + trustTakerStatusClass(node.data)">
+            <ng-container
+              *ngTemplateOutlet="userAlias;context:{ address: node.data.subjects ? node.data.subjects[0] : node.data.subject }">
+            </ng-container>
+          </p>
         </ion-col>
       </ion-row>
       <ion-row>
@@ -202,7 +202,7 @@
       <ion-row class="rejected" *ngIf="node.data.rejectReason">
         <ion-col col-12 *ngIf="node.data.rejectReason.rejector">
           <b>{{ '_angularcore.verifications.rejector' | translate }}</b>
-          <p class="status--1">
+          <p class="status--1 break-word">
             <ng-container
               *ngTemplateOutlet="userAlias;context:{ address: node.data.rejectReason.rejector }">
             </ng-container>
