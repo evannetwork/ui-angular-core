@@ -68,8 +68,8 @@ import { EvanBCCService, } from '../../services/bcc/bcc';
 /**************************************************************************************************/
 
 /**
- * Component to select an account or contract address. For autocompletion processesm, the
- * addressbook of the current user is used. But alsow wildcard addresses can be inserted.
+ * Component to select an account or contract address. For autocompletion processes, the addressbook
+ * of the current user is used. But also wildcard addresses can be inserted.
  *
  * @class      Component AddressInputComponent
  */
