@@ -296,7 +296,7 @@ export class EvanUtilService implements OnDestroy {
    * @param      {number}         ms       Milliseconds to wait
    * @return     {Promise<void>}  solved when setTimeout callback is called
    */
-  timeout(ms: number): Promise<void> {
+  timeout(ms?: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 

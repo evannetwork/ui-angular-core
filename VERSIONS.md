@@ -4,6 +4,7 @@
 ### Features
 - outsource deep verification check logic to `@evan.network/api-blockchain-core`
 - support verifications for contracts
+- add `AddressInputComponent` to retrieve an account id or contract address, with an autocompletion from known address from the addressbook
 
 ### Fixes
 - fix initial routing of angular router

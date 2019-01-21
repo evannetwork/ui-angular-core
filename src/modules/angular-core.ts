@@ -72,6 +72,7 @@ import { EvanUtilService } from '../services/utils';
 import { SingletonService } from '../services/singleton-service';
 
 // components
+import { AddressInputComponent, } from '../components/address-input/address-input';
 import { BigPictureDialog } from '../components/big-picture/big-picture';
 import { BlockieComponent } from '../components/blockie/blockie';
 import { ContractListEntriesComponent } from '../components/contract-listentries/contract-listentries';
@@ -79,13 +80,13 @@ import { ContractMembersComponent } from '../components/contract-members/contrac
 import { DAppLoaderComponent } from '../components/dapp-loader/dapp-loader';
 import { DashboardTopButtons } from '../components/dashboard-top-buttons/dashboard-top-buttons';
 import { EmptyDAppDisplayComponent } from '../components/empty-dapp-display/empty-dapp-display';
-import { EvanVerificationComponent } from '../components/verification/verification';
 import { EvanDAppWrapperComponent } from '../components/dapp-wrapper/dapp-wrapper';
 import { EvanFileSelectComponent } from '../components/file-select/file-select';
 import { EvanLoadingComponent } from '../components/evan-loading/evan-loading';
 import { EvanProfileVerificationsComponent } from '../components/profile-verifications/profile-verifications';
 import { EvanReloadComponent } from '../components/reload-route/reload-route';
 import { EvanSplitPaneComponent } from '../components/split-pane/split-pane';
+import { EvanVerificationComponent } from '../components/verification/verification';
 import { GlobalPasswordComponent } from '../components/global-password/global-password';
 import { ListPagingComponent } from '../components/list-paging/list-paging';
 import { MailDialogComponent } from '../components/mail-dialog/mail-dialog';
@@ -131,6 +132,7 @@ const moduleConfig = {
     HttpModule,
   ],
   declarations: [
+    AddressInputComponent,
     BigPictureDialog,
     BlockieComponent,
     ContractListEntriesComponent,
@@ -138,13 +140,13 @@ const moduleConfig = {
     DAppLoaderComponent,
     DashboardTopButtons,
     EmptyDAppDisplayComponent,
-    EvanVerificationComponent,
     EvanDAppWrapperComponent,
     EvanFileSelectComponent,
     EvanLoadingComponent,
     EvanProfileVerificationsComponent,
     EvanReloadComponent,
     EvanSplitPaneComponent,
+    EvanVerificationComponent,
     GlobalPasswordComponent,
     ListPagingComponent,
     MailDialogComponent,
@@ -202,6 +204,7 @@ const moduleConfig = {
     IonTagsInputModule,
 
     // components
+    AddressInputComponent,
     BigPictureDialog,
     BlockieComponent,
     ContractListEntriesComponent,
