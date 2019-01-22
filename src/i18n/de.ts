@@ -200,11 +200,11 @@ export const de = {
     "warnings": {
       "dont-show-again": "Meldung nicht mehr anzeigen",
       "eve-empty": {
-        "body": "Sie haben ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist nicht mehr möglich, Verträge zu erstellen oder Transaktionen zu senden.",
+        "body": "Sie haben Ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist nicht mehr möglich, Verträge zu erstellen oder Transaktionen zu senden.",
         "title": "EVEs sind aufgebraucht"
       },
       "eve-low": {
-        "body": "Sie haben fast ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist möglich, dass spezielle Aktionen (Vertragserstellungen, Speichertransaktionen) bei einem zu geringen EVE Wert fehlschlagen.",
+        "body": "Sie haben fast Ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist möglich, dass spezielle Aktionen (Vertragserstellungen, Speichertransaktionen) bei einem zu geringen EVE Wert fehlschlagen.",
         "title": "EVEs sind fast aufgebraucht"
       },
       "indexdb-not-available": {
