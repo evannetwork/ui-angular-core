@@ -25,10 +25,31 @@
   https://evan.network/license/
 -->
 
-<evan-claim
-  *ngFor="let claim of claims"
-  [topic]="claim"
-  [address]="account"
-  [mode]="mode || 'icon'"
-  [compute]="true">
-</evan-claim>
+<ion-spinner *ngIf="loading"></ion-spinner>
+<ng-container *ngIf="!loading">
+  <ion-label stacked class="standalone">
+    {{ label }}
+  </ion-label>
+  <ion-item>
+    <ion-label fixed *ngIf="contacts[inputValue]?.alias || contacts[inputValue]?.email">
+      {{ contacts[inputValue]?.alias || contacts[inputValue]?.email }}
+    </ion-label>
+
+    <ion-input
+      [placeholder]="placeholder"
+      [(ngModel)]="inputValue"
+      (keydown)="handleKeyPress($event)"
+      (ionChange)="contactSearchChanged()"
+      (focus)="setShowSuggestions(true)"
+      (focusout)="setShowSuggestions(false)">
+    </ion-input>
+  </ion-item>
+  <div class="suggestions" *ngIf="showSuggestions">
+    <div class="suggestion"
+      *ngFor="let suggestion of suggestions; let i = index"
+      [class.active]="i === activeSuggestion"
+      (click)="inputValue = suggestion; contactSearchChanged();">
+      {{ (contacts[suggestion]?.alias || contacts[suggestion]?.email) ? (contacts[suggestion]?.alias || contacts[suggestion]?.email) + ' (' + suggestion + ')' : suggestion }}
+    </div>
+  </div>
+</ng-container>
