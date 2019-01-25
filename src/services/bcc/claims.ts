@@ -379,8 +379,12 @@ export class EvanClaimService {
                  (claim.issuerAccount !== this.ensRootOwner || claim.subject !== this.ensRootOwner)) {
                 claim.warnings = [ 'notEnsRootOwner' ];
               } else {
-                claim.status = 1;
-                claim.warnings = [ ];
+                const whitelistWarnings = [ 'expired', 'rejected', 'invalid', 'noIdentity', 'issued' ];
+
+                // if it's a root claim, remove parent, selfIssued and issued warnings
+                claim.warnings = claim.warnings.filter(warning => 
+                  whitelistWarnings.indexOf(warning) !== -1
+                );
               }
             }
 
