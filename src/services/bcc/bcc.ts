@@ -102,6 +102,7 @@ export class EvanBCCService {
   public keyProvider: any;
   public mailbox: any;
   public nameResolver: any;
+  public payments: any;
   public profile: any;
   public ProfileBundle: any;
   public rightsAndRoles: CoreBundle.RightsAndRoles;
@@ -124,7 +125,7 @@ export class EvanBCCService {
 
   /**
    * Initialize the bcc service using a password unlocking function.
-   * 
+   *
    * Usage (used in every DApp RootComponent):
    *   await this.bcc.initialize((accountId) => this.bcc.globalPasswordDialog(accountId));
    *
@@ -177,6 +178,7 @@ export class EvanBCCService {
     this.serviceContract = ProfileBundle.ProfileRuntime.serviceContract;
     this.sharing = ProfileBundle.ProfileRuntime.sharing;
     this.claims = ProfileBundle.ProfileRuntime.claims;
+    this.payments = ProfileBundle.ProfileRuntime.payments;
   }
 
   /**
@@ -262,7 +264,7 @@ export class EvanBCCService {
         // use account store from signer or use a new one
         bccProfileOptions.accountStore = bccProfileOptions.signer.accountStore ||
           new AccountStore();
-  
+
         // if we are loading all data via an smart-agent, we need to create a new ExecutorAgent
         if (provider === 'agent-executor') {
           const agentExecutor = await core.getAgentExecutor();
