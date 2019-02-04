@@ -3,6 +3,7 @@
 ## Next Version
 ### Features
 - `updateBCC` navigates to onboarding, if no user is logged in
+- add modal warning if no payment storage was setup before
 
 ### Fixes
 - fix initial routing of angular router

@@ -25,6 +25,7 @@
   https://evan.network/license/
 */
 
+/* tslint:disable */
 export const de = {
   "_angularcore": {
     "account-changed": "Account wurde geändert",
@@ -211,6 +212,11 @@ export const de = {
         "body": "Der von Ihnen genutzte Browser unterstützt nicht das lokale zwischenspeichern von Daten, was zu Laufzeitproblemen führen kann.Bitte benutzen Sie einen der folgenden Browsern: <b>Chrome, Firefox Safari, Edge</b>.<br><br><b>Hinweis</b>: Einige Browser besitzen in einem privaten Modus eingeschränkte Speicherkapazitäten.",
         "title": "Lokaler Datenspeicher nicht verfügbar"
       },
+      "payment-channel": {
+        "body": "Um Daten auf dem evan.network zu speichern, ist ein Guthaben erforderlich. Bitte richten Sie in dem Profileinstellungen ein Guthaben ein, um Daten speichern zu können.",
+        "navigate-to-profile": "Zum den Profileinstellungen",
+        "title": "Speicherguthaben"
+      },
       "quota-exceeded": {
         "body": "Das evan.network kann keine geladenen Daten mehr zwischenspeichern, was zu Laufzeitproblemen führen kann.<br><br>Bitte leeren Sie die evan.network spezifischen Daten.",
         "clear-ipfs-cache": "Daten leeren",
@@ -297,3 +303,4 @@ export const de = {
   "remove": "Entfernen",
   "submit": "Akzeptieren"
 }
+/* tslint:enable */

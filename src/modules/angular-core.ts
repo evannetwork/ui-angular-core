@@ -49,6 +49,7 @@ import { AngularCoreTranslations } from '../i18n/registy';
 import { EvanAddressBookService } from '../services/bcc/address-book';
 import { EvanAlertService } from '../services/ui/alert';
 import { EvanBCCService } from '../services/bcc/bcc';
+import { EvanPaymentService } from '../services/bcc/payment';
 import { EvanBcService } from '../services/bcc/bc';
 import { EvanBookmarkService } from '../services/bcc/bookmark';
 import { EvanClaimService } from '../services/bcc/claims';
@@ -177,6 +178,7 @@ const moduleConfig = {
     EvanMailboxService,
     EvanModalService,
     EvanOnboardingService,
+    EvanPaymentService,
     EvanPictureService,
     EvanQrCodeService,
     EvanQueue,

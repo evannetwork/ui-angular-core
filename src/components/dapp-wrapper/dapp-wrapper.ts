@@ -56,6 +56,7 @@ import { EvanTranslationService } from '../../services/ui/translate';
 import { EvanLoggingService } from '../../services/ui/logging';
 import { EvanAlertService } from '../../services/ui/alert';
 import { AsyncComponent } from '../../classes/AsyncComponent';
+import { EvanPaymentService } from '../../services/bcc/payment';
 
 /**************************************************************************************************/
 
@@ -211,20 +212,21 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
   /***************** initialization  *****************/
   constructor(
     private _DomSanitizer: DomSanitizer,
+    private alertService: EvanAlertService,
     private bccService: EvanBCCService,
     private core: EvanCoreService,
     private definitionService: EvanDescriptionService,
     private elementRef: ElementRef,
     private evanQueue: EvanQueue,
+    private logging: EvanLoggingService,
     private mailboxService: EvanMailboxService,
     private menuController: MenuController,
+    private paymentService: EvanPaymentService,
     private ref: ChangeDetectorRef,
     private router: Router,
     private routing: EvanRoutingService,
     private translateService: EvanTranslationService,
     private utilService: EvanUtilService,
-    private logging: EvanLoggingService,
-    private alertService: EvanAlertService
   ) {
     super(ref, false);
   }
@@ -326,7 +328,7 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
                   {
                     role: 'cancel',
                     cssClass: 'display-none',
-                    handler: data => resolve()
+                    handler: () => resolve()
                   },
                   {
                     text: 'ok',
@@ -342,7 +344,7 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
                     handler: async () => {
                       await new Promise((quotaClearResolve) => {
                         let deleteRequest = indexedDB.deleteDatabase('ipfs-cache');
-                        
+
                         deleteRequest.onsuccess = () => quotaClearResolve();
                         deleteRequest.onerror = () => quotaClearResolve();
                         deleteRequest.onblocked = () => quotaClearResolve();
@@ -359,6 +361,23 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
 
                         window.location.reload();
                       } catch (ex) { }
+
+                      resolve();
+                    }
+                  });
+                }
+
+                // if the quota exceeded warning was received, add the clear ipfs cache data button
+                if (data.detail.type === 'payment-channel') {
+                  buttons.unshift({
+                    text: this.translateService.instant(
+                      '_angularcore.warnings.payment-channel.navigate-to-profile'),
+                    handler: async () => {
+                      this.routing.navigate([
+                        `/${ this.routing.getActiveRootEns() }`,
+                        `profile.${ getDomainName() }`,
+                        `payments`
+                      ].join('/'));
 
                       resolve();
                     }
@@ -383,6 +402,15 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
 
         await this.warningDisplayed;
       });
+
+      // check if the user already has created an payment channel, if not, trigger an popup to
+      // navigate the user to the profile page, where the payment channel can be set up
+      //   => cannot be check within the dapp-browser, their is no uer logged in
+      const paymentChannels = await this.paymentService.requestPaymentAgent('getChannels');
+      const activeChannels = paymentChannels.channels.filter(channel => channel.state === 'OPEN');
+      if (activeChannels.length !== 0) {
+        this.core.utils.sendEvent('evan-warning', { type: 'payment-channel' });
+      }
 
       // watch for developer mode is changing
       this.isDeveloperMode = window.localStorage['evan-developer-mode'] === 'true';

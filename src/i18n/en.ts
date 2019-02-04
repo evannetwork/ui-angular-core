@@ -25,6 +25,7 @@
   https://evan.network/license/
 */
 
+/* tslint:disable */
 export const en = {
   "_angularcore": {
     "account-changed": "Account changed",
@@ -210,6 +211,11 @@ export const en = {
         "body": "The browser you are using does not support local caching of data, which can lead to runtime problems. Please use one of the following browsers: <b>Chrome, Firefox Safari, Edge</b>.<br><br><b>Hint</b>: Some browsers have limited memory in a private mode.",
         "title": "Local data memory not available"
       },
+      "payment-channel": {
+        "body": "In order to store data on the evan.network, a credit is required. Please set up a credit in the profile settings in order to be able to save data.",
+        "navigate-to-profile": "Go to the profile settings",
+        "title": "Storage payments"
+      },
       "quota-exceeded": {
         "body": "The evan.network can no longer cache loaded data, which can lead to runtime problems.<br><br>Please clear the evan.network specific data.",
         "clear-ipfs-cache": "Clear Data",
@@ -301,3 +307,5 @@ export const en = {
   "remove": "Remove",
   "submit": "Submit"
 }
+/* tslint:enable */
+
