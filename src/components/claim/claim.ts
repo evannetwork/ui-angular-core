@@ -26,7 +26,8 @@
 */
 
 import {
-  getDomainName
+  getDomainName,
+  System,
 } from 'dapp-browser';
 
 import {
@@ -48,7 +49,6 @@ import {
   transition,
   trigger,
   ViewChild,
-  d3,
 } from 'angular-libs';
 
 import { AsyncComponent } from '../../classes/AsyncComponent';
@@ -67,6 +67,8 @@ import { createOpacityTransition } from '../../animations/opacity';
 import { createGrowTransition } from '../../animations/grow';
 
 /**************************************************************************************************/
+
+let d3;
 
 /**
  * Display a all claims for a specific topic using the api-blockchain-core claims service.
@@ -825,6 +827,10 @@ export class EvanClaimComponent extends AsyncComponent {
     const svgZoomContainer = svg.childNodes[1];
 
     // declares a tree layout and assigns the size
+    if (!d3) {
+      d3 = (await System.import(`d3.libs.${ getDomainName() }!dapp-content`)).default;
+    }
+
     let treemap = d3.tree()
       // Using nodeSize we are able to control
       // the separation between nodes. If we used
