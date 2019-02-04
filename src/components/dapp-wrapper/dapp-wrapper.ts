@@ -408,7 +408,7 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
       //   => cannot be check within the dapp-browser, their is no uer logged in
       const paymentChannels = await this.paymentService.requestPaymentAgent('getChannels');
       const activeChannels = paymentChannels.channels.filter(channel => channel.state === 'OPEN');
-      if (activeChannels.length !== 0) {
+      if (activeChannels.length === 0) {
         this.core.utils.sendEvent('evan-warning', { type: 'payment-channel' });
       }
 
