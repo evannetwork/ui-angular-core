@@ -269,7 +269,7 @@ export class EvanBCCService {
       this.copyCoreToInstance();
 
       if (activeAccount) {
-        const bccProfileOptions: any ={
+        const bccProfileOptions: any = {
           accountId: activeAccount,
           CoreBundle: CoreBundle,
           coreOptions: coreOptions,
@@ -292,7 +292,7 @@ export class EvanBCCService {
             contractLoader: CoreBundle.CoreRuntime.contractLoader,
             logLog: CoreBundle.logLog,
             logLogLevel: CoreBundle.logLogLevel,
-            signer: bccProfileOptions,
+            signer: bccProfileOptions.signer,
             token: agentExecutor.token,
             web3: this.web3,
           });
