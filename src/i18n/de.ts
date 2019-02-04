@@ -121,6 +121,9 @@ export const de = {
       },
       "details": "Verifizierungsdetails",
       "details-desc": "Übersicht über Verifizierungen und deren genaue Statusinformationen.",
+      "disable-sub-verifications": "Unterverifizierungen ausschalten",
+      "disable-sub-verifications-desc": "Sobald diese Einstellung aktiviert ist, werden alle Verifizierungen, die unter dieser erstellt werden, als nicht zulässig dargestellt.",
+      "disabled-sub-verifications": "ausgeschaltet",
       "dispatcher": {
         "acceptDispatcher": {
           "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> bestätigen?",
@@ -175,6 +178,7 @@ export const de = {
       "set-description": "Beschreibung speichern",
       "since": "seit",
       "status": "Status",
+      "sub-verifications": "Unterverifizierungen",
       "subject": "Zugewiesener",
       "subject-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können für diese Identität keine Verifizierungen ausgestellt werden.",
       "topic": "Verifizierungspfad",
@@ -184,6 +188,7 @@ export const de = {
       "verification-description": "Verifizierungsbeschreibung",
       "verification-hover": "Verifizierung {{ displayName }} ausgestellt von {{ from }}",
       "warnings": {
+        "disableSubVerifications": "Unterverifizierungen ausgeschaltet",
         "expired": "abgelaufen",
         "invalid": "manipuliert",
         "invalidPath": "Ungültige Verifizierungskette",

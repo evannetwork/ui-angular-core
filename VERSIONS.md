@@ -8,6 +8,7 @@
 - `updateBCC` navigates to onboarding, if no user is logged in
 - add modal warning if no payment storage was setup before
 - add `EvanPaymentService` for requesting payment agent
+- add `disableSubVerifications` flags to verifications
 
 ### Fixes
 - fix initial routing of angular router

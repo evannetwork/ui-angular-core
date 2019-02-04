@@ -471,6 +471,7 @@ export class EvanVerificationComponent extends AsyncComponent {
         description: verification.description,
         ensAddress: verification.ensAddress,
         expirationDate: verification.enableExpirationDate ? verification.expirationDate : null,
+        disableSubVerifications: verification.disableSubVerifications || false,
         id: verification.id,
         issuer: verification.issuerAccount,
         rejectReason: verification.rejectReason,

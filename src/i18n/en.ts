@@ -120,6 +120,9 @@ export const en = {
       },
       "details": "Verification detail",
       "details-desc": "Overview of verifications and their exact status information.",
+      "disable-sub-verifications": "Disable subverifications",
+      "disable-sub-verifications-desc": "Once this setting is enabled, any verifications created under it will be displayed as invalid.",
+      "disabled-sub-verifications": "disabled",
       "dispatcher": {
         "acceptDispatcher": {
           "description": "Do you want to accept the verification \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
@@ -174,6 +177,7 @@ export const en = {
       "set-description": "Save verification description",
       "since": "expired",
       "status": "Status",
+      "sub-verifications": "Subverifications",
       "subject": "Subject",
       "subject-no-identity": "No verification administration has been created for this account yet, so no verifications can be issued for this identity.",
       "topic": "Verification path",
@@ -183,6 +187,7 @@ export const en = {
       "verification-description": "Verification description",
       "verification-hover": "Verification {{ displayName }} issued by {{ from }}",
       "warnings": {
+        "disableSubVerifications": "Sub verifications disabled",
         "expired": "expired",
         "invalid": "manipulated",
         "invalidPath": "Invalid verification chain",

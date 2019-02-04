@@ -205,6 +205,14 @@
           </p>
         </ion-col>
       </ion-row>
+      <ion-row *ngIf="node.data.disableSubVerifications">
+        <ion-col col-12>
+          <b>{{ '_angularcore.verifications.sub-verifications' | translate }}</b>
+          <p>
+            {{ '_angularcore.verifications.disabled-sub-verifications' | translate }}
+          </p>
+        </ion-col>
+      </ion-row>
       <ion-row class="rejected" *ngIf="node.data.rejectReason">
         <ion-col col-12 *ngIf="node.data.rejectReason.rejector">
           <b>{{ '_angularcore.verifications.rejector' | translate }}</b>
@@ -457,6 +465,22 @@
             (focusout)="ref.detectChanges()">
           </ion-datetime>
         </ion-item>
+      </div>
+
+      <div class="display-flex-justify">
+        <ion-checkbox margin-right
+          [(ngModel)]="issueVerification.disableSubVerifications"
+          (ionChange)="ref.detectChanges()"
+          (focusout)="ref.detectChanges()">
+        </ion-checkbox>
+        <div class="evan-checkbox-label">
+          <ion-label class="standalone">
+            {{ '_angularcore.verifications.disable-sub-verifications' | translate }}
+          </ion-label>
+          <span>
+            {{ '_angularcore.verifications.disable-sub-verifications-desc' | translate }}
+          </span>
+        </div>
       </div>
 
       <div margin-top text-center>

@@ -96,7 +96,6 @@ import { QrCodeComponent } from '../components/qr-code/qr-code';
 import { QRCodeScannerDialogComponent } from '../components/qr-code-scanner/qr-code-scanner';
 import { SnapshotDialogComponent } from '../components/take-snapshot/take-snapshot';
 import { TrustDialogComponent } from '../components/trust-dialog/trust-dialog';
-import { AddressInputComponent } from '../components/address-input/address-input';
 
 // pipes
 import { ObjectToArrayPipe } from '../pipes/ObjectToArray';
