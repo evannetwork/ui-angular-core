@@ -32,7 +32,7 @@ evan-address-input {
   display: block;
 
   ion-label.label.standalone[stacked] {
-    margin-bottom: 0 !important;
+    margin-bottom: 4px !important;
   }
 
   ion-label[fixed] {
@@ -50,10 +50,13 @@ evan-address-input {
 
     .suggestion {
       display: block;
+      overflow: hidden;
 
       padding: 10px;
 
       cursor: pointer;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   }
 }

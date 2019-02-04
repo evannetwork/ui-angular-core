@@ -29,6 +29,6 @@
   *ngFor="let verification of verifications"
   [topic]="verification"
   [address]="account"
-  [mode]="'icon'"
+  [mode]="mode || 'icon'"
   [compute]="true">
 </evan-verification>

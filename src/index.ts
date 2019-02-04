@@ -39,6 +39,7 @@ export * from './services/bcc/core';
 export * from './services/bcc/description';
 export * from './services/bcc/mailbox';
 export * from './services/bcc/onboarding';
+export * from './services/bcc/payment';
 export * from './services/bcc/queue';
 export * from './services/bcc/queue-utilities';
 export * from './services/singleton-service';

@@ -32,7 +32,6 @@
     <zxing-scanner #scanner class="test-class"
       [scannerEnabled]="true"
       [device]="selectedDevice"
-      [cssClass]="{customClass:true}"
       (camerasFound)="displayCameras($event)"
       (scanSuccess)="handleQrCodeResult($event)"
       (click)="rejectDialog()">

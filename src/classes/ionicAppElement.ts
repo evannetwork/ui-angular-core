@@ -188,8 +188,7 @@ export async function startAngularApplication(AppModule: any, routes: Routes): P
           }
         }
 
-        moduleFactory = AppModule.ngFactory = await compiler.compileModuleAsync(AppModule);
-
+        moduleFactory = AppModule.ngFactory = await compiler.compileModuleSync(AppModule);
         compiler._metadataResolver.clearCacheFor(AppModule);
       } catch (ex) {
         console.error(ex);

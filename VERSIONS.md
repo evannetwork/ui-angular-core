@@ -5,6 +5,9 @@
 - outsource deep verification check logic to `@evan.network/api-blockchain-core`
 - support verifications for contracts
 - add `AddressInputComponent` to retrieve an account id or contract address, with an autocompletion from known address from the addressbook
+- `updateBCC` navigates to onboarding, if no user is logged in
+- add modal warning if no payment storage was setup before
+- add `EvanPaymentService` for requesting payment agent
 
 ### Fixes
 - fix initial routing of angular router

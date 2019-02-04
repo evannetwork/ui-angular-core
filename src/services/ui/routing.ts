@@ -112,11 +112,11 @@ Router.prototype.navigateByUrl = function(url: any, extras: any): Promise<any> {
   let mergedTree = this.urlHandlingStrategy.merge(urlTree, this.rawUrlTree);
 
   // history stack history timeout to prevent pushing of empty routes
-  //   => Angular 5 router provides the functionality to 
+  //   => Angular 5 router provides the functionality to
   if (stackHistoryTimeout) {
     window.clearTimeout(stackHistoryTimeout);
   }
-  
+
   // save latest location
   const locationHash = window.location.hash;
   stackHistoryTimeout = setTimeout(() => {
@@ -125,7 +125,7 @@ Router.prototype.navigateByUrl = function(url: any, extras: any): Promise<any> {
   }, 100);
 
   // return this.scheduleNavigation(mergedTree, 'imperative', extras);
-  // trigger navigation 
+  // trigger navigation
   window.location.hash = `#${ mergedTree.toString() }`;
 
   return Promise.resolve();
@@ -190,8 +190,8 @@ export class EvanRoutingService {
       }
 
       // much better logic for handling history stacking, but it will end in routing endless loops
-      //   by using goback an history popping 
-      // 
+      //   by using goback an history popping
+      //
       // check for url navigation to handle correct back logic outside of router.navigate
       // const beforeUrl = getRouteFromUrl(event.oldURL.split('#/')[1]);
       // if (routing.history.length === 0 || routing.history[routing.history.length - 1] !== beforeUrl) {
@@ -207,7 +207,7 @@ export class EvanRoutingService {
 
         if (!(isDashboard && isFavorites)) {
           this.goBack();
-          
+         
           backbuttonTimeout = setTimeout(() => {
             backbuttonTimeout = undefined;
           }, 500);
@@ -390,7 +390,7 @@ export class EvanRoutingService {
    * Uses an hash value and replaces the current hash with the new one. But it will use href = to
    * force parent dapp router handling, if we only set the hash, the navigation will stuck within
    * the current child DApp.
-   * 
+   *
    *   e.g. dashboard/favorites goes back to dashboard with empty history stack
    *        but nothing will happen because the favorites capured the navigation event and
    *        stops bubbling
@@ -400,7 +400,7 @@ export class EvanRoutingService {
   forceUrlNavigation(hash: string) {
     // HACKY HACKY HACKY
     //   by using goBack it could be possible that the logic navigates to dashboard.evan
-    //   a strange behavior occures 
+    //   a strange behavior occures
     //        dashboard.evan/XXX
     //     => dashboard.evan
     //     => dashboard.evan/favorites (everything is fine)
@@ -434,7 +434,7 @@ export class EvanRoutingService {
     }
 
     // navigate back
-    //  => use 
+    //  => use
     if (routing.history.length === 0) {
       const splitHash = this.getRouteFromUrl(window.location.hash).split('/');
 

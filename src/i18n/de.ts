@@ -25,6 +25,7 @@
   https://evan.network/license/
 */
 
+/* tslint:disable */
 export const de = {
   "_angularcore": {
     "account-changed": "Account wurde geändert",
@@ -201,16 +202,21 @@ export const de = {
     "warnings": {
       "dont-show-again": "Meldung nicht mehr anzeigen",
       "eve-empty": {
-        "body": "Sie haben ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist nicht mehr möglich, Verträge zu erstellen oder Transaktionen zu senden.",
+        "body": "Sie haben Ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist nicht mehr möglich, Verträge zu erstellen oder Transaktionen zu senden.",
         "title": "EVEs sind aufgebraucht"
       },
       "eve-low": {
-        "body": "Sie haben fast ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist möglich, dass spezielle Aktionen (Vertragserstellungen, Speichertransaktionen) bei einem zu geringen EVE Wert fehlschlagen.",
+        "body": "Sie haben fast Ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist möglich, dass spezielle Aktionen (Vertragserstellungen, Speichertransaktionen) bei einem zu geringen EVE Wert fehlschlagen.",
         "title": "EVEs sind fast aufgebraucht"
       },
       "indexdb-not-available": {
         "body": "Der von Ihnen genutzte Browser unterstützt nicht das lokale zwischenspeichern von Daten, was zu Laufzeitproblemen führen kann.Bitte benutzen Sie einen der folgenden Browsern: <b>Chrome, Firefox Safari, Edge</b>.<br><br><b>Hinweis</b>: Einige Browser besitzen in einem privaten Modus eingeschränkte Speicherkapazitäten.",
         "title": "Lokaler Datenspeicher nicht verfügbar"
+      },
+      "payment-channel": {
+        "body": "Um Daten auf dem evan.network zu speichern, ist ein Guthaben erforderlich. Bitte richten Sie in dem Profileinstellungen ein Guthaben ein, um Daten speichern zu können.",
+        "navigate-to-profile": "Zum den Profileinstellungen",
+        "title": "Speicherguthaben"
       },
       "quota-exceeded": {
         "body": "Das evan.network kann keine geladenen Daten mehr zwischenspeichern, was zu Laufzeitproblemen führen kann.<br><br>Bitte leeren Sie die evan.network spezifischen Daten.",
@@ -298,3 +304,4 @@ export const de = {
   "remove": "Entfernen",
   "submit": "Akzeptieren"
 }
+/* tslint:enable */
