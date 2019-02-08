@@ -25,103 +25,13 @@
   https://evan.network/license/
 */
 
+/* tslint:disable */
 export const de = {
   "_angularcore": {
     "account-changed": "Account wurde geändert",
     "account-changed-description": "Sie haben Ihren aktiven Account geändert.<br> Die Seite / Applikation muss <b>neu geladen werden</b>.",
     "camera": "Kamera",
     "cancel": "Abbrechen",
-    "claims": {
-      "accept": "bestätigen",
-      "all-issuers": "Alle Verifizierungen den diesen Verifizierungspfad und Nutzer betreffen.",
-      "cancel": "abbrechen",
-      "claim-description": "Verifizierungsbeschreibung",
-      "close-details": "schließen",
-      "creation-date": "Erstelldatum",
-      "delete": "löschen",
-      "descName": {
-        "desc": "Bitte geben Sie einen Verifizierungsnamen ein.",
-        "error": "Sie müssen einen Namen angeben, um die Beschreibung zu speichern!",
-        "title": "Verifizierungsname"
-      },
-      "details": "Verifizierungsdetails",
-      "details-desc": "Übersicht über Verifizierunge und deren genaue Statusinformationen.",
-      "dispatcher": {
-        "acceptDispatcher": {
-          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> bestätigen?",
-          "ok": "bestätigen",
-          "title": "Verifizierung bestätigen"
-        },
-        "cancel": "abbrechen",
-        "deleteDispatcher": {
-          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> löschen?",
-          "ok": "löschen",
-          "title": "Verifizierung löschen"
-        },
-        "descriptionDispatcher": {
-          "description": "Möchten Sie die Metadaten dieses Verifizierungspfades speichern?",
-          "ok": "speichern",
-          "title": "Verifizierungspfad Anpassungen"
-        },
-        "rejectDispatcher": {
-          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> verwerfen?",
-          "ok": "verwerfen",
-          "rejected-description": "Die Verifizierung <b>{{ topic }}</b> von dem Nutzer <b>{{ from }}</b> an <b>{{ to }}</b> wurde von <b>{{ rejector }}</b> verworfen: ",
-          "title": "Verifizierung verwerfen"
-        }
-      },
-      "done": "ok",
-      "enable-expiration-date": "Ablaufdatum benutzen",
-      "expiration-date": "Ablaufdatum",
-      "interactions": "Bearbeitung",
-      "issue": "ausstellen",
-      "issue-claim": "Verifizierung ausstellen",
-      "issue-claim-description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" für den Nutzer <b>{{ to }}</b> ausstellen?",
-      "issued-by": "ausgestellt von",
-      "issuer": "Aussteller",
-      "issuer-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können Sie keine Verifizierunge ausstellen. Bitte besuchen die Zertifikasverwaltung Anwendung, um die diese einzurichten.",
-      "not-set": "Nicht ausgestellt",
-      "not-set-desc": "...",
-      "okays": {
-        "confirmed": "bestätigt",
-        "notExpired": "gültig",
-        "valid": "valide",
-        "validPath": "gültige Verifizierungskette"
-      },
-      "reject": "verwerfen",
-      "reject-claim": "Verwerfen",
-      "reject-date": "Ablehungsdatum",
-      "reject-reason": "Ablehnungsgrund",
-      "rejector": "Ablehnender",
-      "select-desc-img": {
-        "select": "Bild auswählen",
-        "title": "Verifizierungsbild"
-      },
-      "set-description": "Beschreibung speichern",
-      "since": "seit",
-      "status": "Status",
-      "subject": "Zugewiesener",
-      "subject-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können für diese Identität keine Verifizierunge ausgestellt werden.",
-      "topic": "Verifizierungspfad",
-      "trust-provider": "Aussteller",
-      "trust-taker": "Empfänger",
-      "until": "bis",
-      "warnings": {
-        "expired": "ausgelaufen",
-        "invalid": "manipuliert",
-        "invalidPath": "Ungültige Verifizierungskette",
-        "issued": "nicht bestätigt",
-        "missing": "Verifizierung existiert nicht.",
-        "noIdentity": "Verifizierungsverwaltung fehlt",
-        "notEnsRootOwner": "Ungültiges Stammzertifikat",
-        "parentMissing": "Pfad nicht existent",
-        "parentUntrusted": "Pfad nicht bestätigt",
-        "rejected": "verworfen",
-        "selfIssued": "selbst erstellt",
-        "title": "Warnungen",
-        "undefined": "valide"
-      }
-    },
     "contract-members": {
       "add-members": "Mitglieder hinzufügen",
       "i": "Mein Account",
@@ -196,19 +106,122 @@ export const de = {
     },
     "use-password": "Entsperren",
     "user-locked": "Profil gesperrt",
+    "verifications": {
+      "accept": "bestätigen",
+      "all-issuers": "Alle Verifizierungen den diesen Verifizierungspfad und Nutzer betreffen.",
+      "cancel": "abbrechen",
+      "close-details": "schließen",
+      "contract": "Vertrag",
+      "creation-date": "Erstelldatum",
+      "delete": "löschen",
+      "descName": {
+        "desc": "Bitte geben Sie einen Verifizierungsnamen ein.",
+        "error": "Sie müssen einen Namen angeben, um die Beschreibung zu speichern!",
+        "title": "Verifizierungsname"
+      },
+      "details": "Verifizierungsdetails",
+      "details-desc": "Übersicht über Verifizierungen und deren genaue Statusinformationen.",
+      "disable-sub-verifications": "Unterverifizierungen ausschalten",
+      "disable-sub-verifications-desc": "Sobald diese Einstellung aktiviert ist, werden alle Verifizierungen, die unter dieser erstellt werden, als nicht zulässig dargestellt.",
+      "disabled-sub-verifications": "ausgeschaltet",
+      "dispatcher": {
+        "acceptDispatcher": {
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> bestätigen?",
+          "ok": "bestätigen",
+          "title": "Verifizierung bestätigen"
+        },
+        "cancel": "abbrechen",
+        "deleteDispatcher": {
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> löschen?",
+          "ok": "löschen",
+          "title": "Verifizierung löschen"
+        },
+        "descriptionDispatcher": {
+          "description": "Möchten Sie die Metadaten dieses Verifizierungspfades speichern?",
+          "ok": "speichern",
+          "title": "Verifizierungspfad Anpassungen"
+        },
+        "rejectDispatcher": {
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> verwerfen?",
+          "ok": "verwerfen",
+          "rejected-description": "Die Verifizierung <b>{{ topic }}</b> von dem Nutzer <b>{{ from }}</b> an <b>{{ to }}</b> wurde von <b>{{ rejector }}</b> verworfen: ",
+          "title": "Verifizierung verwerfen"
+        }
+      },
+      "done": "ok",
+      "enable-expiration-date": "Ablaufdatum benutzen",
+      "expiration-date": "Ablaufdatum",
+      "interactions": "Bearbeitung",
+      "issue": "ausstellen",
+      "issue-verification": "Verifizierung ausstellen",
+      "issue-verification-description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" für den Nutzer <b>{{ to }}</b> ausstellen?",
+      "issued-by": "ausgestellt von",
+      "issuer": "Aussteller",
+      "issuer-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können Sie keine Verifizierungen ausstellen. Bitte besuchen die Zertifikasverwaltung Anwendung, um die diese einzurichten.",
+      "not-set": "Nicht ausgestellt",
+      "not-set-desc": "...",
+      "okays": {
+        "confirmed": "bestätigt",
+        "notExpired": "gültig",
+        "valid": "valide",
+        "validPath": "gültige Verifizierungskette"
+      },
+      "reject": "verwerfen",
+      "reject-date": "Ablehnungsdatum",
+      "reject-reason": "Ablehnungsgrund",
+      "reject-verification": "Verwerfen",
+      "rejector": "Ablehnender",
+      "select-desc-img": {
+        "select": "Bild auswählen",
+        "title": "Verifizierungsbild"
+      },
+      "set-description": "Beschreibung speichern",
+      "since": "seit",
+      "status": "Status",
+      "sub-verifications": "Unterverifizierungen",
+      "subject": "Zugewiesener",
+      "subject-no-identity": "Für diesen Account wurde noch keine Verifizierungsverwaltung erstellt, somit können für diese Identität keine Verifizierungen ausgestellt werden.",
+      "topic": "Verifizierungspfad",
+      "trust-provider": "Aussteller",
+      "trust-taker": "Empfänger",
+      "until": "bis",
+      "verification-description": "Verifizierungsbeschreibung",
+      "verification-hover": "Verifizierung {{ displayName }} ausgestellt von {{ from }}",
+      "warnings": {
+        "disableSubVerifications": "Unterverifizierungen ausgeschaltet",
+        "expired": "abgelaufen",
+        "invalid": "manipuliert",
+        "invalidPath": "Ungültige Verifizierungskette",
+        "issued": "nicht bestätigt",
+        "missing": "Verifizierung existiert nicht.",
+        "noIdentity": "Verifizierungsverwaltung fehlt",
+        "notEnsRootOwner": "Ungültiges Stammzertifikat",
+        "parentMissing": "Pfad nicht existent",
+        "parentUntrusted": "Pfad nicht bestätigt",
+        "rejected": "verworfen",
+        "selfIssued": "selbst erstellt",
+        "title": "Warnungen",
+        "undefined": "valide"
+      }
+    },
     "warnings": {
       "dont-show-again": "Meldung nicht mehr anzeigen",
       "eve-empty": {
-        "body": "Sie haben ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist nicht mehr möglich, Verträge zu erstellen oder Transaktionen zu senden.",
+        "body": "Sie haben Ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist nicht mehr möglich, Verträge zu erstellen oder Transaktionen zu senden.",
         "title": "EVEs sind aufgebraucht"
       },
       "eve-low": {
-        "body": "Sie haben fast ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist möglich, dass spezielle Aktionen (Vertragserstellungen, Speichertransaktionen) bei einem zu geringen EVE Wert fehlschlagen.",
+        "body": "Sie haben fast Ihr vollständiges Kontingent an EVEs aufgebraucht ({{ value }} EVEs). Es ist möglich, dass spezielle Aktionen (Vertragserstellungen, Speichertransaktionen) bei einem zu geringen EVE Wert fehlschlagen.",
         "title": "EVEs sind fast aufgebraucht"
       },
       "indexdb-not-available": {
         "body": "Der von Ihnen genutzte Browser unterstützt nicht das lokale zwischenspeichern von Daten, was zu Laufzeitproblemen führen kann.Bitte benutzen Sie einen der folgenden Browsern: <b>Chrome, Firefox Safari, Edge</b>.<br><br><b>Hinweis</b>: Einige Browser besitzen in einem privaten Modus eingeschränkte Speicherkapazitäten.",
         "title": "Lokaler Datenspeicher nicht verfügbar"
+      },
+      "payment-channel": {
+        "body": "Um Daten auf dem evan.network zu speichern, ist ein Guthaben erforderlich. Bitte richten Sie in dem Profileinstellungen ein Guthaben ein, um Daten speichern zu können.",
+        "navigate-to-profile": "Zum den Profileinstellungen",
+        "title": "Speicherguthaben"
       },
       "quota-exceeded": {
         "body": "Das evan.network kann keine geladenen Daten mehr zwischenspeichern, was zu Laufzeitproblemen führen kann.<br><br>Bitte leeren Sie die evan.network spezifischen Daten.",
@@ -296,3 +309,4 @@ export const de = {
   "remove": "Entfernen",
   "submit": "Akzeptieren"
 }
+/* tslint:enable */

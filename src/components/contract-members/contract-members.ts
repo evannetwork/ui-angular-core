@@ -47,7 +47,7 @@ import {
 import { AsyncComponent } from '../../classes/AsyncComponent';
 import { createOpacityTransition } from '../../animations/opacity';
 import { EvanAddressBookService } from '../../services/bcc/address-book';
-import { EvanClaimService } from '../../services/bcc/claims';
+import { EvanVerificationService } from '../../services/bcc/verifications';
 import { EvanCoreService } from '../../services/bcc/core';
 import { EvanQueue, } from '../../services/bcc/queue';
 import { QueueId, } from '../../services/bcc/queue-utilities';
@@ -212,20 +212,20 @@ export class ContractMembersComponent extends AsyncComponent {
   public touched: boolean;
 
   /**
-   * for the current profile activated claims
+   * for the current profile activated verifications
    */
-  private claims: Array<string> = [ ];
+  private verifications: Array<string> = [ ];
 
   /**
-   * Function to unsubscribe from profile claims watcher queue results.
+   * Function to unsubscribe from profile verifications watcher queue results.
    */
-  private profileClaimsWatcher: Function;
+  private profileVerificationsWatcher: Function;
 
 
   /***************** initialization  *****************/
   constructor(
     private addressBook: EvanAddressBookService,
-    private claimsService: EvanClaimService,
+    private verificationsService: EvanVerificationService,
     private core: EvanCoreService,
     private element: ElementRef,
     private menuController: MenuController,
@@ -258,12 +258,12 @@ export class ContractMembersComponent extends AsyncComponent {
         }
       });
 
-    // load profile active claims
-    this.profileClaimsWatcher = await this.queueService.onQueueFinish(
+    // load profile active verifications
+    this.profileVerificationsWatcher = await this.queueService.onQueueFinish(
       new QueueId(`profile.${ getDomainName() }`, '*'),
       async (reload, results) => {
         reload && await this.core.utils.timeout(0);
-        this.claims = await this.claimsService.getProfileActiveClaims();
+        this.verifications = await this.verificationsService.getProfileActiveVerifications();
         this.ref.detectChanges();
       }
     );
@@ -286,7 +286,7 @@ export class ContractMembersComponent extends AsyncComponent {
    * remove the right menu on element destroy
    */
   async _ngOnDestroy() {
-    this.profileClaimsWatcher();
+    this.profileVerificationsWatcher();
 
     try {
       document.querySelector('body > ion-app dapp-wrapper').removeChild(this.ionMenu);

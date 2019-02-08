@@ -2,8 +2,23 @@
 
 ## Next Version
 ### Features
+- outsource deep verification check logic to `@evan.network/api-blockchain-core`
+- support verifications for contracts
+- add `AddressInputComponent` to retrieve an account id or contract address, with an autocompletion from known address from the addressbook
+- `updateBCC` navigates to onboarding, if no user is logged in
+- add modal warning if no payment storage was setup before
+- add `EvanPaymentService` for requesting payment agent
+- add `disableSubVerifications` flags to verifications
+
 ### Fixes
+- fix initial routing of angular router
+  - Router.prototype.originNavigateByUrl was overwritten with a custom one of the angular-core. if the angular-core gets initialzed multiple times, the function will be more and more nested. But the origin one, that is needed initially, is not present. So backuped the function directly to the router prototype.
+- reverse verification detail order (from right evan to left specific)
+- add `getNameForAccountSync` to `EvanAddressBookService`
+
 ### Deprecations
+- rename claims to verifications
+- rename `getComputedClaim` to `computeVerifications`
 
 ## Version 1.7.1
 ### Fixes
@@ -42,9 +57,9 @@
 ### Features
 - add `includeActiveAccount` to `contract-members` component
 - add `evan-claim` component for displaying claims using and topic and several display modes (icon, normal, detail)
-- add `EvanClaimsService` to handle `api-blockchain-core` claims api
-- add `EvanProfileClaimsComponent` for displaying profile activated claims easily
-- handle profile activated claims within `EvanClaimsService`
+- add `EvanVerificationsService` to handle `api-blockchain-core` claims api
+- add `EvanProfileVerificationsComponent` for displaying profile activated claims easily
+- handle profile activated claims within `EvanVerificationsService`
 - add claims status display into `EvanContractMembersComponent`
 
 ## Version 1.4.0

@@ -31,16 +31,17 @@ import * as SmartContracts from 'smart-contracts';
 import {
   AccountStore,
   config,
+  core,
   getCoreOptions,
   getDomainName,
   getLatestKeyProvider,
   KeyProvider,
   lightwallet,
   queue,
+  routing,
   updateCoreRuntime,
   web3,
   web3Helper,
-  core,
 } from 'dapp-browser';
 
 import {
@@ -87,7 +88,7 @@ export class EvanBCCService {
    * blockchain-core original properties. Mapped from e.g
    * BCC.coreInstance.executor => this.executor
    */
-  public claims: ProfileBundle.Claims;
+  public verifications: ProfileBundle.Verifications;
   public config: any;
   public contractLoader: any;
   public contracts: any;
@@ -102,6 +103,7 @@ export class EvanBCCService {
   public keyProvider: any;
   public mailbox: any;
   public nameResolver: any;
+  public payments: any;
   public profile: any;
   public ProfileBundle: any;
   public rightsAndRoles: CoreBundle.RightsAndRoles;
@@ -124,7 +126,7 @@ export class EvanBCCService {
 
   /**
    * Initialize the bcc service using a password unlocking function.
-   * 
+   *
    * Usage (used in every DApp RootComponent):
    *   await this.bcc.initialize((accountId) => this.bcc.globalPasswordDialog(accountId));
    *
@@ -176,7 +178,8 @@ export class EvanBCCService {
     this.ProfileBundle = ProfileBundle;
     this.serviceContract = ProfileBundle.ProfileRuntime.serviceContract;
     this.sharing = ProfileBundle.ProfileRuntime.sharing;
-    this.claims = ProfileBundle.ProfileRuntime.claims;
+    this.verifications = ProfileBundle.ProfileRuntime.verifications;
+    this.payments = ProfileBundle.ProfileRuntime.payments;
   }
 
   /**
@@ -242,15 +245,31 @@ export class EvanBCCService {
     disableKeys?: boolean
   ) {
     this.updateBCCPromise = await new Promise(async (resolve, reject) => {
-      const coreOptions = await getCoreOptions(CoreBundle, SmartContracts, provider);
+      // check if no user is logged in and a bcc should be initialized
+      let loggedIn = core.getAccountId();
+      let isOnboard = false;
+      if (loggedIn) {
+        // check if the current available account is onboared
+        try {
+          isOnboard = await CoreBundle.isAccountOnboarded(core.getAccountId());
+        } catch (ex) { }
+      }
 
+      // if no user is selected / the active user isn't onboarded and we are currently not loading the
+      // onboarding, navigate their
+      if (!isOnboard && !routing.isOnboarding()) {
+        return routing.goToOnboarding();
+      }
+
+      // start bcc setup
+      const coreOptions = await getCoreOptions(CoreBundle, SmartContracts, provider);
       await CoreBundle.createAndSetCore(coreOptions);
 
       // set core bundle instance to this scope to use it within getSigner
       this.copyCoreToInstance();
 
       if (activeAccount) {
-        const bccProfileOptions: any ={
+        const bccProfileOptions: any = {
           accountId: activeAccount,
           CoreBundle: CoreBundle,
           coreOptions: coreOptions,
@@ -262,7 +281,7 @@ export class EvanBCCService {
         // use account store from signer or use a new one
         bccProfileOptions.accountStore = bccProfileOptions.signer.accountStore ||
           new AccountStore();
-  
+
         // if we are loading all data via an smart-agent, we need to create a new ExecutorAgent
         if (provider === 'agent-executor') {
           const agentExecutor = await core.getAgentExecutor();
@@ -273,7 +292,7 @@ export class EvanBCCService {
             contractLoader: CoreBundle.CoreRuntime.contractLoader,
             logLog: CoreBundle.logLog,
             logLogLevel: CoreBundle.logLogLevel,
-            signer: bccProfileOptions,
+            signer: bccProfileOptions.signer,
             token: agentExecutor.token,
             web3: this.web3,
           });

@@ -1,0 +1,87 @@
+/*
+  Copyright (C) 2018-present evan GmbH.
+
+  This program is free software: you can redistribute it and/or modify it
+  under the terms of the GNU Affero General Public License, version 3,
+  as published by the Free Software Foundation.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Affero General Public License for more details.
+
+  You should have received a copy of the GNU Affero General Public License
+  along with this program. If not, see http://www.gnu.org/licenses/ or
+  write to the Free Software Foundation, Inc., 51 Franklin Street,
+  Fifth Floor, Boston, MA, 02110-1301 USA, or download the license from
+  the following URL: https://evan.network/license/
+
+  You can be released from the requirements of the GNU Affero General Public
+  License by purchasing a commercial license.
+  Buying such a license is mandatory as soon as you use this software or parts
+  of it on other blockchains than evan.network.
+
+  For more information, please contact evan GmbH at this address:
+  https://evan.network/license/
+*/
+
+@import 'ui-angular-sass/src/variables/colors';
+evan-address-input {
+  position: relative;
+
+  display: block;
+
+  ion-label.label.standalone[stacked] {
+    margin-bottom: 4px !important;
+  }
+
+  ion-label[fixed] {
+    font-size: 14px;
+    font-weight: 400 !important;
+
+    margin: 0 !important;
+  }
+
+  .suggestions {
+    position: absolute;
+    z-index: 10;
+
+    width: 100%;
+
+    .suggestion {
+      display: block;
+      overflow: hidden;
+
+      padding: 10px;
+
+      cursor: pointer;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+@mixin customTheme($colors, $theme) {
+  evan-address-input {
+    .suggestions {
+      background-color: map-get($theme, background-color-2);
+      box-shadow: map-get($theme, grid-list-item-shadow);
+
+      .suggestion:hover, .suggestion.active {
+        background-color: rgba(map-get($colors, primary), 0.2);
+      }
+    }
+  }
+}
+
+// apply custom styles for all themes
+@import 'ui-angular-sass/src/theme';
+@each $theme, $definition in $evanThemes {
+  @if $theme == 'evan' {
+    @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
+  } @else {
+    .evan-#{$theme} {
+      @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
+    }
+  }
+}
