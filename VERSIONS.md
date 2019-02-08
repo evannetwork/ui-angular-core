@@ -20,6 +20,12 @@
 - rename claims to verifications
 - rename `getComputedClaim` to `computeVerifications`
 
+## Version 1.7.1
+### Fixes
+- fix verification whitelisting
+- remove `cssClass` from ngx-scanner
+
+
 ## Version 1.7.0
 ### Features
 - add salting for encryptionKeys accountId + password
