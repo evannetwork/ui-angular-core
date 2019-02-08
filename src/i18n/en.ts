@@ -167,7 +167,7 @@ export const en = {
       },
       "reject": "reject",
       "reject-date": "Reject date",
-      "reject-reason": "Reject Reason",
+      "reject-reason": "Reject reason",
       "reject-verification": "reject",
       "rejector": "Rejector",
       "select-desc-img": {

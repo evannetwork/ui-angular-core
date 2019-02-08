@@ -3,7 +3,7 @@
     "author": "evan GmbH",
     "dapp": {
       "dependencies": {
-        "angular-libs": "^1.4.1",
+        "angular-libs": "^2.0.0",
         "bcc": "^2.0.0",
         "smart-contracts": "^2.0.0"
       },
@@ -12,7 +12,7 @@
         "angularcore.css",
         "angularcore.js"
       ],
-      "origin": "QmfFh8t725PasW8YKzcMJaqQkkdM2NCoyKD7ZZrwTzQswZ",
+      "origin": "QmWPpgJ9qKk2N46D6YHTudM3H9DEf4T98n72X5jGaysTc8",
       "type": "library"
     },
     "dbcpVersion": 2,
@@ -42,7 +42,8 @@
       "1.6.0": "QmYGvZ6GtB2bxB518sZEqY3S3HxSuREBJgxTNa1cyCEgCf",
       "1.6.1": "QmcHe7GdSxGdExZrEia4V8fwVa9E4qY871Z76SYbS66Xzc",
       "1.7.0": "QmcAjnf3Ua5nbjFPdi7HENSkiZj61r6MzRZstqX8e7LnFJ",
-      "1.7.1": "QmdF4f6V6Gn2ZX6669zBASDooVRmWHC3fQzKc3nU1WBtDH"
+      "1.7.1": "QmVn4559tbT1rvakwnW45xrA1suCm1Y9Lr1xGAzKGwTL7A",
+      "2.0.0": "QmW61yqnGC35Kq2cBax1ZckKFKEubvxSfC9aw6SYrcUWvX"
     }
   }
 }
