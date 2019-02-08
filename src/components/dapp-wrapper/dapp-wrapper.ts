@@ -406,11 +406,11 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
       // check if the user already has created an payment channel, if not, trigger an popup to
       // navigate the user to the profile page, where the payment channel can be set up
       //   => cannot be check within the dapp-browser, their is no uer logged in
-      const paymentChannels = await this.paymentService.requestPaymentAgent('getChannels');
-      const activeChannels = paymentChannels.channels.filter(channel => channel.state === 'OPEN');
-      if (activeChannels.length === 0) {
-        this.core.utils.sendEvent('evan-warning', { type: 'payment-channel' });
-      }
+      // const paymentChannels = await this.paymentService.requestPaymentAgent('getChannels');
+      // const activeChannels = paymentChannels.channels.filter(channel => channel.state === 'OPEN');
+      // if (activeChannels.length === 0) {
+      //   this.core.utils.sendEvent('evan-warning', { type: 'payment-channel' });
+      // }
 
       // watch for developer mode is changing
       this.isDeveloperMode = window.localStorage['evan-developer-mode'] === 'true';
