@@ -20,6 +20,13 @@
 - rename claims to verifications
 - rename `getComputedClaim` to `computeVerifications`
 
+
+## Version 1.7.2
+### Fixes
+- fix cross version dispatcher loading
+- fix onboarding check login to previously ensure coreInstance
+
+
 ## Version 1.7.1
 ### Fixes
 - fix verification whitelisting

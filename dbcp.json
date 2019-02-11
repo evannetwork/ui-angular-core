@@ -12,7 +12,7 @@
         "angularcore.css",
         "angularcore.js"
       ],
-      "origin": "QmdbZqVgEQeeY4JdQmtEvB58v3HYFj9cnX4vsbKqeBzY4w",
+      "origin": "QmfF6Fh5qvE55D1CZxhBxJdWiZMPmB3QE8kpi37r5n5dZS",
       "type": "library"
     },
     "dbcpVersion": 2,
@@ -43,7 +43,8 @@
       "1.6.1": "QmcHe7GdSxGdExZrEia4V8fwVa9E4qY871Z76SYbS66Xzc",
       "1.7.0": "QmcAjnf3Ua5nbjFPdi7HENSkiZj61r6MzRZstqX8e7LnFJ",
       "1.7.1": "Qmc8SgAXwBHskNno2zsM64WviD55FTopA6YLm3xoh8X9fe",
-      "2.0.0": "QmankSeoNVTWaYbZUZa8UFWZrhEDCwvrTKEky9iHPbk4QQ"
+      "1.7.2": "QmZivuLmzbvP9ocruFDrsLDviKTWoHuPcPyYf1UhQXXZpD",
+      "2.0.0": "QmNk7P9oonXri4mfSaGGV3PAfdHfUKY5BRtGY7fm2W9ix7"
     }
   }
 }
