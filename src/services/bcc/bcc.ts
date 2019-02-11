@@ -251,6 +251,9 @@ export class EvanBCCService {
       const coreOptions = await getCoreOptions(CoreBundle, SmartContracts, provider);
       await CoreBundle.createAndSetCore(coreOptions);
 
+      // set core bundle instance to this scope to use it within getSigner
+      this.copyCoreToInstance();
+
       // check if no user is logged in and a bcc should be initialized
       let loggedIn = core.getAccountId();
       let isOnboard = false;
@@ -266,9 +269,6 @@ export class EvanBCCService {
       if (!isOnboard && !routing.isOnboarding()) {
         return routing.goToOnboarding();
       }
-
-      // set core bundle instance to this scope to use it within getSigner
-      this.copyCoreToInstance();
 
       if (activeAccount) {
         const bccProfileOptions: any = {
