@@ -27,8 +27,11 @@
 
 <div *ngIf="show">
   <div class="img-wrapper">
-    <div class="spinner"></div>
-    <div class="evan-logo-favicon"></div>
+    <img [src]="_DomSanitizer.bypassSecurityTrustUrl(customLoading)" *ngIf="customLoading">
+    <ng-container *ngIf="!customLoading">
+      <div class="spinner"></div>
+      <div class="evan-logo-favicon"></div>
+    </ng-container>
   </div>
   <h2 *ngIf="loadingText">
     {{ loadingText }}

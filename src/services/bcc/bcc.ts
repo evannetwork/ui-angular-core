@@ -314,6 +314,7 @@ export class EvanBCCService {
 
         if (!disableKeys) {
           await this.keyProvider.setKeys();
+          console.dir(bccProfileOptions.keyProvider);
           await this.setExchangeKeys(activeAccount);
         }
       }
