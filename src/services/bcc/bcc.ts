@@ -247,6 +247,10 @@ export class EvanBCCService {
     disableKeys?: boolean
   ) {
     this.updateBCCPromise = await new Promise(async (resolve, reject) => {
+      // start bcc setup
+      const coreOptions = await getCoreOptions(CoreBundle, SmartContracts, provider);
+      await CoreBundle.createAndSetCore(coreOptions);
+
       // check if no user is logged in and a bcc should be initialized
       let loggedIn = core.getAccountId();
       let isOnboard = false;
@@ -262,10 +266,6 @@ export class EvanBCCService {
       if (!isOnboard && !routing.isOnboarding()) {
         return routing.goToOnboarding();
       }
-
-      // start bcc setup
-      const coreOptions = await getCoreOptions(CoreBundle, SmartContracts, provider);
-      await CoreBundle.createAndSetCore(coreOptions);
 
       // set core bundle instance to this scope to use it within getSigner
       this.copyCoreToInstance();
