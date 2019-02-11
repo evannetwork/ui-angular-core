@@ -25,7 +25,7 @@
   https://evan.network/license/
 */
 
-import { System, dapp, queue } from 'dapp-browser';
+import { System, dapp, queue, getDomainName } from 'dapp-browser';
 
 import {
   OnInit, Injectable, Component, // '@angular/core';
@@ -42,7 +42,6 @@ import { EvanToastService } from '../ui/toast';
 import { EvanTranslationService } from '../ui/translate';
 import { EvanUtilService } from './../utils';
 
-import { AngularCore } from '../../modules/angular-core';
 import {
   QueueDispatcher,
   QueueId,
@@ -401,9 +400,10 @@ export class EvanQueue implements OnDestroy {
     const dispatcherService = ensQueueModule[serviceName];
 
     // get runtime module for getting service instance
+    const angularCoreLib = await System.import(`angularcore.${ getDomainName() }!dapp-content`);
     @NgModule({
       imports: [
-        AngularCore,
+        angularCoreLib.AngularCore,
         DispatcherModule
       ]
     })

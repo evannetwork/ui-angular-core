@@ -41,6 +41,7 @@ import {
   web3,
   web3Helper,
   core,
+  routing,
 } from 'dapp-browser';
 
 import {
@@ -242,12 +243,28 @@ export class EvanBCCService {
     disableKeys?: boolean
   ) {
     this.updateBCCPromise = await new Promise(async (resolve, reject) => {
+      // start bcc setup
       const coreOptions = await getCoreOptions(CoreBundle, SmartContracts, provider);
-
       await CoreBundle.createAndSetCore(coreOptions);
 
       // set core bundle instance to this scope to use it within getSigner
       this.copyCoreToInstance();
+
+      // check if no user is logged in and a bcc should be initialized
+      let loggedIn = core.getAccountId();
+      let isOnboard = false;
+      if (loggedIn) {
+        // check if the current available account is onboared
+        try {
+          isOnboard = await CoreBundle.isAccountOnboarded(core.getAccountId());
+        } catch (ex) { }
+      }
+
+      // if no user is selected / the active user isn't onboarded and we are currently not loading the
+      // onboarding, navigate their
+      if (!isOnboard && !routing.isOnboarding()) {
+        return routing.goToOnboarding();
+      }
 
       if (activeAccount) {
         const bccProfileOptions: any ={
