@@ -27,7 +27,7 @@
 
 import {
   Component, OnInit, Input, OnDestroy, // @angular/core
-  Observable, ChangeDetectorRef,
+  Observable, ChangeDetectorRef, DomSanitizer
 } from 'angular-libs';
 
 import {
@@ -79,10 +79,16 @@ export class EvanLoadingComponent implements OnInit, OnDestroy {
    */
   private isDashboardDApp: boolean;
 
+  /**
+   * Shows a custom loading symbol from localStorage
+   */
+  private customLoading: string;
+
   /***************** initialization  *****************/
   constructor(
     private routing: EvanRoutingService,
-    private ref: ChangeDetectorRef
+    private ref: ChangeDetectorRef,
+    private _DomSanitizer: DomSanitizer,
   ) { }
 
   /**
@@ -90,6 +96,11 @@ export class EvanLoadingComponent implements OnInit, OnDestroy {
    */
   ngOnInit() {
     this.ref.detach();
+
+    // check if a custom loading symbol was specified
+    if (window.localStorage['evan-custom-loading']) {
+      this.customLoading = window.localStorage['evan-custom-loading'];
+    }
 
     if (this.delayLoading) {
       setTimeout(() => {

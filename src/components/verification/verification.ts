@@ -403,11 +403,15 @@ export class EvanVerificationComponent extends AsyncComponent {
 
     // if issue identity could be loaded, extract the contract address
     this.activeAccount = this.core.activeAccount();
-    this.activeIdentity = await this.bcc.verifications.getIdentityForAccount(this.activeAccount);
-    if (this.activeIdentity && this.activeIdentity.options &&
-      this.activeIdentity.options.address !== '0x0000000000000000000000000000000000000000') {
-      this.activeIdentity = this.activeIdentity.options.address;
-    } else {
+    try {
+      this.activeIdentity = await this.bcc.verifications.getIdentityForAccount(this.activeAccount);
+      if (this.activeIdentity && this.activeIdentity.options &&
+        this.activeIdentity.options.address !== '0x0000000000000000000000000000000000000000') {
+        this.activeIdentity = this.activeIdentity.options.address;
+      } else {
+        this.activeIdentity = null;
+      }
+    } catch (ex) {
       this.activeIdentity = null;
     }
 

@@ -2,6 +2,12 @@
 
 ## Next Version
 ### Features
+### Fixes
+### Deprecations
+
+
+## Version 2.0.0
+### Features
 - outsource deep verification check logic to `@evan.network/api-blockchain-core`
 - support verifications for contracts
 - add `AddressInputComponent` to retrieve an account id or contract address, with an autocompletion from known address from the addressbook
@@ -19,6 +25,13 @@
 ### Deprecations
 - rename claims to verifications
 - rename `getComputedClaim` to `computeVerifications`
+
+
+## Version 1.7.2
+### Fixes
+- fix cross version dispatcher loading
+- fix onboarding check login to previously ensure coreInstance
+
 
 ## Version 1.7.1
 ### Fixes

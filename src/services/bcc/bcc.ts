@@ -47,6 +47,7 @@ import {
 import {
   Router,             // '@angular/router';
   OnInit, Injectable, // '@angular/core';
+  NgZone,
 } from 'angular-libs';
 
 import { GlobalPasswordComponent } from '../../components/global-password/global-password';
@@ -116,10 +117,11 @@ export class EvanBCCService {
    * initialize and make it standalone
    */
   constructor(
-    public singleton: SingletonService,
-    public core: EvanCoreService,
+    private _ngZone: NgZone,
+    private modalService: EvanModalService,
     private utils: EvanUtilService,
-    private modalService: EvanModalService
+    public core: EvanCoreService,
+    public singleton: SingletonService,
   ) {
     return singleton.create(EvanBCCService, this);
   }
@@ -483,18 +485,25 @@ export class EvanBCCService {
    */
   async globalPasswordDialog(accountId?: string): Promise<string> {
     let password;
-    if (this.passwordModalPromise) {
-      password = await this.passwordModalPromise;
-    } else {
-      this.passwordModalPromise = this.modalService.createModal(GlobalPasswordComponent, {
-        core: this.core,
-        bcc: this,
-        accountId: accountId
-      });
 
-      password = await this.passwordModalPromise;
-      this.passwordModalPromise = false;
-    }
+    await new Promise((resolve) => {
+      this._ngZone.run(async () => {
+        if (this.passwordModalPromise) {
+          password = await this.passwordModalPromise;
+        } else {
+          this.passwordModalPromise = this.modalService.createModal(GlobalPasswordComponent, {
+            core: this.core,
+            bcc: this,
+            accountId: accountId
+          });
+
+          password = await this.passwordModalPromise;
+          this.passwordModalPromise = false;
+        }
+
+        resolve();
+      })
+    })
 
     return password;
   }

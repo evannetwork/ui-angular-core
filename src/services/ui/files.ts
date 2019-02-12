@@ -105,7 +105,7 @@ export class EvanFileService implements OnDestroy {
       }))
     );
 
-    // overwrite the attachments object with the crypto informations, how the data needs to
+    // overwrite the attachments object with the crypto information, how the data needs to
     // be decrypted
     return files;
   }

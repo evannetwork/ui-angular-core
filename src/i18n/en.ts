@@ -167,7 +167,7 @@ export const en = {
       },
       "reject": "reject",
       "reject-date": "Reject date",
-      "reject-reason": "Reject Reason",
+      "reject-reason": "Reject reason",
       "reject-verification": "reject",
       "rejector": "Rejector",
       "select-desc-img": {
@@ -192,7 +192,7 @@ export const en = {
         "invalid": "manipulated",
         "invalidPath": "Invalid verification chain",
         "issued": "not accepted",
-        "missing": "Verification does not exists.",
+        "missing": "Verification does not exist.",
         "noIdentity": "Verification management missing",
         "notEnsRootOwner": "Invalid root verification",
         "parentMissing": "Path does not exist",

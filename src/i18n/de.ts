@@ -219,7 +219,7 @@ export const de = {
         "title": "Lokaler Datenspeicher nicht verfügbar"
       },
       "payment-channel": {
-        "body": "Um Daten auf dem evan.network zu speichern, ist ein Guthaben erforderlich. Bitte richten Sie in dem Profileinstellungen ein Guthaben ein, um Daten speichern zu können.",
+        "body": "Um Daten auf dem evan.network zu speichern, ist ein Guthaben erforderlich. Bitte richten Sie in den Profileinstellungen ein Guthaben ein, um Daten speichern zu können.",
         "navigate-to-profile": "Zum den Profileinstellungen",
         "title": "Speicherguthaben"
       },

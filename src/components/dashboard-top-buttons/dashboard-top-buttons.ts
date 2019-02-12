@@ -55,7 +55,7 @@ import { EvanUtilService } from '../../services/utils';
   selector: 'dashboard-top-buttons',
   templateUrl: 'dashboard-top-buttons.html'
 })
-export class DashboardTopButtons extends AsyncComponent {
+export class DashboardTopButtons {
   /**
    * event handler that watches for queue updates
    */
@@ -69,23 +69,31 @@ export class DashboardTopButtons extends AsyncComponent {
     private ref: ChangeDetectorRef,
     private utilService: EvanUtilService,
   ) {
-    super(ref, false);
+    this.ref.detach();
+    this.ref.detectChanges();
   }
 
   /**
    * TODO: Optionally it can be move to body level to handle fixed containing elements
    */
-  async _ngAfterViewInit() {
+  async ngAfterViewInit() {
     this.onQueueButtonChange = this.utilService.onEvent('evan-queue-button-count', async () => {
       this.setQueueButtonCount();
       this.ref.detectChanges();
     });
 
-    document.body.querySelector('ion-app').appendChild(this.element.nativeElement);
+    const ionApp = document.body.querySelector('ion-app');
+    for (let i = 0; i < ionApp.childNodes.length; i++) {
+      if ((<any>ionApp.childNodes[i]).tagName.toLowerCase() === 'dashboard-top-buttons') {
+        ionApp.removeChild(ionApp.childNodes[i]);
+      }
+    }
+
+    ionApp.appendChild(this.element.nativeElement);
     this.setQueueButtonCount();
   }
 
-  async _ngOnDestroy() {
+  ngOnDestroy() {
     if (this.element.nativeElement && this.element.nativeElement.parentElement) {
       this.element.nativeElement.parentElement.removeChild(this.element.nativeElement);
     }
@@ -100,13 +108,13 @@ export class DashboardTopButtons extends AsyncComponent {
    */
   setQueueButtonCount() {
     const logErrors = logLog.filter(entry => entry.level === 'error');
-    const nativeElement = this.element.nativeElement;
 
     // remove the previous added queue button active class
-    nativeElement.className = nativeElement.className.replace(/ queue-button-active-*/g, '');
+    this.element.nativeElement.className = this.element.nativeElement.className
+      .replace(/ queue-button-active-*/g, '');
 
     // add the new queue button active class
-    nativeElement.className += ' queue-button-active-' + ([
+    this.element.nativeElement.className += ' queue-button-active-' + ([
       this.queue.queue.entries.length > 0,
       this.mailboxService.newMailCount > 0,
       logErrors.length > 0 && !this.queue.exception

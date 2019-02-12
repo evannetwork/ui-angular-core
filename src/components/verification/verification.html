@@ -99,7 +99,7 @@
 <!---------------------------------------- verification display ------------------------------------------>
 <ng-template #verificationDisplay let-verification="verification" let-mode="mode" let-action="action">
   <div [class]="'evan-verification mode-' + mode + ' status-' + verification.status"
-    [title]="'_angularcore.verifications.verification-hover' | translate:{ displayName: verification.displayName, from: addressBookService.getNameForAccountSync(addressBook, verification.issuerAccount) }"
+    [title]="'_angularcore.verifications.verification-hover' | translate:{ displayName: verification.displayName, from: addressBookService.getNameForAccountSync(addressBook, verification.issuerAccount) || '' }"
     (click)="action ? action($event) : openVerificationPopup(verification, $event)">
     <ng-container *ngTemplateOutlet="verificationIcon;context:{ verification: verification, mode: mode }"></ng-container>
     <ng-container *ngIf="!loadingVerifications && mode != 'icon'">
@@ -228,7 +228,7 @@
             {{ node.data.rejectReason.date | date:'mediumDate':'':translate.translate.currentLang }}
           </p>
         </ion-col>
-        <ion-col col-12>
+        <ion-col col-12 *ngIf="node.data.rejectReason.reason">
           <b>{{ '_angularcore.verifications.reject-reason' | translate }}</b>
           <p class="multiline">
             {{ node.data.rejectReason.reason }}

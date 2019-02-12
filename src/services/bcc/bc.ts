@@ -76,7 +76,7 @@ export class EvanBcService {
   public joinLeaveBcQueueId: QueueId;
 
   /**
-   * queue id for applying business center informations to the users profile
+   * queue id for applying business center information to the users profile
    */
   public profileQueueId: QueueId;
 
