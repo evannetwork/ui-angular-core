@@ -95,7 +95,7 @@ export class EvanLoggingService {
   ) { }
 
   /**
-   * Using BCC log function to handle a generalized loggin mechanism.
+   * Using BCC log function to handle a generalized logging mechanism.
    *
    * @param      {string}  message  message to log
    * @param      {string}  level    level to log the message with
@@ -123,7 +123,7 @@ export class EvanLoggingService {
   }
 
   /**
-   * enchance log message with user informations
+   * enchance log message with user information
    *
    * @param      {Array<any>}  logs    logs to use
    * @return     {Array<any>}  log object
@@ -160,7 +160,7 @@ export class EvanLoggingService {
   }
 
   /**
-   * Choose type all for current filtered log. Choose erros for only errors.
+   * Choose type all for current filtered log. Choose errors for only errors.
    *
    * @param      {string}      type    all | errors
    * @return     {Array<any>}  specific logs for type
@@ -238,7 +238,7 @@ export class EvanLoggingService {
   }
 
   /**
-   * Start copying of the error log. Choose type all for current filtered log. Choose erros for only
+   * Start copying of the error log. Choose type all for current filtered log. Choose errors for only
    * errors.
    *
    * @param      {string}  type    nothing, 'all' | 'errors'
