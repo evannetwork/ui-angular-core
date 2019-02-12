@@ -12,7 +12,7 @@
         "angularcore.css",
         "angularcore.js"
       ],
-      "origin": "QmereSCR2YgGfKe5vjzhA513cdmv9CjRJf56u1gyTwhMkj",
+      "origin": "QmWWvMXj8frUFsGjVrABprehizo6R1yeyMXfTSapWfoWbR",
       "type": "library"
     },
     "dbcpVersion": 2,
@@ -41,10 +41,8 @@
       "1.5.0": "QmVgUrsYhVF4t1rngY3HgNq5ebF9xDJNVodUC97HN8hTTS",
       "1.6.0": "QmYGvZ6GtB2bxB518sZEqY3S3HxSuREBJgxTNa1cyCEgCf",
       "1.6.1": "QmcHe7GdSxGdExZrEia4V8fwVa9E4qY871Z76SYbS66Xzc",
-      "1.7.0": "QmcAjnf3Ua5nbjFPdi7HENSkiZj61r6MzRZstqX8e7LnFJ",
-      "1.7.1": "Qmc8SgAXwBHskNno2zsM64WviD55FTopA6YLm3xoh8X9fe",
-      "1.7.2": "QmZivuLmzbvP9ocruFDrsLDviKTWoHuPcPyYf1UhQXXZpD",
-      "2.0.0": "QmYuP4ZhYZhPdvFaF46fqYztSA879iTXrrWvnFnjNuo7Ym"
+      "1.7.0": "QmXnQwgjvJhVaLvUBRvXAPi7xmbCC6HGYQYbbaAoMSb1WA",
+      "2.0.0": "QmQF4UC8dSv4CKYZZNrfQpw8BQmCWtqxgoEctcGZLm6HqM"
     }
   }
 }
