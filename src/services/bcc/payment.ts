@@ -66,7 +66,7 @@ export class EvanPaymentService {
   /**
    * Url to the payment agent server.
    */
-  public paymentAgentUrl: string = `https://payments.evan.network`
+  public paymentAgentUrl: string = `https://payments.test.evan.network`
 
   /**
    * base endpoint of the payment

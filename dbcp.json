@@ -18,7 +18,7 @@
     "dbcpVersion": 2,
     "description": "Contractus core angular modules & components.",
     "license": {
-      "file": "https://ipfs.evan.network/ipns/QmT1FwnYyURjLj7nKMwEuTPUBc5uJ6z1zAVsYnKfUL1X1q/AGPL-3.0-only.txt",
+      "file": "https://ipfs.test.evan.network/ipns/QmT1FwnYyURjLj7nKMwEuTPUBc5uJ6z1zAVsYnKfUL1X1q/AGPL-3.0-only.txt",
       "type": "AGPL-3.0-only"
     },
     "name": "angularcore",

@@ -67,7 +67,7 @@ export class EvanCoreService {
   /**
    * base url of the evan.network smart agents server
    */
-  public agentUrl = 'https://agents.evan.network';
+  public agentUrl = 'https://agents.test.evan.network';
 
   /**
    * load dependency services
