@@ -25,15 +25,9 @@
   https://evan.network/license/
 */
 
-import { config, routing } from 'dapp-browser';
-
 import * as ProfileBundle from 'bcc';
-
-import {
-  Router,             // '@angular/router';
-  OnInit, Injectable, // '@angular/core';
-  Observable, CanActivate
-} from 'angular-libs';
+import { bccHelper, config, dapp, getDomainName, ipfs, lightwallet, System, routing, } from 'dapp-browser';
+import { Router, OnInit, Injectable, Observable, CanActivate, Http } from 'angular-libs';
 
 import { SingletonService } from '../singleton-service';
 import { EvanBCCService } from './bcc';
@@ -41,6 +35,7 @@ import { EvanCoreService } from './core';
 import { EvanDescriptionService } from './description';
 import { EvanRoutingService } from '../ui/routing';
 import { EvanUtilService } from '../utils';
+import { EvanTranslationService } from '../ui/translate';
 
 /**************************************************************************************************/
 
@@ -63,10 +58,11 @@ export class EvanOnboardingService {
   constructor(
     private bcc: EvanBCCService,
     private core: EvanCoreService,
-    private singleton: SingletonService,
+    private http: Http,
     private routingService: EvanRoutingService,
-    private definitions: EvanDescriptionService,
-    private utils: EvanUtilService
+    private singleton: SingletonService,
+    private translate: EvanTranslationService,
+    private utils: EvanUtilService,
   ) {
     return singleton.create(EvanOnboardingService, this, () => {
       this.onboarding = new ProfileBundle.Onboarding({
@@ -99,8 +95,8 @@ export class EvanOnboardingService {
    */
   getOnboardingQueryParams(): any {
     let queryParams = this.routingService.getQueryparams();
-      queryParams.origin = queryParams.origin ||
-        this.routingService.getRouteFromUrl(window.location.hash);
+    queryParams.origin = queryParams.origin ||
+      this.routingService.getRouteFromUrl(window.location.hash);
 
     if (queryParams.origin && queryParams.origin.indexOf('onboarding') !== -1) {
       queryParams.origin = routing.defaultDAppENS;
@@ -134,7 +130,7 @@ export class EvanOnboardingService {
     let queryParams = this.getOnboardingQueryParams();
 
     this.routingService.openENS(
-      this.definitions.getEvanENSAddress('onboarding'),
+      `onboarding.${ getDomainName() }`,
       '',
       queryParams
     );

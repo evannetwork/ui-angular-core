@@ -2,6 +2,10 @@
 
 ## Next Version
 ### Features
+- add `EvanTermsOfUseComponent` for accepting the user changed terms of use
+- add `updateTermsOfUse` to `EvanBCCService` to check for missing verification holder and terms of use changes
+- add `agentUrl` parameter to the `EvanCoreService`
+
 ### Fixes
 ### Deprecations
 

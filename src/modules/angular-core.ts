@@ -96,6 +96,7 @@ import { QrCodeComponent } from '../components/qr-code/qr-code';
 import { QRCodeScannerDialogComponent } from '../components/qr-code-scanner/qr-code-scanner';
 import { SnapshotDialogComponent } from '../components/take-snapshot/take-snapshot';
 import { TrustDialogComponent } from '../components/trust-dialog/trust-dialog';
+import { EvanTermsOfUseComponent } from '../components/terms-of-use/terms-of-use';
 
 // pipes
 import { ObjectToArrayPipe } from '../pipes/ObjectToArray';
@@ -147,6 +148,7 @@ const moduleConfig = {
     EvanProfileVerificationsComponent,
     EvanReloadComponent,
     EvanSplitPaneComponent,
+    EvanTermsOfUseComponent,
     EvanVerificationComponent,
     GlobalPasswordComponent,
     ListPagingComponent,
@@ -214,13 +216,14 @@ const moduleConfig = {
     DAppLoaderComponent,
     DashboardTopButtons,
     EmptyDAppDisplayComponent,
-    EvanVerificationComponent,
     EvanDAppWrapperComponent,
     EvanFileSelectComponent,
     EvanLoadingComponent,
     EvanProfileVerificationsComponent,
     EvanReloadComponent,
     EvanSplitPaneComponent,
+    EvanTermsOfUseComponent,
+    EvanVerificationComponent,
     GlobalPasswordComponent,
     ListPagingComponent,
     MailDialogComponent,
@@ -238,12 +241,13 @@ const moduleConfig = {
     OneTimeDirective,
   ],
   entryComponents: [
-    MailDialogComponent,
-    GlobalPasswordComponent,
-    TrustDialogComponent,
-    SnapshotDialogComponent,
-    QRCodeScannerDialogComponent,
     BigPictureDialog,
+    EvanTermsOfUseComponent,
+    GlobalPasswordComponent,
+    MailDialogComponent,
+    QRCodeScannerDialogComponent,
+    SnapshotDialogComponent,
+    TrustDialogComponent,
   ]
 };
 

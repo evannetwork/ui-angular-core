@@ -65,6 +65,11 @@ export class EvanCoreService {
   private web3: any;
 
   /**
+   * base url of the evan.network smart agents server
+   */
+  public agentUrl = 'https://agents.evan.network';
+
+  /**
    * load dependency services
    */
   constructor(

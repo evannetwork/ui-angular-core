@@ -104,6 +104,9 @@ export const de = {
       "header": "Bild aufnehmen",
       "video_no_available": "Kamera ist nicht verfügbar"
     },
+    "terms-of-use-accept": "akzeptieren",
+    "terms-of-use-changed": "Änderung der Nutzungsbedingungen",
+    "terms-of-use-error": "Während der Bestätigung der Nutzungsbedingungen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
     "use-password": "Entsperren",
     "user-locked": "Profil gesperrt",
     "verifications": {

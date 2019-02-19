@@ -78,8 +78,8 @@ export class EvanModalService {
         .resolveComponentFactory(component)
         .create(this.injector);
 
+      // save payload to modal instance
       const payloadKeys = Object.keys(payload);
-
       for (let i = 0; i < payloadKeys.length; i++) {
         (<any>componentRef.instance)[payloadKeys[i]] = payload[payloadKeys[i]];
       }

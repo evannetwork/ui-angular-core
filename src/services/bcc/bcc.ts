@@ -39,6 +39,7 @@ import {
   lightwallet,
   queue,
   routing,
+  System,
   updateCoreRuntime,
   web3,
   web3Helper,
@@ -48,9 +49,11 @@ import {
   Router,             // '@angular/router';
   OnInit, Injectable, // '@angular/core';
   NgZone,
+  Injector,
 } from 'angular-libs';
 
 import { GlobalPasswordComponent } from '../../components/global-password/global-password';
+import { EvanTermsOfUseComponent } from '../../components/terms-of-use/terms-of-use';
 
 import { EvanCoreService } from './core';
 import { EvanToastService } from '../ui/toast';
@@ -79,6 +82,11 @@ export class EvanBCCService {
    * wait for password dialog to be resolved
    */
   private passwordModalPromise: any;
+
+  /**
+   * wait for terms of use dialog to be resolved
+   */
+  private termsOfUseModalPromise: any;
 
   /**
    * wait for bcc is updated to be resolved
@@ -118,6 +126,7 @@ export class EvanBCCService {
    */
   constructor(
     private _ngZone: NgZone,
+    private injector: Injector,
     private modalService: EvanModalService,
     private utils: EvanUtilService,
     public core: EvanCoreService,
@@ -145,6 +154,7 @@ export class EvanBCCService {
 
     if (!ProfileBundle.ProfileRuntime) {
       await this.updateBCC();
+      await this.updateTermsOfUse();
     } else {
       this.copyCoreToInstance();
       this.copyProfileToInstance();
@@ -328,6 +338,73 @@ export class EvanBCCService {
   }
 
   /**
+    * Check the terms of use has changed and if the current user accepted it.
+    *
+    * @param      {string}         activeAccount  current active account
+    * @return     {Promise<void>}  resolved when done
+    */
+  async updateTermsOfUse(activeAccount = this.core.activeAccount()) {
+    if (activeAccount) {
+      let newTermsOfUse = true;
+
+      // check if the verification management is missing, then it's an old account and the terms of
+      // use must be accepted and an identity must be created.
+      if (await this.verifications.identityAvailable(activeAccount)) {
+        // load the origin of the current terms of use dapp and check if a '/evan/onboarding/termsofuse'
+        // verification for the current user exists for this origin hash, else, it has been changed and
+        // needs to be accepted again
+        const termsOfUseEns = `termsofuse.${ getDomainName() }`;
+        const termsOfUseOrigin = (await System.import(`${ termsOfUseEns }!ens`)).dapp.origin;
+        const termsOfUseVerifications = await this.verifications.getVerifications(
+          this.core.activeAccount(), `/evan/onboarding/termsofuse-${ termsOfUseOrigin }`);
+
+        // iterate through all verifications and check, if this terms of use verification is issued by
+        // the faucet agent
+        for (let i = 0; i < termsOfUseVerifications.length; i++) {
+          // extract the issuer account
+          const verification = termsOfUseVerifications[i];
+          const subjectIdentity = await this.verifications.getIdentityForAccount(verification.subject,
+            true);
+          const dataHash = this.nameResolver
+            .soliditySha3(subjectIdentity, verification.topic, verification.data)
+            .replace('0x', '');
+          const issuerAccount = this.executor.web3.eth.accounts.recover(dataHash,
+            verification.signature);
+
+          // check if the user has accepted the latest terms of use and if the terms of use
+          // verification is issued by the faucet agetn
+          if (issuerAccount === config.faucetAccount) {
+            newTermsOfUse = false;
+            break;
+          }
+        }
+      }
+
+      // if new terms of use are available, load the terms of use and show them, so the user can
+      // read and accept them
+      if (newTermsOfUse) {
+        await new Promise((resolve) => {
+          this._ngZone.run(async () => {
+            // let the user update the terms of use
+            if (!this.termsOfUseModalPromise) {
+              this.termsOfUseModalPromise = this.modalService.createModal(EvanTermsOfUseComponent, {
+                bcc: this,
+                core: this.core,
+              });
+            }
+
+            // wait to be finished
+            await this.termsOfUseModalPromise;
+            this.termsOfUseModalPromise = null;
+
+            resolve();
+          })
+        }) 
+      }
+    }
+  }
+
+  /**
    * Returns an new blockchain-core profile instance. !Attention : It's only
    * builded for load values to check for public and private keys (e.g. used by
    * onboarding or global-password) Executor is the normal one from the global
@@ -337,7 +414,7 @@ export class EvanBCCService {
    *                                                 profile instance for
    * @return     {ProfileBundle.Profile}  The profile for account.
    */
-  public getProfileForAccount(accountId: string): ProfileBundle.Profile {
+  public getProfileForAccount(accountId: string, password: string = 'unencrypted'): ProfileBundle.Profile {
     const keyProvider = new KeyProvider(
       this.utils.deepCopy(getLatestKeyProvider().keys),
       accountId,
@@ -492,9 +569,9 @@ export class EvanBCCService {
           password = await this.passwordModalPromise;
         } else {
           this.passwordModalPromise = this.modalService.createModal(GlobalPasswordComponent, {
-            core: this.core,
+            accountId: accountId,
             bcc: this,
-            accountId: accountId
+            core: this.core,
           });
 
           password = await this.passwordModalPromise;
