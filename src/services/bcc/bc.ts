@@ -81,6 +81,11 @@ export class EvanBcService {
   public profileQueueId: QueueId;
 
   /**
+   * do not load bc instances duplicated times
+   */
+  public loadPromises: any = { };
+
+  /**
    * initialize and make it singleton
    */
   constructor(
@@ -119,32 +124,44 @@ export class EvanBcService {
   async getCurrentBusinessCenter(ensDomain?: string): Promise<any> {
     ensDomain = ensDomain || this.routing.getActiveRootEns();
 
-    if (!this.loadedBcs[ensDomain]) {
-      if (!this.bcc.ProfileBundle) {
-        await this.bcc.updateBCC();
+    // if the bc was already loaded, return it directly
+    if (this.loadedBcs[ensDomain]) {
+      return this.loadedBcs[ensDomain];
+    } else {
+      if (!this.loadPromises[ensDomain]) {
+        this.loadPromises[ensDomain] = new Promise(async (resolve) => {
+          const loadedBc = await BCBundle.createBC({
+            ensDomain,
+            ProfileBundle: BCBundle
+          });
+
+          // save loadedBc to cache, to be able to load isMember previously
+          this.loadedBcs[ensDomain] = loadedBc;
+
+          // load this after the description of the loaded bc to handle inner function call
+          //   of getCurrentBusinessCenter
+          loadedBc.joined = await this.isMember(this.core.activeAccount(), ensDomain);
+          const currentProfile = await this.profileSet(ensDomain);
+
+          if (loadedBc.joined && currentProfile) {
+            const members = await this.getMembers(null, ensDomain);
+            const profiles = await this.getProfiles(members);
+
+            loadedBc.members = members;
+            loadedBc.profiles = profiles;
+          }
+
+          // save loadedBc to cache
+          this.loadedBcs[ensDomain] = loadedBc;
+          resolve();
+          delete this.loadPromises[ensDomain];
+        });
       }
 
-      this.loadedBcs[ensDomain] = await BCBundle.createBC({
-        ensDomain,
-        ProfileBundle: this.bcc.ProfileBundle
-      });
-
-      // load this after the description of the loaded bc to handle inner function call
-      //   of getCurrentBusinessCenter
-      const joined = await this.isMember(this.core.activeAccount(), ensDomain);
-      const currentProfile = await this.profileSet(ensDomain);
-
-      if (joined && currentProfile) {
-        const members = await this.getMembers(null, ensDomain);
-        const profiles = await this.getProfiles(members);
-
-        this.loadedBcs[ensDomain].members = members;
-        this.loadedBcs[ensDomain].profiles = profiles;
-      }
-      this.loadedBcs[ensDomain].joined = joined;
+      // wait for finished loading
+      await this.loadPromises[ensDomain];
+      return this.loadedBcs[ensDomain];
     }
-
-    return this.loadedBcs[ensDomain];
   }
 
   /**
@@ -157,8 +174,13 @@ export class EvanBcService {
   async reloadBc(ensDomain?: string): Promise<any> {
     ensDomain = ensDomain || this.routing.getActiveRootEns();
 
-    delete this.loadedBcs[ensDomain];
+    // wait for previous loading to be finished
+    if (this.loadPromises[ensDomain]) {
+      await this.loadPromises[ensDomain];
+    }
 
+    // clear loaded bc and trigger reload
+    delete this.loadedBcs[ensDomain];
     await this.getCurrentBusinessCenter(ensDomain);
   }
 
