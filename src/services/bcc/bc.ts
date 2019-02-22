@@ -321,7 +321,6 @@ export class EvanBcService {
     Ipld.purgeCryptoInfo(bcContracts);
 
     const contractKeys = Object.keys(bcContracts);
-
     if (contractKeys.length > 0) {
       await prottle(10, contractKeys.map(contract => async () => {
         const contractDetails = await this.getBCContract(ensDomain, contract);

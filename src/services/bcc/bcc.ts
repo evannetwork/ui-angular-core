@@ -30,6 +30,7 @@ import * as ProfileBundle from 'bcc';
 import * as SmartContracts from 'smart-contracts';
 import {
   AccountStore,
+  bccHelper,
   config,
   core,
   getCoreOptions,
@@ -202,24 +203,7 @@ export class EvanBCCService {
    * @return     {ProfileBundle.SignerInternal}  The signer.
    */
   getSigner(provider = this.core.getCurrentProvider()): ProfileBundle.SignerInternal {
-    let signer;
-    if (provider === 'internal') {
-      signer = new ProfileBundle.SignerInternal({
-        accountStore: new AccountStore(),
-        config: { },
-        contractLoader: CoreBundle.CoreRuntime.contractLoader,
-        web3: CoreBundle.CoreRuntime.web3,
-        logLog: CoreBundle.logLog,
-        logLogLevel: CoreBundle.logLogLevel
-      });
-    } else {
-      signer = new ProfileBundle.SignerExternal({
-        logLog: CoreBundle.logLog,
-        logLogLevel: CoreBundle.logLogLevel
-      });
-    }
-
-    return signer;
+    return bccHelper.getSigner(CoreBundle, provider, new AccountStore());
   }
 
 
