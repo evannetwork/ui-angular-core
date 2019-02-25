@@ -338,7 +338,8 @@ export class EvanBCCService {
         // verification for the current user exists for this origin hash, else, it has been changed and
         // needs to be accepted again
         const termsOfUseEns = `termsofuse.${ getDomainName() }`;
-        const termsOfUseOrigin = (await System.import(`${ termsOfUseEns }!ens`)).dapp.origin;
+        const termsOfUseOrigin = (await this.description.getDescription(termsOfUseEns)).public.dapp
+          .origin;
         const termsOfUseVerifications = await this.verifications.getVerifications(
           this.core.activeAccount(), `/evan/onboarding/termsofuse-${ termsOfUseOrigin }`);
 
