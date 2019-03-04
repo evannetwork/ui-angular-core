@@ -234,7 +234,7 @@ export class AddressInputComponent extends AsyncComponent implements ControlValu
    */
   private contactSearchChanged() {
     const suggestions = [ ];
-    const searchValue = this.inputValue.toLowerCase();
+    const searchValue = (this.inputValue || '').toLowerCase();
     const previousSelectedSuggestion = this.suggestions[this.activeSuggestion];
 
     this.contactKeys.forEach(contactKey => {
