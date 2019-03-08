@@ -22,7 +22,7 @@
     "SASS"
   ],
   "license": "AGPL-3.0-only",
-  "main": "dist/index.js",
+  "main": "dist/angularcore.js",
   "name": "@evan.network/ui-angular-core",
   "repository": {
     "type": "git",
