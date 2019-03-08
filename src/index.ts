@@ -25,6 +25,10 @@
   https://evan.network/license/
 */
 
+import { System } from '@evan.network/ui-dapp-browser';
+
+System.map['@evan.network/ui-angular-core'] = 'angularcore.evan!dapp-content';
+
 // modules
 export * from './modules/angular-core';
 

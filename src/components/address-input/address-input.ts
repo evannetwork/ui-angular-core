@@ -26,10 +26,6 @@
 */
 
 import {
-  CoreRuntime
-} from 'bcc';
-
-import {
   getDomainName
 } from 'dapp-browser';
 
@@ -115,6 +111,11 @@ export class AddressInputComponent extends AsyncComponent implements ControlValu
    */
   @Output() public onChange: EventEmitter<any> = new EventEmitter();
 
+  /**
+   * Event trigger that is called when the input has been submitted
+   */
+  @Output() public onSubmit: EventEmitter<any> = new EventEmitter();
+
   /*****************    variables    *****************/
   /**
    * search input reference for autofocus
@@ -161,6 +162,11 @@ export class AddressInputComponent extends AsyncComponent implements ControlValu
    * highlight current active suggestions
    */
   private activeSuggestion: number = 0;
+
+  /**
+   * Prefilled topic selectors
+   */
+  @ViewChild('userSelect') verificationTopicSelect: any;
 
   /***************** initialization  *****************/
   constructor(
@@ -233,32 +239,33 @@ export class AddressInputComponent extends AsyncComponent implements ControlValu
    * @param      {any}     $event  input event
    */
   private contactSearchChanged() {
-    const suggestions = [ ];
-    const searchValue = (this.inputValue || '').toLowerCase();
+    this.suggestions = this.contactKeys;
     const previousSelectedSuggestion = this.suggestions[this.activeSuggestion];
 
-    this.contactKeys.forEach(contactKey => {
-      const lowerCaseKey = contactKey.toLowerCase();
-      let matchString = '';
+    // const searchValue = (this.inputValue || '').toLowerCase();
 
-      if (this.contacts[contactKey]) {
-        const keys = Object.keys(this.contacts[contactKey]);
+    // this.contactKeys.forEach(contactKey => {
+    //   const lowerCaseKey = contactKey.toLowerCase();
+    //   let matchString = '';
 
-        for (let i = 0; i < keys.length; i++) {
-          matchString += this.contacts[contactKey][keys[i]];
-        }
-      }
+    //   if (this.contacts[contactKey]) {
+    //     const keys = Object.keys(this.contacts[contactKey]);
 
-      matchString = matchString.toLowerCase();
+    //     for (let i = 0; i < keys.length; i++) {
+    //       matchString += this.contacts[contactKey][keys[i]];
+    //     }
+    //   }
 
-      if (suggestions.length < 6 && searchValue !== lowerCaseKey &&
-        (contactKey.toLowerCase().indexOf(searchValue) !== -1 ||
-        matchString.indexOf(searchValue) !== -1)) {
-        suggestions.push(contactKey);
-      }
-    });
+    //   matchString = matchString.toLowerCase();
 
-    this.suggestions = suggestions;
+    //   if (suggestions.length < 6 && searchValue !== lowerCaseKey &&
+    //     (contactKey.toLowerCase().indexOf(searchValue) !== -1 ||
+    //     matchString.indexOf(searchValue) !== -1)) {
+    //     suggestions.push(contactKey);
+    //   }
+    // });
+
+    // this.suggestions = suggestions;
 
     const newPreviousIndex = this.suggestions.indexOf(previousSelectedSuggestion);
     if (newPreviousIndex !== -1) {
@@ -286,24 +293,13 @@ export class AddressInputComponent extends AsyncComponent implements ControlValu
 
     switch ($event.keyCode) {
       case 13: {
-        this.inputValue = this.suggestions[this.activeSuggestion];
-        this.contactSearchChanged();
+        if (this.suggestions.length > 0) {
+          this.contactSearchChanged();
+          this.onSubmit.emit();
+          this.ref.detectChanges();
 
-        return this.core.utils.stopEventBubbling($event);
-      }
-      // up arrow
-      case 38: {
-        this.activeSuggestion = this.activeSuggestion === 0 ? this.suggestions.length - 1 :
-          this.activeSuggestion - 1;
-
-        break;
-      }
-      // down arrow
-      case 40: {
-        this.activeSuggestion = this.activeSuggestion === this.suggestions.length -1 ? 0
-          : this.activeSuggestion + 1;
-
-        break;
+          return this.core.utils.stopEventBubbling($event);
+        }
       }
     }
 

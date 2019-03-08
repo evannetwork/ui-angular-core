@@ -55,13 +55,14 @@ import { AsyncComponent } from '../../classes/AsyncComponent';
 import { EvanAddressBookService } from '../../services/bcc/address-book';
 import { EvanAlertService, } from '../../services/ui/alert';
 import { EvanBCCService } from '../../services/bcc/bcc';
-import { EvanVerificationService } from '../../services/bcc/verifications';
 import { EvanCoreService } from '../../services/bcc/core';
-import { EvanQueue } from '../../services/bcc/queue';
-import { EvanTranslationService } from '../../services/ui/translate';
-import { QueueId, } from '../../services/bcc/queue-utilities';
+import { EvanDescriptionService } from '../../services/bcc/description';
 import { EvanFileService, } from '../../services/ui/files';
 import { EvanPictureService, } from '../../services//ui/picture';
+import { EvanQueue } from '../../services/bcc/queue';
+import { EvanTranslationService } from '../../services/ui/translate';
+import { EvanVerificationService } from '../../services/bcc/verifications';
+import { QueueId, } from '../../services/bcc/queue-utilities';
 
 import { createOpacityTransition } from '../../animations/opacity';
 import { createGrowTransition } from '../../animations/grow';
@@ -263,14 +264,15 @@ export class EvanVerificationComponent extends AsyncComponent {
     private addressBookService: EvanAddressBookService,
     private alertService: EvanAlertService,
     private bcc: EvanBCCService,
-    private verificationService: EvanVerificationService,
     private core: EvanCoreService,
+    private descriptionService: EvanDescriptionService,
     private element: ElementRef,
     private fileService: EvanFileService,
     private menuController: MenuController,
     private pictureService: EvanPictureService,
     private queue: EvanQueue,
     private translate: EvanTranslationService,
+    private verificationService: EvanVerificationService,
     public ref: ChangeDetectorRef,
   ) {
     super(ref);
@@ -424,6 +426,13 @@ export class EvanVerificationComponent extends AsyncComponent {
     this.addressbook = await this.addressBookService.loadAccounts();
     // reset verifications loading status, could be old within cached values
     this.computed = await this.verificationService.computeVerifications(this.topic, this.verifications);
+
+    // load contract dbcp name
+    const firstVerification = this.verifications[0];
+    if (firstVerification.subjectType === 'contract') {
+      const dbcp = await this.descriptionService.getDescription(firstVerification.subject);
+      this.computed.alias = dbcp.name;
+    }
 
     this.loadingVerifications = false;
     this.ref.detectChanges();

@@ -35,53 +35,12 @@ evan-address-input {
     margin-bottom: 4px !important;
   }
 
-  ion-label[fixed] {
+  & .active-user {
     font-size: 14px;
     font-weight: 400 !important;
 
-    margin: 0 !important;
-  }
+    margin: 0 0 0 25px !important;
 
-  .suggestions {
-    position: absolute;
-    z-index: 10;
-
-    width: 100%;
-
-    .suggestion {
-      display: block;
-      overflow: hidden;
-
-      padding: 10px;
-
-      cursor: pointer;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-  }
-}
-
-@mixin customTheme($colors, $theme) {
-  evan-address-input {
-    .suggestions {
-      background-color: map-get($theme, background-color-2);
-      box-shadow: map-get($theme, grid-list-item-shadow);
-
-      .suggestion:hover, .suggestion.active {
-        background-color: rgba(map-get($colors, primary), 0.2);
-      }
-    }
-  }
-}
-
-// apply custom styles for all themes
-@import 'ui-angular-sass/src/theme';
-@each $theme, $definition in $evanThemes {
-  @if $theme == 'evan' {
-    @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
-  } @else {
-    .evan-#{$theme} {
-      @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
-    }
+    white-space: nowrap;
   }
 }

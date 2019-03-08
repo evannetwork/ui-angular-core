@@ -131,7 +131,7 @@ export class EvanModalService {
       document.body.getElementsByTagName('ion-app')[0].appendChild(domElem);
 
       if (evanModalAnimation) {
-        const modalShowWatcher = setInterval(() => {
+        const modalShowWatcher: any = setInterval(() => {
           const evanModalEl = domElem.querySelectorAll('.evan-modal');
 
           if (evanModalEl.length > 0) {

@@ -54,7 +54,7 @@ export class EvanDescriptionService {
   /**
    * cached descriptions
    */
-  private descriptions: any;
+  public descriptions: any;
 
   /**
    * make it standalone and load dependency services

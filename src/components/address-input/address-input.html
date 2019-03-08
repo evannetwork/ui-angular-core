@@ -30,26 +30,36 @@
   <ion-label stacked class="standalone">
     {{ label }}
   </ion-label>
-  <ion-item>
-    <ion-label fixed>
-      {{ contacts[inputValue]?.alias || contacts[inputValue]?.email || '---' }}
-    </ion-label>
-
-    <ion-input
-      [placeholder]="placeholder"
+  <div class="display-flex-justify">
+    <ion-item>
+      <ion-input
+        [placeholder]="placeholder"
+        [(ngModel)]="inputValue"
+        (keydown)="handleKeyPress($event)"
+        (ionChange)="contactSearchChanged()"
+        (focus)="setShowSuggestions(true)"
+        (focusout)="setShowSuggestions(false)">
+      </ion-input>
+    </ion-item>
+    <p class="clickable active-user" fixed 
+      *ngIf="contacts[inputValue]?.alias || contacts[inputValue]?.email"
+      (click)="userSelect.open($event)">
+      {{  contacts[inputValue]?.alias || contacts[inputValue]?.email }}
+    </p>
+    <button ion-button icon-only round clear class="user-select-open"
+      (click)="userSelect.open($event)">
+      <ion-icon name="arrow-dropdown"></ion-icon>
+    </button>
+    <ion-select name="userSelect" class="evan-callout" interface="popover"
+      #userSelect
       [(ngModel)]="inputValue"
-      (keydown)="handleKeyPress($event)"
-      (ionChange)="contactSearchChanged()"
-      (focus)="setShowSuggestions(true)"
-      (focusout)="setShowSuggestions(false)">
-    </ion-input>
-  </ion-item>
-  <div class="suggestions" *ngIf="showSuggestions">
-    <div class="suggestion"
-      *ngFor="let suggestion of suggestions; let i = index"
-      [class.active]="i === activeSuggestion"
-      (click)="inputValue = suggestion; contactSearchChanged();">
-      {{ (contacts[suggestion]?.alias || contacts[suggestion]?.email) ? (contacts[suggestion]?.alias || contacts[suggestion]?.email) + ' (' + suggestion + ')' : suggestion }}
-    </div>
+      [selectOptions]="{ cssClass: 'evan-callout evan-topic-prefill top' }"
+      (ionChange)="contactSearchChanged()">
+      <ion-option
+        *ngFor="let suggestion of suggestions"
+        [value]="suggestion">
+        {{ (contacts[suggestion]?.alias || contacts[suggestion]?.email) ? (contacts[suggestion]?.alias || contacts[suggestion]?.email) + ' (' + suggestion + ')' : suggestion }}
+      </ion-option>
+    </ion-select>
   </div>
 </ng-container>

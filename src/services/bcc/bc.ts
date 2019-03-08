@@ -25,12 +25,10 @@
   https://evan.network/license/
 */
 
-import * as BCBundle from 'bcc';
+import * as bcc from 'bcc';
 
-import {
-  Ipld,
-  prottle
-} from 'bcc';
+import { Ipld, prottle } from 'bcc';
+import { bccHelper, config } from 'dapp-browser';
 
 import { EvanBCCService } from './bcc';
 import { EvanCoreService } from './core';
@@ -103,6 +101,101 @@ export class EvanBcService {
   }
 
   /**
+   * Create a new BCInstance.
+   *
+   * @param      {BundleOptions}    options  bundle options
+   * @return     {BCInstance}  new BC instance
+   */
+  async createBC(options: any): Promise<any> {
+    const ensDomain = options.ensDomain;
+    const runtime = bccHelper.profileRuntimes[options.ProfileBundle.instanceId];
+
+    // if user entered ens address, resolve it
+    let bcAddress = ensDomain;
+    if (bcAddress.indexOf('0x') !== 0) {
+      bcAddress = await runtime.nameResolver.getAddress(ensDomain);
+    }
+
+    const nameResolverConfig = JSON.parse(JSON.stringify(config.nameResolver));
+    nameResolverConfig.labels.businessCenterRoot = ensDomain;
+
+    const nameResolver = new bcc.NameResolver({
+      config: nameResolverConfig,
+      executor: runtime.executor,
+      contractLoader: runtime.contractLoader,
+      web3: runtime.web3,
+      logLog: bcc.logLog,
+      LogLogLevel: bcc.logLogLevel
+    });
+
+    const businessCenter = runtime.contractLoader.loadContract('BusinessCenter', bcAddress);
+    const bcRoles = new bcc.RightsAndRoles({
+      contractLoader: runtime.contractLoader,
+      executor: runtime.executor,
+      nameResolver: nameResolver,
+      web3: runtime.web3,
+      logLog: bcc.logLog
+    });
+
+    const ipld = new Ipld({
+      ipfs: runtime.dfs,
+      keyProvider: runtime.keyProvider,
+      cryptoProvider: runtime.description.cryptoProvider,
+      defaultCryptoAlgo: 'aes',
+      originator: nameResolver.soliditySha3(ensDomain),
+      nameResolver,
+      logLog: bcc.logLog,
+    });
+
+    const bcProfiles = new bcc.BusinessCenterProfile({
+      ipld: ipld,
+      nameResolver: nameResolver,
+      defaultCryptoAlgo: 'aes',
+      bcAddress: ensDomain,
+      cryptoProvider: runtime.description.cryptoProvider,
+      logLog: bcc.logLog,
+    });
+
+    const dataContract = new bcc.DataContract({
+      cryptoProvider: runtime.description.cryptoProvider,
+      dfs: runtime.dfs,
+      executor: runtime.executor,
+      loader: runtime.contractLoader,
+      nameResolver: nameResolver,
+      sharing: runtime.sharing,
+      web3: runtime.web3,
+      description: runtime.description,
+      logLog: bcc.logLog,
+    });
+
+    const serviceContract = new bcc.ServiceContract({
+      cryptoProvider: runtime.description.cryptoProvider,
+      dfs: runtime.dfs,
+      executor: runtime.executor,
+      keyProvider: runtime.keyProvider,
+      loader: runtime.contractLoader,
+      nameResolver: nameResolver,
+      sharing: runtime.sharing,
+      web3: runtime.web3,
+      logLog: bcc.logLog,
+    });
+
+    const description = await runtime.description.getDescriptionFromEns(ensDomain);
+
+    return {
+      ensDomain,
+      bcAddress,
+      businessCenter,
+      bcRoles,
+      ipld,
+      bcProfiles,
+      description: (<any>description),
+      dataContract,
+      serviceContract,
+    };
+  }
+
+  /**
    * Gets the current business center. It is created using the BCBundle.createBC
    * runtime function.
    * 
@@ -130,9 +223,9 @@ export class EvanBcService {
     } else {
       if (!this.loadPromises[ensDomain]) {
         this.loadPromises[ensDomain] = new Promise(async (resolve) => {
-          const loadedBc = await BCBundle.createBC({
+          const loadedBc = await this.createBC({
             ensDomain,
-            ProfileBundle: BCBundle
+            ProfileBundle: bcc
           });
 
           // save loadedBc to cache, to be able to load isMember previously

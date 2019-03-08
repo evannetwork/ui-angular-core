@@ -82,7 +82,7 @@ export class EvanOnboardingService {
    * @return     {boolean}  True if onboarded, False otherwise.
    */
   async isOnboarded(accountId?: string): Promise<boolean> {
-    return ProfileBundle.isAccountOnboarded(accountId || this.core.activeAccount());
+    return bccHelper.isAccountOnboarded(accountId || this.core.activeAccount());
   }
 
   /**

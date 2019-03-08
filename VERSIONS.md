@@ -5,9 +5,14 @@
 - add `EvanTermsOfUseComponent` for accepting the user changed terms of use
 - add `updateTermsOfUse` to `EvanBCCService` to check for missing verification holder and terms of use changes
 - add `agentUrl` parameter to the `EvanCoreService`
+- use `createDefaultRuntime` instead of bcc bundle
 
 ### Fixes
+- simplify `address-input`
+- show correct name of contracts within the `verification detail`
+
 ### Deprecations
+
 
 
 ## Version 2.0.0
