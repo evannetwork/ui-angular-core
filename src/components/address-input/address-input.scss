@@ -35,12 +35,16 @@ evan-address-input {
     margin-bottom: 4px !important;
   }
 
-  & .active-user {
+  .active-user {
     font-size: 14px;
     font-weight: 400 !important;
 
     margin: 0 0 0 25px !important;
 
     white-space: nowrap;
+  }
+
+  ion-select button {
+    display: none;
   }
 }
