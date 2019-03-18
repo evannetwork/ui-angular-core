@@ -55,7 +55,7 @@ import { EvanUtilService } from '../../services/utils';
   selector: 'dashboard-top-buttons',
   templateUrl: 'dashboard-top-buttons.html'
 })
-export class DashboardTopButtons {
+export class DashboardTopButtons extends AsyncComponent {
   /**
    * event handler that watches for queue updates
    */
@@ -69,31 +69,31 @@ export class DashboardTopButtons {
     private ref: ChangeDetectorRef,
     private utilService: EvanUtilService,
   ) {
-    this.ref.detach();
-    this.ref.detectChanges();
+    super(ref, false);
   }
 
   /**
    * TODO: Optionally it can be move to body level to handle fixed containing elements
    */
-  async ngAfterViewInit() {
+  async _ngAfterViewInit() {
     this.onQueueButtonChange = this.utilService.onEvent('evan-queue-button-count', async () => {
       this.setQueueButtonCount();
       this.ref.detectChanges();
     });
 
     const ionApp = document.body.querySelector('ion-app');
-    for (let i = 0; i < ionApp.childNodes.length; i++) {
-      if ((<any>ionApp.childNodes[i]).tagName.toLowerCase() === 'dashboard-top-buttons') {
-        ionApp.removeChild(ionApp.childNodes[i]);
-      }
-    }
+    // for (let i = 0; i < ionApp.childNodes.length; i++) {
+    //   if ((<any>ionApp.childNodes[i]).tagName.toLowerCase() === 'dashboard-top-buttons' &&
+    //       <any>ionApp.childNodes[i] !== this.element.nativeElement) {
+    //     ionApp.removeChild(ionApp.childNodes[i]);
+    //   }
+    // }
 
     ionApp.appendChild(this.element.nativeElement);
     this.setQueueButtonCount();
   }
 
-  ngOnDestroy() {
+  async _ngOnDestroy() {
     if (this.element.nativeElement && this.element.nativeElement.parentElement) {
       this.element.nativeElement.parentElement.removeChild(this.element.nativeElement);
     }
