@@ -6,6 +6,7 @@
 - add `updateTermsOfUse` to `EvanBCCService` to check for missing verification holder and terms of use changes
 - add `agentUrl` parameter to the `EvanCoreService`
 - use `createDefaultRuntime` instead of bcc bundle
+- scope angular and ionic styles to .evan-angular scopes
 
 ### Fixes
 - simplify `address-input`
