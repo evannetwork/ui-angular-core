@@ -69,10 +69,10 @@ let warningTimeout = { };
  *   - url routing has as title (dynamic)
  *   - mailbox alerts
  *   - queue status
- *   
+ *
  * ng-content selectors:
  *   - "evan-content" for wrapper content
- *   
+ *
  * Usage:
  *   <dapp-wrapper *ngIf="!loading" #dappWrapper>
  *     <div evan-content [@routerTransition]="o?.activatedRouteData?.state">
@@ -104,7 +104,7 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
   /**
    * Emitted when the routing data refresh property is set and the reload button
    * is clicked, so the parent module can reload the current component content.
-   * 
+   *
    */
   @Output() refreshing: EventEmitter<any> = new EventEmitter();
 
@@ -145,7 +145,7 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
   private mailCheckInterval: any;
 
   /**
-   * used to check, if the content should be refreshed (dom elements will be hidden) 
+   * used to check, if the content should be refreshed (dom elements will be hidden)
    */
   private refreshContent: boolean;
 
@@ -406,11 +406,11 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
       // check if the user already has created an payment channel, if not, trigger an popup to
       // navigate the user to the profile page, where the payment channel can be set up
       //   => cannot be check within the dapp-browser, their is no uer logged in
-      // const paymentChannels = await this.paymentService.requestPaymentAgent('getChannels');
-      // const activeChannels = paymentChannels.channels.filter(channel => channel.state === 'OPEN');
-      // if (activeChannels.length === 0) {
-      //   this.core.utils.sendEvent('evan-warning', { type: 'payment-channel' });
-      // }
+      const paymentChannels = await this.paymentService.requestPaymentAgent('getChannels');
+      const activeChannels = paymentChannels.channels.filter(channel => channel.state === 'OPEN');
+      if (activeChannels.length === 0) {
+        this.core.utils.sendEvent('evan-warning', { type: 'payment-channel' });
+      }
 
       // watch for developer mode is changing
       this.isDeveloperMode = window.localStorage['evan-developer-mode'] === 'true';
