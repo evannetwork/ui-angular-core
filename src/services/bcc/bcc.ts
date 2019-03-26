@@ -275,7 +275,7 @@ export class EvanBCCService {
         // load private and encryption keys
         let unlockedVault: any = { };
         let privateKey;
-        if (!disableKeys) {
+        if (!disableKeys && provider !== 'agent-executor') {
           unlockedVault = await lightwallet.loadUnlockedVault();
           privateKey = await lightwallet.getPrivateKey(unlockedVault, activeAccount);
           coreOptions.config.accountMap = { };
@@ -327,7 +327,10 @@ export class EvanBCCService {
         }
 
         if (!disableKeys) {
-          this.keyProvider.init(bccProfile.profile);
+          if (provider !== 'agent-executor') {
+            this.keyProvider.init(bccProfile.profile);
+          }
+
           await this.keyProvider.setKeys();
           try {
             await this.setExchangeKeys(activeAccount);
@@ -350,8 +353,8 @@ export class EvanBCCService {
     * @param      {string}         activeAccount  current active account
     * @return     {Promise<void>}  resolved when done
     */
-  async updateTermsOfUse(activeAccount = this.core.activeAccount()) {
-    if (activeAccount) {
+  async updateTermsOfUse(activeAccount = this.core.activeAccount(), provider = this.core.getCurrentProvider()) {
+    if (activeAccount && provider !== 'agent-executor') {
       let newTermsOfUse = true;
 
       // check if the verification management is missing, then it's an old account and the terms of
