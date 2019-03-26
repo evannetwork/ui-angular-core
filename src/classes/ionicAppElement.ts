@@ -75,7 +75,7 @@ window.addEventListener('beforeunload', function (event) {
   delete (<any>window).ng;
 
   // for stopping of all ionic angular applications within the dom
-  const appElements = document.getElementsByTagName('.evan-angular');
+  const appElements = document.getElementsByTagName('ion-app');
   for (let i = 0; i < appElements.length; i++) {
     stopAngularApplication();
   }
@@ -92,7 +92,7 @@ window.addEventListener('beforeunload', function (event) {
  * @return     {Element}  returns the new ionic-app element
  */
 export function createIonicAppElement(container: Element, name: string) {
-  const ionApps = container.querySelectorAll('.evan-angular');
+  const ionApps = container.querySelectorAll('ion-app');
 
   for (let i = 0; i < ionApps.length; i++) {
     ionApps[i].parentElement.removeChild(ionApps[i]);
@@ -101,27 +101,22 @@ export function createIonicAppElement(container: Element, name: string) {
   stopAngularApplication();
 
   // create a new container for the dapp to load
-  const evanContainer = document.createElement(`div`);
   const ionApp = document.createElement(`ion-app`);
-
-  evanContainer.appendChild(ionApp);
-  
-  evanContainer.className = 'evan-angular';
   ionApp.id = name;
   ionApp.className += ' evan-dapp app-root app-root-md md platform-core enable-hover visible';
-  evanContainer.setAttribute('angular-application-ref', 'e-' + generateID() + '-e');
+  ionApp.setAttribute('angular-application-ref', 'e-' + generateID() + '-e');
 
   if (container !== document.body) {
     ionApp.style.cssText = 'contain: unset !important;';
   }
 
   if (document.body.firstChild) {
-    document.body.insertBefore(evanContainer, document.body.firstChild);
+    document.body.insertBefore(ionApp, document.body.firstChild);
   } else {
-    document.body.appendChild(evanContainer);
+    document.body.appendChild(ionApp);
   }
 
-  return evanContainer;
+  return ionApp;
 }
 
 /**

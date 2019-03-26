@@ -110,9 +110,7 @@ export class BootstrapComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit() {
     this.ionAppElement = this.elementRef.nativeElement;
 
-    while (this.ionAppElement && this.ionAppElement.className &&
-           this.ionAppElement.className.indexOf('evan-angular') === -1 &&
-           this.ionAppElement.tagName.toLowerCase() !== 'body') {
+    while (!(this.ionAppElement.tagName.toLowerCase() === 'ion-app' || this.ionAppElement.tagName.toLowerCase() === 'body')) {
       this.ionAppElement = this.ionAppElement.parentElement;
     }
 
@@ -138,4 +136,3 @@ export class BootstrapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 }
-
