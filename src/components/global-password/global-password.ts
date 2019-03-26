@@ -52,10 +52,10 @@ import { EvanAlertService } from '../../services/ui/alert';
  * Global password component that is used within each Angular DApp. Will be
  * registered in the root.ts in each evan.network featured DApp. Unlocks the
  * current users profile. Should only be used using the modal service!
- * 
+ *
  * Usage within root component:
  *   await this.bcc.initialize((accountId) => this.bcc.globalPasswordDialog(accountId));
- *   
+ *
  * Directly usage:
  *   password = await this.modalService.createModal(GlobalPasswordComponent, {
  *     core: this.core,
@@ -119,7 +119,7 @@ export class GlobalPasswordComponent implements OnInit, AfterViewInit {
    * will be applied from the modal service
    */
   private core: EvanCoreService;
-  
+
   /**
    * show loading
    */
@@ -206,7 +206,11 @@ export class GlobalPasswordComponent implements OnInit, AfterViewInit {
       );
 
       this.core.logout();
-    } catch (ex) { }
+    } catch (ex) {
+      if(ex) {
+        this.core.logout();
+      }
+    }
   }
 
   ngAfterViewInit() {
