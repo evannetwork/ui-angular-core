@@ -327,10 +327,7 @@ export class EvanBCCService {
         }
 
         if (!disableKeys) {
-          if (provider !== 'agent-executor') {
-            this.keyProvider.init(bccProfile.profile);
-          }
-
+          this.keyProvider.init(bccProfile.profile);
           await this.keyProvider.setKeys();
           try {
             await this.setExchangeKeys(activeAccount);
