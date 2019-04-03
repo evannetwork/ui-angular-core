@@ -25,139 +25,141 @@
   https://evan.network/license/
 */
 
-dapp-wrapper {
-  & > ion-content {
-    & > .scroll-content {
-      z-index: 12;
-    }
-  }
-
-  .refresh-icon {
-    margin-left: 10px;
-
-    vertical-align: bottom;
-  }
-
-  ion-header {
-    &:after {
-      display: none;
+.evan-angular {
+  dapp-wrapper {
+    & > ion-content {
+      & > .scroll-content {
+        z-index: 12;
+      }
     }
 
-    ion-title.clickable {
-      .toolbar-title {
-        &:hover {
-          text-decoration: underline;
+    .refresh-icon {
+      margin-left: 10px;
+
+      vertical-align: bottom;
+    }
+
+    ion-header {
+      &:after {
+        display: none;
+      }
+
+      ion-title.clickable {
+        .toolbar-title {
+          &:hover {
+            text-decoration: underline;
+          }
         }
       }
-    }
 
-    ion-navbar {
-      .notification-count {
-        font-size: 12px;
+      ion-navbar {
+        .notification-count {
+          font-size: 12px;
 
-        position: absolute;
-        top: 7px;
-        right: 7px;
+          position: absolute;
+          top: 7px;
+          right: 7px;
 
-        width: 20px;
-        height: 20px;
-        padding: 4px;
+          width: 20px;
+          height: 20px;
+          padding: 4px;
 
-        border-radius: 50%;
+          border-radius: 50%;
+        }
+
+        ion-buttons[start] {
+          order: 2 !important;
+        }
       }
 
-      ion-buttons[start] {
-        order: 2 !important;
-      }
-    }
-
-    ion-buttons.header-img-wrapper {
-      display: inline-block;
-
-      height: 40px;
-
-      vertical-align: middle;
-
-      & > div {
+      ion-buttons.header-img-wrapper {
         display: inline-block;
 
-        margin-right: 12px;
-        padding-right: 20px;
+        height: 40px;
 
         vertical-align: middle;
 
-        &, img {
-          height: 40px;
+        & > div {
+          display: inline-block;
+
+          margin-right: 12px;
+          padding-right: 20px;
+
+          vertical-align: middle;
+
+          &, img {
+            height: 40px;
+          }
+        }
+
+        button {
+          vertical-align: middle !important;
         }
       }
+    }
+
+    .evan-queue-status {
+      position: absolute;
+      top: 0;
+      right: -2px;
 
       button {
-        vertical-align: middle !important;
-      }
-    }
-  }
+        width: 56px;
+        height: 56px;
+        margin: 0;
+        margin-right: -4px;
 
-  .evan-queue-status {
-    position: absolute;
-    top: 0;
-    right: -2px;
+        border-radius: 0;
 
-    button {
-      width: 56px;
-      height: 56px;
-      margin: 0;
-      margin-right: -4px;
-
-      border-radius: 0;
-
-      ion-spinner {
-        width: 30px;
-        height: 30px;
-      }
-    }
-  }
-
-  ion-menu#queueMenu {
-    h4 {
-      margin: 0;
-      padding: 12px;
-    }
-
-    .scroll-content {
-      & > ion-icon {
-        font-size: 50px;
-
-        width: 100px;
-        height: 100px;
-        padding-top: 25px;
-
-        vertical-align: middle;
-
-        border-radius: 50%;
-      }
-
-      & > ion-spinner {
-        width: 100px;
-        height: 100px;
-
-        &.error {
-          position: absolute;
-          top: 2px;
-          right: 0;
-          left: 0;
-
-          width: 130px;
-          height: 130px;
-          margin: auto;
+        ion-spinner {
+          width: 30px;
+          height: 30px;
         }
       }
     }
 
-    .queue-exception {
-      display: block;
+    ion-menu#queueMenu {
+      h4 {
+        margin: 0;
+        padding: 12px;
+      }
 
-      margin: 25px;
-      padding: 25px;
+      .scroll-content {
+        & > ion-icon {
+          font-size: 50px;
+
+          width: 100px;
+          height: 100px;
+          padding-top: 25px;
+
+          vertical-align: middle;
+
+          border-radius: 50%;
+        }
+
+        & > ion-spinner {
+          width: 100px;
+          height: 100px;
+
+          &.error {
+            position: absolute;
+            top: 2px;
+            right: 0;
+            left: 0;
+
+            width: 130px;
+            height: 130px;
+            margin: auto;
+          }
+        }
+      }
+
+      .queue-exception {
+        display: block;
+
+        margin: 25px;
+        padding: 25px;
+      }
     }
   }
 }
@@ -252,9 +254,11 @@ dapp-wrapper {
 @import 'ui-angular-sass/src/theme';
 @each $theme, $definition in $evanThemes {
   @if $theme == 'evan' {
-    @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
+    .evan-angular {
+      @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
+    }
   } @else {
-    .evan-#{$theme} {
+    .evan-angular.evan-#{$theme} {
       @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
     }
   }
