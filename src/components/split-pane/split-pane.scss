@@ -297,14 +297,16 @@ evan-split-pane, .evan-split-pane {
     @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
   } @else {
     .evan-#{$theme} {
-      @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
+      .evan-angular {
+        @include customTheme(map-get($definition, colors), map-get($definition, evanStyles));
 
-      ion-footer {
-        ion-item.item-md.item-block.item-select {
-          margin-top: 0 !important;
-          padding: 0 !important;
+        ion-footer {
+          ion-item.item-md.item-block.item-select {
+            margin-top: 0 !important;
+            padding: 0 !important;
 
-          background-color: transparent !important;
+            background-color: transparent !important;
+          }
         }
       }
     }

@@ -78,8 +78,8 @@ export class EvanModalService {
         .resolveComponentFactory(component)
         .create(this.injector);
 
+      // save payload to modal instance
       const payloadKeys = Object.keys(payload);
-
       for (let i = 0; i < payloadKeys.length; i++) {
         (<any>componentRef.instance)[payloadKeys[i]] = payload[payloadKeys[i]];
       }
@@ -131,7 +131,7 @@ export class EvanModalService {
       document.body.getElementsByTagName('ion-app')[0].appendChild(domElem);
 
       if (evanModalAnimation) {
-        const modalShowWatcher = setInterval(() => {
+        const modalShowWatcher: any = setInterval(() => {
           const evanModalEl = domElem.querySelectorAll('.evan-modal');
 
           if (evanModalEl.length > 0) {

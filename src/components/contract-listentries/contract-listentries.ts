@@ -148,13 +148,13 @@ export class ContractListEntriesComponent extends AsyncComponent {
 
     this.dataContract = new CoreBundle.DataContract({
       cryptoProvider: this.bcc.description.cryptoProvider,
-      dfs: CoreBundle.CoreRuntime.dfs,
-      executor: CoreBundle.CoreRuntime.executor,
-      loader: CoreBundle.CoreRuntime.contractLoader,
+      dfs: this.bcc.coreRuntime.dfs,
+      executor: this.bcc.coreRuntime.executor,
+      loader: this.bcc.coreRuntime.contractLoader,
       nameResolver: this.bcc.nameResolver,
-      sharing: CoreBundle.ProfileRuntime.sharing,
-      web3: CoreBundle.CoreRuntime.web3,
-      description: CoreBundle.CoreRuntime.description,
+      sharing: this.bcc.profileRuntime.sharing,
+      web3: this.bcc.coreRuntime.web3,
+      description: this.bcc.coreRuntime.description,
     });
 
     this.listEntryCount = await this.dataContract

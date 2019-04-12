@@ -29,34 +29,7 @@
   <div class="evan-logo"></div>
   <div class="evan-beauty-screen"></div>
 
-  <form class="password-dialog" *ngIf="!termsOfUse">
-    <h3>{{ '_angularcore.user-locked' | translate }}</h3>
-    <ion-item>
-      <ion-label stacked>{{ '_angularcore.password' | translate }}</ion-label>
-      <ion-input type="password" #passwordInput
-        id="password"
-        name="password"
-        clearOnEdit="false" 
-        [(ngModel)]="password"
-        (keyup.enter)="usePassword()"
-        (ionChange)="ref.detectChanges()">
-      </ion-input>
-    </ion-item>
-    <div class="input-error" [@growTransition]="{ value: ':enter', params : { height : '14px' } }"
-      *ngIf="invalidPassword">
-      {{ '_angularcore.invalid-password' | translate }}
-    </div>
-
-    <button ion-button icon-end outline round color="primary"
-      (click)="usePassword()"
-      [disabled]="password.length < 8 || loading">
-      {{ '_angularcore.use-password' | translate }}
-      <ion-spinner color="light" *ngIf="loading" margin-left></ion-spinner>
-      <ion-icon name="arrow-forward" *ngIf="!loading"></ion-icon>
-    </button>
-  </form>
-
-  <form class="password-dialog terms-of-use-changed" *ngIf="termsOfUse">
+  <form class="password-dialog terms-of-use-changed">
     <h3>{{ '_angularcore.terms-of-use-changed' | translate }}</h3>
 
     <div [innerHTML]="termsOfUse"></div>
@@ -73,11 +46,4 @@
       <ion-spinner color="light" *ngIf="loading" margin-left></ion-spinner>
     </button>
   </form>
-
-  <div class="logout-button" text-center>
-    <button ion-button icon-left round color="alert" (click)="logout()">
-      <ion-icon name="log-out" color="light"></ion-icon>
-      <span color="light">{{ '_angularcore.logout' | translate }}</span>
-    </button>
-  </div>
 </div>

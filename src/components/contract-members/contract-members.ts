@@ -278,7 +278,7 @@ export class ContractMembersComponent extends AsyncComponent {
    */
   async _ngAfterViewInit() {
     this.ionMenu = this.element.nativeElement.querySelector('ion-menu');
-    document.querySelector('body > ion-app dapp-wrapper').appendChild(this.ionMenu);
+    document.querySelector('body > .evan-angular > ion-app dapp-wrapper').appendChild(this.ionMenu);
     setTimeout(() => this.setShowTags());
   }
 
@@ -289,7 +289,7 @@ export class ContractMembersComponent extends AsyncComponent {
     this.profileVerificationsWatcher();
 
     try {
-      document.querySelector('body > ion-app dapp-wrapper').removeChild(this.ionMenu);
+      document.querySelector('body > .evan-angular > ion-app dapp-wrapper').removeChild(this.ionMenu);
     } catch (ex) { }
   }
 

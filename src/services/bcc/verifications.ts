@@ -235,6 +235,6 @@ export class EvanVerificationService {
    * @return     {void}  
    */
   public deleteFromVerificationCache(subject: string, topic: string) {
-    this.bcc.verifications.computeVerifications(subject, topic);
+    this.bcc.verifications.deleteFromVerificationCache(subject, topic);
   }
 }

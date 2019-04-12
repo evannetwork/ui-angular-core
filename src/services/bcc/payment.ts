@@ -56,22 +56,22 @@ export class EvanPaymentService {
   /**
    * account address of the payment agent.
    */
-  public agentAccountId: string = '0xAF176885bD81D5f6C76eeD23fadb1eb0e5Fe1b1F';
+  public paymentAgentAccountId: string = '0xAF176885bD81D5f6C76eeD23fadb1eb0e5Fe1b1F';
 
   /**
    * Manager of the payment channel.
    */
-  public channelManagerAccountId: string = '0x0A0D9dddEba35Ca0D235A4086086AC704bbc8C2b'
+  public paymentChannelManagerAccountId: string = '0x0A0D9dddEba35Ca0D235A4086086AC704bbc8C2b'
 
   /**
    * Url to the payment agent server.
    */
-  public paymentAgentUrl: string = `https://payments.evan.network`
+  public paymentAgentUrl: string = `https://payments.test.evan.network`
 
   /**
    * base endpoint of the payment
    */
-  public paymentEndPoint: string = 'api/ipfs-payments';
+  public paymentEndPoint: string = 'api/smart-agents/ipfs-payments';
 
   /**
    * create singleton instance and create queue id

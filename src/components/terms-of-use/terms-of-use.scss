@@ -26,25 +26,33 @@
 */
 
 @import 'ui-angular-sass/src/variables/colors';
-evan-address-input {
-  position: relative;
 
-  display: block;
+.password-dialog-container {
+  .password-dialog.terms-of-use-changed {
+    bottom: 0;
+    color: #fff;
+    max-height: 500px;
+    max-width: 100%;
+    overflow-y: auto;
+    top: 0;
+    width: 95%;
 
-  ion-label.label.standalone[stacked] {
-    margin-bottom: 4px !important;
-  }
+    & > div {
+      text-align: left;
 
-  .active-user {
-    font-size: 14px;
-    font-weight: 400 !important;
+      @media (min-width: 769px) {
+        margin: 25px;
+      }
+    }
 
-    margin: 0 0 0 25px !important;
-
-    white-space: nowrap;
-  }
-
-  ion-select button {
-    display: none;
+    @media (min-width: 993px) {
+      max-width: 60%;
+    }
+    @media (min-width: 1201px) {
+      max-width: 50%;
+    }
+    @media (min-width: 1501px) {
+      max-width: 40%;
+    }
   }
 }

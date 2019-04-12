@@ -17,7 +17,7 @@
     "skipLibCheck": true,
     "types": [],
     "paths": {
-      "bcc": ["../../api-blockchain-core/bundles/bcc/bcc"],
+      "bcc": ["../../api-blockchain-core/dist/index.js"],
       "smart-contracts": ["../../smart-contracts-core/index.js"],
       "dapp-browser": ["../../ui-dapp-browser/runtime/build/main"],
       "angular-libs": ["../../ui-angular-libs/dist/angularlibs.js"]

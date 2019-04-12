@@ -25,11 +25,11 @@
   https://evan.network/license/
 */
 
-import * as CoreBundle from 'bcc';
-import * as ProfileBundle from 'bcc';
+import * as bcc from 'bcc';
 import * as SmartContracts from 'smart-contracts';
 import {
   AccountStore,
+  bccHelper,
   config,
   core,
   getCoreOptions,
@@ -39,6 +39,7 @@ import {
   lightwallet,
   queue,
   routing,
+  System,
   updateCoreRuntime,
   web3,
   web3Helper,
@@ -48,9 +49,11 @@ import {
   Router,             // '@angular/router';
   OnInit, Injectable, // '@angular/core';
   NgZone,
+  Injector,
 } from 'angular-libs';
 
 import { GlobalPasswordComponent } from '../../components/global-password/global-password';
+import { EvanTermsOfUseComponent } from '../../components/terms-of-use/terms-of-use';
 
 import { EvanCoreService } from './core';
 import { EvanToastService } from '../ui/toast';
@@ -81,6 +84,11 @@ export class EvanBCCService {
   private passwordModalPromise: any;
 
   /**
+   * wait for terms of use dialog to be resolved
+   */
+  private termsOfUseModalPromise: any;
+
+  /**
    * wait for bcc is updated to be resolved
    */
   public updateBCCPromise: any;
@@ -89,13 +97,13 @@ export class EvanBCCService {
    * blockchain-core original properties. Mapped from e.g
    * BCC.coreInstance.executor => this.executor
    */
-  public verifications: ProfileBundle.Verifications;
   public config: any;
   public contractLoader: any;
   public contracts: any;
   public CoreBundle: any;
+  public coreRuntime: any;
   public cryptoProvider: any;
-  public dataContract: ProfileBundle.DataContract;
+  public dataContract: bcc.DataContract;
   public description: any;
   public dfs: any;
   public executor: any;
@@ -107,10 +115,12 @@ export class EvanBCCService {
   public payments: any;
   public profile: any;
   public ProfileBundle: any;
-  public rightsAndRoles: CoreBundle.RightsAndRoles;
-  public serviceContract: ProfileBundle.ServiceContract;
-  public sharing: ProfileBundle.Sharing;
+  public profileRuntime: any;
+  public rightsAndRoles: bcc.RightsAndRoles;
+  public serviceContract: bcc.ServiceContract;
+  public sharing: bcc.Sharing;
   public uiEvents: any;
+  public verifications: bcc.Verifications;
   public web3: any;
 
   /**
@@ -118,6 +128,7 @@ export class EvanBCCService {
    */
   constructor(
     private _ngZone: NgZone,
+    private injector: Injector,
     private modalService: EvanModalService,
     private utils: EvanUtilService,
     public core: EvanCoreService,
@@ -143,45 +154,44 @@ export class EvanBCCService {
       lightwallet.setPasswordFunction(passwordFunction);
     }
 
-    if (!ProfileBundle.ProfileRuntime) {
+    if (!bccHelper.profileRuntimes[bcc.instanceId]) {
       await this.updateBCC();
+      await this.updateTermsOfUse();
     } else {
-      this.copyCoreToInstance();
       this.copyProfileToInstance();
     }
   }
 
   /**
-   * Copy BCC core object instances into the service this scope.
-   */
-  copyCoreToInstance() {
-    this.config = config;
-    this.web3 = CoreBundle.CoreRuntime.web3;
-    this.contractLoader = CoreBundle.CoreRuntime.contractLoader;
-    this.executor = CoreBundle.CoreRuntime.executor;
-    this.description = CoreBundle.CoreRuntime.description;
-    this.nameResolver = CoreBundle.CoreRuntime.nameResolver;
-    this.cryptoProvider = this.description.cryptoProvider;
-    this.contracts = CoreBundle.CoreRuntime.contracts;
-    this.dfs = CoreBundle.CoreRuntime.dfs;
-
-    this.CoreBundle = CoreBundle;
-  }
-  /**
    * Copy BCC profile object instances into the service this scope.
    */
   copyProfileToInstance() {
-    this.dataContract = ProfileBundle.ProfileRuntime.dataContract;
-    this.ipldInstance = ProfileBundle.ProfileRuntime.ipldInstance;
-    this.keyExchange = ProfileBundle.ProfileRuntime.keyExchange;
-    this.keyProvider = ProfileBundle.ProfileRuntime.keyProvider;
-    this.mailbox = ProfileBundle.ProfileRuntime.mailbox;
-    this.profile = ProfileBundle.ProfileRuntime.profile;
-    this.ProfileBundle = ProfileBundle;
-    this.serviceContract = ProfileBundle.ProfileRuntime.serviceContract;
-    this.sharing = ProfileBundle.ProfileRuntime.sharing;
-    this.verifications = ProfileBundle.ProfileRuntime.verifications;
-    this.payments = ProfileBundle.ProfileRuntime.payments;
+    const runtime = bccHelper.profileRuntimes[bcc.instanceId] ||
+      bccHelper.coreRuntimes[bcc.instanceId];
+    this.profileRuntime = runtime;
+    this.coreRuntime = runtime;
+    this.CoreBundle = bcc;
+
+    this.config = config;
+    this.web3 = runtime.web3;
+    this.contractLoader = runtime.contractLoader;
+    this.executor = runtime.executor;
+    this.description = runtime.description;
+    this.nameResolver = runtime.nameResolver;
+    this.cryptoProvider = this.description.cryptoProvider;
+    this.contracts = runtime.contracts;
+    this.dfs = runtime.dfs;
+    this.dataContract = runtime.dataContract;
+    this.ipldInstance = runtime.ipldInstance;
+    this.keyExchange = runtime.keyExchange;
+    this.keyProvider = runtime.keyProvider;
+    this.mailbox = runtime.mailbox;
+    this.profile = runtime.profile;
+    this.ProfileBundle = bcc;
+    this.serviceContract = runtime.serviceContract;
+    this.sharing = runtime.sharing;
+    this.verifications = runtime.verifications;
+    this.payments = runtime.payments;
   }
 
   /**
@@ -191,25 +201,8 @@ export class EvanBCCService {
    * @param      {string}                        provider  The provider
    * @return     {ProfileBundle.SignerInternal}  The signer.
    */
-  getSigner(provider = this.core.getCurrentProvider()): ProfileBundle.SignerInternal {
-    let signer;
-    if (provider === 'internal') {
-      signer = new ProfileBundle.SignerInternal({
-        accountStore: new AccountStore(),
-        config: { },
-        contractLoader: CoreBundle.CoreRuntime.contractLoader,
-        web3: CoreBundle.CoreRuntime.web3,
-        logLog: CoreBundle.logLog,
-        logLogLevel: CoreBundle.logLogLevel
-      });
-    } else {
-      signer = new ProfileBundle.SignerExternal({
-        logLog: CoreBundle.logLog,
-        logLogLevel: CoreBundle.logLogLevel
-      });
-    }
-
-    return signer;
+  getSigner(provider = this.core.getCurrentProvider()): bcc.SignerInternal {
+    return bccHelper.getSigner(bcc, provider, new AccountStore());
   }
 
 
@@ -218,14 +211,14 @@ export class EvanBCCService {
    *
    * @return     {CoreBundle.RightsAndRoles}  The rights and roles object
    */
-  getRightsAndRolesObj(): CoreBundle.RightsAndRoles {
-    return new CoreBundle.RightsAndRoles({
+  getRightsAndRolesObj(): bcc.RightsAndRoles {
+    return new bcc.RightsAndRoles({
       contractLoader: this.contractLoader,
       executor: this.executor,
       nameResolver: this.nameResolver,
       web3: this.web3,
-      logLog: CoreBundle.logLog,
-      logLogLevel: CoreBundle.logLogLevel
+      logLog: bcc.logLog,
+      logLogLevel: bcc.logLogLevel
     });
   }
 
@@ -248,11 +241,10 @@ export class EvanBCCService {
   ) {
     this.updateBCCPromise = await new Promise(async (resolve, reject) => {
       // start bcc setup
-      const coreOptions = await getCoreOptions(CoreBundle, SmartContracts, provider);
-      await CoreBundle.createAndSetCore(coreOptions);
+      const coreOptions = await getCoreOptions(bcc, SmartContracts, provider);
+      const coreRuntime = bccHelper.coreRuntimes[bcc.instanceId];
 
-      // set core bundle instance to this scope to use it within getSigner
-      this.copyCoreToInstance();
+      this.copyProfileToInstance();
 
       // check if no user is logged in and a bcc should be initialized
       let loggedIn = core.getAccountId();
@@ -260,7 +252,7 @@ export class EvanBCCService {
       if (loggedIn) {
         // check if the current available account is onboared
         try {
-          isOnboard = await CoreBundle.isAccountOnboarded(core.getAccountId());
+          isOnboard = await bccHelper.isAccountOnboarded(core.getAccountId());
         } catch (ex) { }
       }
 
@@ -273,27 +265,38 @@ export class EvanBCCService {
       if (activeAccount) {
         const bccProfileOptions: any = {
           accountId: activeAccount,
-          CoreBundle: CoreBundle,
+          CoreBundle: bcc,
           coreOptions: coreOptions,
           keyProvider: getLatestKeyProvider(),
           signer: this.getSigner(provider),
           SmartContracts: SmartContracts
         };
+        
+        // load private and encryption keys
+        let unlockedVault: any = { };
+        let privateKey;
+        if (!disableKeys && provider !== 'agent-executor') {
+          unlockedVault = await lightwallet.loadUnlockedVault();
+          privateKey = await lightwallet.getPrivateKey(unlockedVault, activeAccount);
+          coreOptions.config.accountMap = { };
+          coreOptions.config.accountMap[activeAccount] = privateKey;
+        }
 
         // use account store from signer or use a new one
         bccProfileOptions.accountStore = bccProfileOptions.signer.accountStore ||
           new AccountStore();
+        bccProfileOptions.accountStore.accounts = coreOptions.config.accountMap;
 
         // if we are loading all data via an smart-agent, we need to create a new ExecutorAgent
         if (provider === 'agent-executor') {
           const agentExecutor = await core.getAgentExecutor();
 
-          bccProfileOptions.executor = new CoreBundle.ExecutorAgent({
+          bccProfileOptions.executor = new bcc.ExecutorAgent({
             agentUrl: agentExecutor.agentUrl,
             config: {},
-            contractLoader: CoreBundle.CoreRuntime.contractLoader,
-            logLog: CoreBundle.logLog,
-            logLogLevel: CoreBundle.logLogLevel,
+            contractLoader: coreRuntime.contractLoader,
+            logLog: bcc.logLog,
+            logLogLevel: bcc.logLogLevel,
             signer: bccProfileOptions.signer,
             token: agentExecutor.token,
             web3: this.web3,
@@ -301,20 +304,34 @@ export class EvanBCCService {
         }
 
         // initialize bcc for an profile
-        const bccProfile = ProfileBundle.createAndSet(bccProfileOptions);
+        const bccProfile = await bccHelper.createDefaultRuntime(
+          bcc,
+          activeAccount,
+          unlockedVault.encryptionKey,
+          privateKey,
+          JSON.parse(JSON.stringify(coreOptions.config)),
+          coreRuntime.web3,
+          coreRuntime.dfs,
+          bccProfileOptions
+        );
+        bccHelper.profileRuntimes[bcc.instanceId] = bccProfile;
+
         this.copyProfileToInstance();
-        this.copyCoreToInstance();
 
         // load rightsAndRoles object for the current account
         this.rightsAndRoles = this.getRightsAndRolesObj();
 
         if (provider === 'metamask') {
-          ProfileBundle.ProfileRuntime.coreInstance.executor.eventHub.eventWeb3 = (<any>window).web3;
+          this.coreRuntime.executor.eventHub.eventWeb3 = (<any>window).web3;
+          this.profileRuntime.executor.eventHub.eventWeb3 = (<any>window).web3;
         }
 
         if (!disableKeys) {
+          this.keyProvider.init(bccProfile.profile);
           await this.keyProvider.setKeys();
-          await this.setExchangeKeys(activeAccount);
+          try {
+            await this.setExchangeKeys(activeAccount);
+          } catch (ex) { }
         }
       }
 
@@ -328,6 +345,74 @@ export class EvanBCCService {
   }
 
   /**
+    * Check the terms of use has changed and if the current user accepted it.
+    *
+    * @param      {string}         activeAccount  current active account
+    * @return     {Promise<void>}  resolved when done
+    */
+  async updateTermsOfUse(activeAccount = this.core.activeAccount(), provider = this.core.getCurrentProvider()) {
+    if (activeAccount && provider !== 'agent-executor') {
+      let newTermsOfUse = true;
+
+      // check if the verification management is missing, then it's an old account and the terms of
+      // use must be accepted and an identity must be created.
+      if (await this.verifications.identityAvailable(activeAccount)) {
+        // load the origin of the current terms of use dapp and check if a '/evan/onboarding/termsofuse'
+        // verification for the current user exists for this origin hash, else, it has been changed and
+        // needs to be accepted again
+        const termsOfUseEns = `termsofuse.${ getDomainName() }`;
+        const termsOfUseOrigin = (await this.description.getDescription(termsOfUseEns)).public.dapp
+          .origin;
+        const termsOfUseVerifications = await this.verifications.getVerifications(
+          this.core.activeAccount(), `/evan/onboarding/termsofuse-${ termsOfUseOrigin }`);
+
+        // iterate through all verifications and check, if this terms of use verification is issued by
+        // the faucet agent
+        for (let i = 0; i < termsOfUseVerifications.length; i++) {
+          // extract the issuer account
+          const verification = termsOfUseVerifications[i];
+          const subjectIdentity = await this.verifications.getIdentityForAccount(verification.subject,
+            true);
+          const dataHash = this.nameResolver
+            .soliditySha3(subjectIdentity, verification.topic, verification.data)
+            .replace('0x', '');
+          const issuerAccount = this.executor.web3.eth.accounts.recover(dataHash,
+            verification.signature);
+
+          // check if the user has accepted the latest terms of use and if the terms of use
+          // verification is issued by the faucet agetn
+          if (issuerAccount === config.faucetAccount) {
+            newTermsOfUse = false;
+            break;
+          }
+        }
+      }
+
+      // if new terms of use are available, load the terms of use and show them, so the user can
+      // read and accept them
+      if (newTermsOfUse) {
+        await new Promise((resolve) => {
+          this._ngZone.run(async () => {
+            // let the user update the terms of use
+            if (!this.termsOfUseModalPromise) {
+              this.termsOfUseModalPromise = this.modalService.createModal(EvanTermsOfUseComponent, {
+                bcc: this,
+                core: this.core,
+              });
+            }
+
+            // wait to be finished
+            await this.termsOfUseModalPromise;
+            this.termsOfUseModalPromise = null;
+
+            resolve();
+          })
+        }) 
+      }
+    }
+  }
+
+  /**
    * Returns an new blockchain-core profile instance. !Attention : It's only
    * builded for load values to check for public and private keys (e.g. used by
    * onboarding or global-password) Executor is the normal one from the global
@@ -337,18 +422,18 @@ export class EvanBCCService {
    *                                                 profile instance for
    * @return     {ProfileBundle.Profile}  The profile for account.
    */
-  public getProfileForAccount(accountId: string): ProfileBundle.Profile {
+  public getProfileForAccount(accountId: string, password: string = 'unencrypted'): bcc.Profile {
     const keyProvider = new KeyProvider(
       this.utils.deepCopy(getLatestKeyProvider().keys),
       accountId,
     );
 
-    const cryptoProvider = new CoreBundle.CryptoProvider({
-      unencrypted: new CoreBundle.Unencrypted(),
-      aes: new ProfileBundle.Aes(),
-      aesEcb: new ProfileBundle.AesEcb(),
-      logLog: CoreBundle.logLog,
-      logLogLevel: CoreBundle.logLogLevel
+    const cryptoProvider = new bcc.CryptoProvider({
+      unencrypted: new bcc.Unencrypted(),
+      aes: new bcc.Aes(),
+      aesEcb: new bcc.AesEcb(),
+      logLog: bcc.logLog,
+      logLogLevel: bcc.logLogLevel
     });
 
     // set dummy encryption keys to prevent password dialog
@@ -359,43 +444,44 @@ export class EvanBCCService {
       lightwallet.getEncryptionKeyFromPassword(accountId, 'unencrypted')
     );
 
-    const ipldInstance = new ProfileBundle.Ipld({
-      'ipfs': CoreBundle.CoreRuntime.dfs,
+    const ipldInstance = new bcc.Ipld({
+      'ipfs': this.coreRuntime.dfs,
       'keyProvider': keyProvider,
       'cryptoProvider': cryptoProvider,
       defaultCryptoAlgo: 'aes',
+      nameResolver: this.nameResolver,
       originator: accountId,
-      logLog: CoreBundle.logLog,
-      logLogLevel: CoreBundle.logLogLevel
+      logLog: bcc.logLog,
+      logLogLevel: bcc.logLogLevel
     });
 
-    const sharing = new ProfileBundle.Sharing({
+    const sharing = new bcc.Sharing({
       contractLoader: this.contractLoader,
       cryptoProvider: cryptoProvider,
       description: this.description,
       executor: this.executor,
-      dfs: CoreBundle.CoreRuntime.dfs,
+      dfs: this.coreRuntime.dfs,
       keyProvider: keyProvider,
       nameResolver: this.nameResolver,
       defaultCryptoAlgo: 'aes',
-      logLog: CoreBundle.logLog,
-      logLogLevel: CoreBundle.logLogLevel
+      logLog: bcc.logLog,
+      logLogLevel: bcc.logLogLevel
     });
 
-    const dataContract = new ProfileBundle.DataContract({
+    const dataContract = new bcc.DataContract({
       cryptoProvider: cryptoProvider,
-      dfs: CoreBundle.CoreRuntime.dfs,
+      dfs: this.coreRuntime.dfs,
       executor: this.executor,
       loader: this.contractLoader,
       nameResolver: this.nameResolver,
       sharing: sharing,
       web3: this.web3,
       description: this.description,
-      logLog: CoreBundle.logLog,
-      logLogLevel: CoreBundle.logLogLevel
+      logLog: bcc.logLog,
+      logLogLevel: bcc.logLogLevel
     });
 
-    const evanProfile = new ProfileBundle.Profile({
+    const evanProfile = new bcc.Profile({
       ipld: ipldInstance,
       nameResolver: this.nameResolver,
       defaultCryptoAlgo: 'aes',
@@ -403,8 +489,8 @@ export class EvanBCCService {
       contractLoader: this.contractLoader,
       accountId: accountId,
       dataContract,
-      logLog: CoreBundle.logLog,
-      logLogLevel: CoreBundle.logLogLevel
+      logLog: bcc.logLog,
+      logLogLevel: bcc.logLogLevel
     });
 
     keyProvider.profile = evanProfile;
@@ -492,9 +578,9 @@ export class EvanBCCService {
           password = await this.passwordModalPromise;
         } else {
           this.passwordModalPromise = this.modalService.createModal(GlobalPasswordComponent, {
-            core: this.core,
+            accountId: accountId,
             bcc: this,
-            accountId: accountId
+            core: this.core,
           });
 
           password = await this.passwordModalPromise;

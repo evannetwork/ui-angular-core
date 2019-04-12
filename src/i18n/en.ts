@@ -103,6 +103,9 @@ export const en = {
       "header": "Take a Picture",
       "video_no_available": "Video stream not available"
     },
+    "terms-of-use-accept": "agree",
+    "terms-of-use-changed": "Changes to the Terms of Use",
+    "terms-of-use-error": "An error occurred during terms of use confirmation. Please try again.",
     "use-password": "Unlock",
     "user-locked": "Profile locked",
     "verifications": {

@@ -25,12 +25,10 @@
   https://evan.network/license/
 */
 
-import * as BCBundle from 'bcc';
+import * as bcc from 'bcc';
 
-import {
-  Ipld,
-  prottle
-} from 'bcc';
+import { Ipld, prottle } from 'bcc';
+import { bccHelper, config } from 'dapp-browser';
 
 import { EvanBCCService } from './bcc';
 import { EvanCoreService } from './core';
@@ -81,6 +79,11 @@ export class EvanBcService {
   public profileQueueId: QueueId;
 
   /**
+   * do not load bc instances duplicated times
+   */
+  public loadPromises: any = { };
+
+  /**
    * initialize and make it singleton
    */
   constructor(
@@ -95,6 +98,101 @@ export class EvanBcService {
     return singleton.create(EvanBcService, this, () => {
       this.loadedBcs = { };
     }, true);
+  }
+
+  /**
+   * Create a new BCInstance.
+   *
+   * @param      {BundleOptions}    options  bundle options
+   * @return     {BCInstance}  new BC instance
+   */
+  async createBC(options: any): Promise<any> {
+    const ensDomain = options.ensDomain;
+    const runtime = bccHelper.profileRuntimes[options.ProfileBundle.instanceId];
+
+    // if user entered ens address, resolve it
+    let bcAddress = ensDomain;
+    if (bcAddress.indexOf('0x') !== 0) {
+      bcAddress = await runtime.nameResolver.getAddress(ensDomain);
+    }
+
+    const nameResolverConfig = JSON.parse(JSON.stringify(config.nameResolver));
+    nameResolverConfig.labels.businessCenterRoot = ensDomain;
+
+    const nameResolver = new bcc.NameResolver({
+      config: nameResolverConfig,
+      executor: runtime.executor,
+      contractLoader: runtime.contractLoader,
+      web3: runtime.web3,
+      logLog: bcc.logLog,
+      LogLogLevel: bcc.logLogLevel
+    });
+
+    const businessCenter = runtime.contractLoader.loadContract('BusinessCenter', bcAddress);
+    const bcRoles = new bcc.RightsAndRoles({
+      contractLoader: runtime.contractLoader,
+      executor: runtime.executor,
+      nameResolver: nameResolver,
+      web3: runtime.web3,
+      logLog: bcc.logLog
+    });
+
+    const ipld = new Ipld({
+      ipfs: runtime.dfs,
+      keyProvider: runtime.keyProvider,
+      cryptoProvider: runtime.description.cryptoProvider,
+      defaultCryptoAlgo: 'aes',
+      originator: nameResolver.soliditySha3(ensDomain),
+      nameResolver,
+      logLog: bcc.logLog,
+    });
+
+    const bcProfiles = new bcc.BusinessCenterProfile({
+      ipld: ipld,
+      nameResolver: nameResolver,
+      defaultCryptoAlgo: 'aes',
+      bcAddress: ensDomain,
+      cryptoProvider: runtime.description.cryptoProvider,
+      logLog: bcc.logLog,
+    });
+
+    const dataContract = new bcc.DataContract({
+      cryptoProvider: runtime.description.cryptoProvider,
+      dfs: runtime.dfs,
+      executor: runtime.executor,
+      loader: runtime.contractLoader,
+      nameResolver: nameResolver,
+      sharing: runtime.sharing,
+      web3: runtime.web3,
+      description: runtime.description,
+      logLog: bcc.logLog,
+    });
+
+    const serviceContract = new bcc.ServiceContract({
+      cryptoProvider: runtime.description.cryptoProvider,
+      dfs: runtime.dfs,
+      executor: runtime.executor,
+      keyProvider: runtime.keyProvider,
+      loader: runtime.contractLoader,
+      nameResolver: nameResolver,
+      sharing: runtime.sharing,
+      web3: runtime.web3,
+      logLog: bcc.logLog,
+    });
+
+    const description = await runtime.description.getDescriptionFromEns(ensDomain);
+
+    return {
+      ensDomain,
+      bcAddress,
+      businessCenter,
+      bcRoles,
+      ipld,
+      bcProfiles,
+      description: (<any>description),
+      dataContract,
+      serviceContract,
+    };
   }
 
   /**
@@ -119,32 +217,44 @@ export class EvanBcService {
   async getCurrentBusinessCenter(ensDomain?: string): Promise<any> {
     ensDomain = ensDomain || this.routing.getActiveRootEns();
 
-    if (!this.loadedBcs[ensDomain]) {
-      if (!this.bcc.ProfileBundle) {
-        await this.bcc.updateBCC();
+    // if the bc was already loaded, return it directly
+    if (this.loadedBcs[ensDomain]) {
+      return this.loadedBcs[ensDomain];
+    } else {
+      if (!this.loadPromises[ensDomain]) {
+        this.loadPromises[ensDomain] = new Promise(async (resolve) => {
+          const loadedBc = await this.createBC({
+            ensDomain,
+            ProfileBundle: bcc
+          });
+
+          // save loadedBc to cache, to be able to load isMember previously
+          this.loadedBcs[ensDomain] = loadedBc;
+
+          // load this after the description of the loaded bc to handle inner function call
+          //   of getCurrentBusinessCenter
+          loadedBc.joined = await this.isMember(this.core.activeAccount(), ensDomain);
+          const currentProfile = await this.profileSet(ensDomain);
+
+          if (loadedBc.joined && currentProfile) {
+            const members = await this.getMembers(null, ensDomain);
+            const profiles = await this.getProfiles(members);
+
+            loadedBc.members = members;
+            loadedBc.profiles = profiles;
+          }
+
+          // save loadedBc to cache
+          this.loadedBcs[ensDomain] = loadedBc;
+          resolve();
+          delete this.loadPromises[ensDomain];
+        });
       }
 
-      this.loadedBcs[ensDomain] = await BCBundle.createBC({
-        ensDomain,
-        ProfileBundle: this.bcc.ProfileBundle
-      });
-
-      // load this after the description of the loaded bc to handle inner function call
-      //   of getCurrentBusinessCenter
-      const joined = await this.isMember(this.core.activeAccount(), ensDomain);
-      const currentProfile = await this.profileSet(ensDomain);
-
-      if (joined && currentProfile) {
-        const members = await this.getMembers(null, ensDomain);
-        const profiles = await this.getProfiles(members);
-
-        this.loadedBcs[ensDomain].members = members;
-        this.loadedBcs[ensDomain].profiles = profiles;
-      }
-      this.loadedBcs[ensDomain].joined = joined;
+      // wait for finished loading
+      await this.loadPromises[ensDomain];
+      return this.loadedBcs[ensDomain];
     }
-
-    return this.loadedBcs[ensDomain];
   }
 
   /**
@@ -157,8 +267,13 @@ export class EvanBcService {
   async reloadBc(ensDomain?: string): Promise<any> {
     ensDomain = ensDomain || this.routing.getActiveRootEns();
 
-    delete this.loadedBcs[ensDomain];
+    // wait for previous loading to be finished
+    if (this.loadPromises[ensDomain]) {
+      await this.loadPromises[ensDomain];
+    }
 
+    // clear loaded bc and trigger reload
+    delete this.loadedBcs[ensDomain];
     await this.getCurrentBusinessCenter(ensDomain);
   }
 
@@ -299,7 +414,6 @@ export class EvanBcService {
     Ipld.purgeCryptoInfo(bcContracts);
 
     const contractKeys = Object.keys(bcContracts);
-
     if (contractKeys.length > 0) {
       await prottle(10, contractKeys.map(contract => async () => {
         const contractDetails = await this.getBCContract(ensDomain, contract);

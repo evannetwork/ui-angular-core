@@ -57,37 +57,37 @@ export class EvanMailboxService {
   /**
    * indicator that mails are loading
    */
-  private isLoadingMails;
+  public isLoadingMails;
 
   /**
    * last count of mail notifications
    */
-  private lastNotificationMailCount = 0;
+  public lastNotificationMailCount = 0;
 
   /**
    * maximum mails to get for received mails
    */
-  private receivedMailLoadCount = 10;
+  public receivedMailLoadCount = 10;
 
   /**
    * amount of received mails, that could not be decrypted
    */
-  private invalidReceivedMailCount = 0;
+  public invalidReceivedMailCount = 0;
 
   /**
    * maximum mails to get for sent mails
    */
-  private sentMailLoadCount = 10;
+  public sentMailLoadCount = 10;
 
   /**
    * amount of sent mails, that could not be decrypted
    */
-  private invalidSentMailCount = 0;
+  public invalidSentMailCount = 0;
 
   /**
    * profile queue id, for saving sharing keys, ..
    */
-  private updateProfileQueueId: QueueId;
+  public updateProfileQueueId: QueueId;
 
   /**
    * all mail cache

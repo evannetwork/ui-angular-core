@@ -58,7 +58,7 @@ export class EvanTranslationService implements OnDestroy {
    * load dependencies and register translation updater watcher
    */
   constructor(
-    private translate: TranslateService,
+    public translate: TranslateService,
     private singleton: SingletonService,
     private utils: EvanUtilService
   ) {
