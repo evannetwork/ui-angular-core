@@ -2,18 +2,23 @@
 
 ## Next Version
 ### Features
+### Fixes
+### Deprecations
+
+
+## Version 2.1.0
+### Features
 - add `EvanTermsOfUseComponent` for accepting the user changed terms of use
 - add `updateTermsOfUse` to `EvanBCCService` to check for missing verification holder and terms of use changes
 - add `agentUrl` parameter to the `EvanCoreService`
 - use `createDefaultRuntime` instead of bcc bundle
 - scope angular and ionic styles to .evan-angular scopes
+- wrap full scss into a `.evan-angular` class
 
 ### Fixes
 - simplify `address-input`
 - show correct name of contracts within the `verification detail`
-
-### Deprecations
-
+- fix logout on direct reload of ui
 
 
 ## Version 2.0.0
