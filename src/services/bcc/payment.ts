@@ -71,7 +71,8 @@ export class EvanPaymentService {
   /**
    * base endpoint of the payment
    */
-  public paymentEndPoint: string = 'api/smart-agents/ipfs-payments';
+  // public paymentEndPoint: string = 'api/smart-agents/ipfs-payments';
+  public paymentEndPoint: string = 'api/ipfs-payments';
 
   /**
    * create singleton instance and create queue id
