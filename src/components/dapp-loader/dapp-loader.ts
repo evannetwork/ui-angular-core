@@ -225,6 +225,19 @@ export class DAppLoaderComponent  {
           if (!this.destroyed) {
             await dapp.startDApp(this.dappToStart, this.elementRef.nativeElement);
 
+            // check for vue applications that are running in the same container as the dapp-loader
+            //   => remove it!
+            if (this.elementRef.nativeElement.parentElement) {
+              const parentElement = this.elementRef.nativeElement.parentElement;
+              const childs = parentElement.children;
+
+              for (let i = 0; i < childs.length; i++) {
+                if (childs[i].className.indexOf('evan-vue-dapp') !== -1) {
+                  parentElement.removeChild(childs[i]);
+                }
+              }
+            }
+
             this.elementRef.nativeElement.removeChild(
               this.elementRef.nativeElement.querySelectorAll('evan-loading')[0]
             );

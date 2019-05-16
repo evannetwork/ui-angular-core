@@ -3,6 +3,8 @@
 ## Next Version
 ### Features
 ### Fixes
+- clear vue dapps located next to `dapp-loader`
+
 ### Deprecations
 
 
