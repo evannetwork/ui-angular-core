@@ -130,37 +130,35 @@ export class EvanPictureService {
       cameraInput.setAttribute('accept', 'image/*');
 
       return new Promise((resolve, reject) => {
-        // reject promise when user rejects the camera and focuses the window again
-        const onCancel = () => {
-          window.removeEventListener('focus', onCancel);
+        const uploadCallback = () => {
+          setTimeout(() => {
+            window.removeEventListener('focus', uploadCallback);
 
-          reject();
-        };
-
-        // process img data and return it
-        cameraInput.addEventListener('change', async (event) => {
-          window.removeEventListener('focus', onCancel);
-
-          let fileReader = new FileReader();
-          fileReader.onloadend = async (e) => {
-            const arrayBuffer = (<any>e.target).result;
-            const urlCreator = (<any>window).URL || (<any>window).webkitURL;
-            const dataUri = urlCreator.createObjectURL(new Blob([arrayBuffer], {type: 'image/png'}));
-            const resizedImageBlob = await this.resizeImage(dataUri);
-            const resizedImageDataUri = urlCreator.createObjectURL(resizedImageBlob, {type: 'image/png'});
-            const resizedImage = await this.blobToArrayBuffer(resizedImageBlob);
-            resolve({
-              name: 'capture.png',
-              fileType: 'image/png',
-              file: resizedImage,
-              blobURI: this._DomSanitizer.bypassSecurityTrustUrl(resizedImageDataUri)
-            });
-          };
-          fileReader.readAsArrayBuffer(cameraInput.files[0]);
-        }, false);
+            if (cameraInput.files && cameraInput.files.length > 0) {
+              let fileReader = new FileReader();
+              fileReader.onloadend = async (e) => {
+                const arrayBuffer = (<any>e.target).result;
+                const urlCreator = (<any>window).URL || (<any>window).webkitURL;
+                const dataUri = urlCreator.createObjectURL(new Blob([arrayBuffer], {type: 'image/png'}));
+                const resizedImageBlob = await this.resizeImage(dataUri);
+                const resizedImageDataUri = urlCreator.createObjectURL(resizedImageBlob, {type: 'image/png'});
+                const resizedImage = await this.blobToArrayBuffer(resizedImageBlob);
+                resolve({
+                  name: 'capture.png',
+                  fileType: 'image/png',
+                  file: resizedImage,
+                  blobURI: this._DomSanitizer.bypassSecurityTrustUrl(resizedImageDataUri)
+                });
+              };
+              fileReader.readAsArrayBuffer(cameraInput.files[0]);
+            } else {
+              reject();
+            }
+          }, 500);
+        }
 
         // add cancel listener
-        window.addEventListener('focus', onCancel);
+        window.addEventListener('focus', uploadCallback);
 
         // trigger camerea opening
         cameraInput.click();

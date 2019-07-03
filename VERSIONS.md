@@ -3,6 +3,8 @@
 ## Next Version
 ### Features
 ### Fixes
+- fix `takeSnapshot` for mobile native safari clients 
+
 ### Deprecations
 
 
