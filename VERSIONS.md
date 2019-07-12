@@ -2,10 +2,15 @@
 
 ## Next Version
 ### Features
+
 ### Fixes
-- fix `takeSnapshot` for mobile native safari clients 
 
 ### Deprecations
+
+
+## Version 2.1.2
+### Fixes
+- fix `takeSnapshot` for mobile native safari clients 
 
 
 ## Version 2.1.1

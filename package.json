@@ -32,5 +32,5 @@
     "compodoc": "./node_modules/.bin/compodoc -p src/tsconfig.json"
   },
   "typings": "dist/index.d.ts",
-  "version": "2.1.1"
+  "version": "2.1.2"
 }
