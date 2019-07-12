@@ -183,7 +183,7 @@ export class EvanVerificationService {
    */
   public async getVerifications(subject: string, topic: string, isIdentity?: boolean) {
     return await this.bcc.verifications.getNestedVerifications(
-      subject,
+      this.bcc.web3.utils.toChecksumAddress(subject),
       topic,
       isIdentity
     );
@@ -235,6 +235,7 @@ export class EvanVerificationService {
    * @return     {void}  
    */
   public deleteFromVerificationCache(subject: string, topic: string) {
-    this.bcc.verifications.deleteFromVerificationCache(subject, topic);
+    this.bcc.verifications.deleteFromVerificationCache(
+      this.bcc.web3.utils.toChecksumAddress(subject), topic);
   }
 }
