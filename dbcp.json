@@ -4,8 +4,8 @@
     "dapp": {
       "dependencies": {
         "angular-libs": "^2.1.0",
-        "bcc": "^2.8.3",
-        "smart-contracts": "^2.4.2"
+        "bcc": "^2.9.0",
+        "smart-contracts": "^2.4.3"
       },
       "entrypoint": "angularcore.js",
       "files": [
