@@ -162,6 +162,39 @@ export class EvanTermsOfUseComponent implements OnInit, AfterViewInit {
 
   /*****************    functions    *****************/
   /**
+   * Load the terms of for the current chain the current language.
+   */
+  async loadTermsOfUse() {
+    // load the terms of use origin url
+    const termsOfUseEns = `termsofuse.${ getDomainName() }`;
+    const termsOfUseDbcp = await System.import(`${ termsOfUseEns }!ens`);
+    const termsOfUseOrigin = dapp.getDAppBaseUrl(termsOfUseDbcp, termsOfUseEns);
+    const ipfsHost = ipfs.ipfsConfig.host;
+
+    // multiple url's that can be requested one after another to fallback current runtime configurations
+    const fallbacks = [
+      // load from current ipfs host the current language, else fallback to english
+      `${ termsOfUseOrigin }/${ ipfsHost }/${ this.translate.getCurrentLang() }.html`,
+      `${ termsOfUseOrigin }/${ ipfsHost }/en.html`,
+      // if a not registered ipfs host is requested, load the current language for mainnet, else
+      // fallback to en
+      `${ termsOfUseOrigin }/storage.evan.network/${ this.translate.getCurrentLang() }.html`,
+      `${ termsOfUseOrigin }/storage.evan.network/en.html`,
+    ];
+
+    // try to load the terms of use for the current language, if this is not available, load the 
+    // next fallback
+    for (let i = 0; i < fallbacks.length; i++) {
+      try {
+        return await this.http
+          .get(fallbacks[i])
+          .map((res) => res.text())
+          .toPromise();
+      } catch (ex) { }
+    }
+  }
+
+  /**
    * Accept the new terms of use.
    *
    * @return     {Promise<void>}  resolved when done
@@ -202,38 +235,5 @@ export class EvanTermsOfUseComponent implements OnInit, AfterViewInit {
 
     this.loading = false;
     this.ref.detectChanges();
-  }
-
-  /**
-   * Load the terms of for the current chain the current language.
-   */
-  async loadTermsOfUse() {
-    // load the terms of use origin url
-    const termsOfUseEns = `termsofuse.${ getDomainName() }`;
-    const termsOfUseDbcp = await System.import(`${ termsOfUseEns }!ens`);
-    const termsOfUseOrigin = dapp.getDAppBaseUrl(termsOfUseDbcp, termsOfUseEns);
-    const ipfsHost = ipfs.ipfsConfig.host;
-
-    // multiple url's that can be requested one after another to fallback current runtime configurations
-    const fallbacks = [
-      // load from current ipfs host the current language, else fallback to english
-      `${ termsOfUseOrigin }/${ ipfsHost }/${ this.translate.getCurrentLang() }.html`,
-      `${ termsOfUseOrigin }/${ ipfsHost }/en.html`,
-      // if a not registered ipfs host is requested, load the current language for mainnet, else
-      // fallback to en
-      `${ termsOfUseOrigin }/storage.evan.network/${ this.translate.getCurrentLang() }.html`,
-      `${ termsOfUseOrigin }/storage.evan.network/en.html`,
-    ];
-
-    // try to load the terms of use for the current language, if this is not available, load the 
-    // next fallback
-    for (let i = 0; i < fallbacks.length; i++) {
-      try {
-        return await this.http
-          .get(fallbacks[i])
-          .map((res) => res.text())
-          .toPromise();
-      } catch (ex) { }
-    }
   }
 }
