@@ -129,13 +129,13 @@ export const de = {
       "disabled-sub-verifications": "ausgeschaltet",
       "dispatcher": {
         "acceptDispatcher": {
-          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> bestätigen?",
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\", ausgestellt von dem Nutzer <b>{{ from }}</b> bestätigen?",
           "ok": "bestätigen",
           "title": "Verifizierung bestätigen"
         },
         "cancel": "abbrechen",
         "deleteDispatcher": {
-          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> löschen?",
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\", ausgestellt vom dem Nutzer <b>{{ from }}</b> löschen?",
           "ok": "löschen",
           "title": "Verifizierung löschen"
         },
@@ -145,7 +145,7 @@ export const de = {
           "title": "Verifizierungspfad Anpassungen"
         },
         "rejectDispatcher": {
-          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> verwerfen?",
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\", ausgestellt vom dem Nutzer <b>{{ from }}</b> verwerfen?",
           "ok": "verwerfen",
           "rejected-description": "Die Verifizierung <b>{{ topic }}</b> von dem Nutzer <b>{{ from }}</b> an <b>{{ to }}</b> wurde von <b>{{ rejector }}</b> verworfen: ",
           "title": "Verifizierung verwerfen"

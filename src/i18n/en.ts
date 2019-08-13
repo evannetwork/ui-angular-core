@@ -128,13 +128,13 @@ export const en = {
       "disabled-sub-verifications": "disabled",
       "dispatcher": {
         "acceptDispatcher": {
-          "description": "Do you want to accept the verification \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
+          "description": "Do you want to accept the verification \"<b>{{ topic }}</b>\" issued by the user <b>{{ from }}</b>?",
           "ok": "accept",
           "title": "Accept verification"
         },
         "cancel": "cancel",
         "deleteDispatcher": {
-          "description": "Do you want to delete the verification \"<b>{{ topic }}</b>\" from the user <b>{{ to }}</b>?",
+          "description": "Do you want to delete the verification \"<b>{{ topic }}</b>\" issued by the user <b>{{ from }}</b>?",
           "ok": "delete",
           "title": "Delete verification"
         },
@@ -144,7 +144,7 @@ export const en = {
           "title": "Verification path adjustments"
         },
         "rejectDispatcher": {
-          "description": "Do you want to reject the verification \"<b>{{ topic }}</b>\" of the user <b>{{ to }}</b>?",
+          "description": "Do you want to reject the verification \"<b>{{ topic }}</b>\" issued by the user <b>{{ from }}</b>?",
           "ok": "reject",
           "rejected-description": "The verification <b>{{ topic }}</b> by the user <b>{{ from }}</b> to <b>{{ to }}</b> was rejected by <b>{{ rejector }}</b>: ",
           "title": "Reject verification"
