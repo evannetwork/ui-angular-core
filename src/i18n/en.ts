@@ -30,6 +30,10 @@ export const en = {
   "_angularcore": {
     "account-changed": "Account changed",
     "account-changed-description": "You changed or locked your current account.<br> The page / application needs to be <b>refreshed</b>.",
+    "browser-not-supported": {
+      "desc": "Please be sure to use one of the following browsers:<ul><li>Chrome</li><li>Edge</li><li>Firefox (no private mode!)</li><li>Opera</li><li>Safari</li></ul>",
+      "title": "Your browser is not supported"
+    },
     "camera": "Camera",
     "cancel": "Cancel",
     "contract-members": {

@@ -2,6 +2,7 @@
 
 ## Next Version
 ### Features
+- check for browser support and block not supported browsers
 
 ### Fixes
 
