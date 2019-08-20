@@ -5,6 +5,7 @@
 - check for browser support and block not supported browsers
 
 ### Fixes
+- add `loadForAccount` to favorite reloading
 
 ### Deprecations
 

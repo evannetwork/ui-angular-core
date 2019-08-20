@@ -247,7 +247,7 @@ export class EvanBookmarkService {
    */
   public async getDAppBookmarks(reload?: boolean): Promise<Array<any>> {
     if (reload) {
-      delete this.bcc.profile.trees[this.bcc.profile.treeLabels.bookmarkedDapps];
+      await this.bcc.profile.loadForAccount(this.bcc.profile.treeLabels.bookmarkedDapps);
     }
 
     const bookmarkDapps = this.utils.deepCopy(

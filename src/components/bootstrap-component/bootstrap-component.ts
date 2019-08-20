@@ -113,8 +113,8 @@ export class BootstrapComponent implements OnInit, AfterViewInit, OnDestroy {
     if (utils.browserName === 'Firefox' && utils.isPrivateMode) {
       this.supportedBrowser = false;
     } else {
-      this.supportedBrowser = [
-        'Opera',  'Firefox', 'Safari', 'Chrome', 'Edge', 'Blink',
+      this.supportedBrowser = !utils.browserName || [
+        'Opera',  'Firefox', 'Safari', 'Chrome', 'Edge', 'Blink', 'Cordova',
       ].indexOf(utils.browserName) !== -1;
     }
 
