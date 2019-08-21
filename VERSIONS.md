@@ -6,6 +6,7 @@
 
 ### Fixes
 - add `loadForAccount` to favorite reloading
+- fix profile verification endless loading
 
 ### Deprecations
 
