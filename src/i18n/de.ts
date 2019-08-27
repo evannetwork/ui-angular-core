@@ -30,6 +30,10 @@ export const de = {
   "_angularcore": {
     "account-changed": "Account wurde geändert",
     "account-changed-description": "Sie haben Ihren aktiven Account geändert.<br> Die Seite / Applikation muss <b>neu geladen werden</b>.",
+    "browser-not-supported": {
+      "desc": "Bitte gehen Sie sicher, dass Sie einen der folgenden Browsern verwenden:<ul><li>Chrome</li><li>Edge</li><li>Firefox (kein privater Modus!)</li><li>Opera</li><li>Safari</li></ul>",
+      "title": "Ihr Browser wird nicht unterstützt"
+    },
     "camera": "Kamera",
     "cancel": "Abbrechen",
     "contract-members": {
@@ -129,13 +133,13 @@ export const de = {
       "disabled-sub-verifications": "ausgeschaltet",
       "dispatcher": {
         "acceptDispatcher": {
-          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> bestätigen?",
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\", ausgestellt von dem Nutzer <b>{{ from }}</b> bestätigen?",
           "ok": "bestätigen",
           "title": "Verifizierung bestätigen"
         },
         "cancel": "abbrechen",
         "deleteDispatcher": {
-          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> löschen?",
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\", ausgestellt vom dem Nutzer <b>{{ from }}</b> löschen?",
           "ok": "löschen",
           "title": "Verifizierung löschen"
         },
@@ -145,7 +149,7 @@ export const de = {
           "title": "Verifizierungspfad Anpassungen"
         },
         "rejectDispatcher": {
-          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\" von dem Nutzer <b>{{ to }}</b> verwerfen?",
+          "description": "Möchten Sie die Verifizierung \"<b>{{ topic }}</b>\", ausgestellt vom dem Nutzer <b>{{ from }}</b> verwerfen?",
           "ok": "verwerfen",
           "rejected-description": "Die Verifizierung <b>{{ topic }}</b> von dem Nutzer <b>{{ from }}</b> an <b>{{ to }}</b> wurde von <b>{{ rejector }}</b> verworfen: ",
           "title": "Verifizierung verwerfen"

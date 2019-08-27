@@ -417,22 +417,27 @@ export class EvanVerificationComponent extends AsyncComponent {
       this.activeIdentity = null;
     }
 
-    // load verifications and the computed status to be able to display a combined view for all verifications of a
-    // specific topic
-    this.verifications = await this.verificationService.getVerifications(this.address, this.topic);
-    // set loading status for the verifications
-    this.verificationService.setVerificationsLoading(this.verifications);
-    // load addressbook
-    this.addressbook = await this.addressBookService.loadAccounts();
+    try {
+      // load addressbook
+      this.addressbook = await this.addressBookService.loadAccounts();
+      // load verifications and the computed status to be able to display a combined view for all verifications of a
+      // specific topic
+      this.verifications = await this.verificationService.getVerifications(this.address, this.topic);
+      // set loading status for the verifications
+      this.verificationService.setVerificationsLoading(this.verifications);
+
+      // load contract dbcp name
+      const firstVerification = this.verifications[0];
+      if (firstVerification.subjectType === 'contract') {
+        const dbcp = await this.descriptionService.getDescription(firstVerification.subject);
+        this.computed.alias = dbcp.name;
+      }
+    } catch (ex) {
+      this.verifications = [ ];
+    }
+
     // reset verifications loading status, could be old within cached values
     this.computed = await this.verificationService.computeVerifications(this.topic, this.verifications);
-
-    // load contract dbcp name
-    const firstVerification = this.verifications[0];
-    if (firstVerification.subjectType === 'contract') {
-      const dbcp = await this.descriptionService.getDescription(firstVerification.subject);
-      this.computed.alias = dbcp.name;
-    }
 
     this.loadingVerifications = false;
     this.ref.detectChanges();

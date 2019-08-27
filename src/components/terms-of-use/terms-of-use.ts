@@ -134,6 +134,16 @@ export class EvanTermsOfUseComponent implements OnInit, AfterViewInit {
    */
   private error: any;
 
+  /**
+   * Url to the faucet agent server.
+   */
+  private faucetAgentUrl: string = 'https://agents.test.evan.network';
+
+  /**
+   * base endpoint for identity create
+   */
+  private faucetEndPoint: string = 'api/smart-agents/faucet';
+
   /***************** initialization  *****************/
   constructor(
     private alertService: EvanAlertService,
@@ -161,49 +171,6 @@ export class EvanTermsOfUseComponent implements OnInit, AfterViewInit {
   }
 
   /*****************    functions    *****************/
-  /**
-   * Accept the new terms of use.
-   *
-   * @return     {Promise<void>}  resolved when done
-   */
-  private async acceptTermsOfUse() {
-    this.loading = true;
-    this.ref.detectChanges();
-
-    try {
-      const activeAccount = this.core.activeAccount();
-      // load the current terms of use ipfs that must be signed for a validity check
-      const termsOfUseIpfs = (await this.http
-        .get(`${ this.core.agentUrl }/api/smart-agents/faucet/terms-of-use/get`)
-        .toPromise()
-      ).json().results;
-      // load my private key for signing
-      const privateKey = await lightwallet.getPrivateKey(await lightwallet.loadUnlockedVault(),
-        activeAccount);
-
-      if (!(await this.bcc.verifications.identityAvailable(activeAccount))) {
-        await this.bcc.verifications.createIdentity(activeAccount);
-      }
-      
-      // accept the new terms of use
-      await this.http
-        .post(`${ this.core.agentUrl }/api/smart-agents/faucet/terms-of-use/accept`, {
-          accountId: activeAccount,
-          // sign the accept terms of use message 
-          signature: this.bcc.web3.eth.accounts.sign(termsOfUseIpfs, `0x${ privateKey }`).signature
-        })
-        .toPromise();
-
-      // disable remove element to handle it by the global-password dialog
-      this.resolveDialog(null, 500);
-    } catch (ex) {
-      this.error = ex;
-    }
-
-    this.loading = false;
-    this.ref.detectChanges();
-  }
-
   /**
    * Load the terms of for the current chain the current language.
    */
@@ -235,5 +202,87 @@ export class EvanTermsOfUseComponent implements OnInit, AfterViewInit {
           .toPromise();
       } catch (ex) { }
     }
+  }
+
+  /**
+   * Accept the new terms of use.
+   *
+   * @return     {Promise<void>}  resolved when done
+   */
+  private async acceptTermsOfUse() {
+    this.loading = true;
+    this.ref.detectChanges();
+
+    try {
+      const activeAccount = this.core.activeAccount();
+      // load the current terms of use ipfs that must be signed for a validity check
+      const termsOfUseIpfs = (await this.http
+        .get(`${ this.core.agentUrl }/api/smart-agents/faucet/terms-of-use/get`)
+        .toPromise()
+      ).json().results;
+      // load my private key for signing
+      const privateKey = await lightwallet.getPrivateKey(await lightwallet.loadUnlockedVault(),
+        activeAccount);
+
+      if (!(await this.bcc.verifications.identityAvailable(activeAccount))) {
+        await this.requestFaucetAgent(
+          'identity/create', { accountIdChild: this.core.activeAccount() });
+      }
+      
+      // accept the new terms of use
+      await this.http
+        .post(`${ this.core.agentUrl }/api/smart-agents/faucet/terms-of-use/accept`, {
+          accountId: activeAccount,
+          // sign the accept terms of use message 
+          signature: this.bcc.web3.eth.accounts.sign(termsOfUseIpfs, `0x${ privateKey }`).signature
+        })
+        .toPromise();
+
+      // disable remove element to handle it by the global-password dialog
+      this.resolveDialog(null, 500);
+    } catch (ex) {
+      this.error = ex;
+    }
+
+    this.loading = false;
+    this.ref.detectChanges();
+  }
+
+  /**
+   * Send a rest get request to the faucet agent using the corresponding new build headers.
+   *
+   * @param      {string}        endPoint  endpoint that should be called
+   * @return     {Promise<any>}  json result of the request
+   */
+  private async requestFaucetAgent(endPoint: string, search = {}): Promise<any> {
+    const activeAccount = this.core.activeAccount();
+    const message = new Date().getTime();
+    const signature = await this.signMessage(message.toString(10), activeAccount);
+    const headers = {
+      authorization: [
+        `EvanAuth ${ activeAccount }`,
+        `EvanMessage ${ message }`,
+        `EvanSignedMessage ${ signature }`
+      ].join(',')
+    };
+
+    return (await this.http
+      .get(`${ this.faucetAgentUrl }/${ this.faucetEndPoint }/${ endPoint }`, { headers,search })
+      .toPromise()
+    ).json();
+  }
+
+  /**
+   * Sign a message for a specific account
+   *
+   * @param      {string}  msg      message that should be signed
+   * @param      {string}  account  account id to sign the message with (default = activeAccount)
+   * @return     {string}  signed message signature
+   */
+  private async signMessage(msg: string, account: string = this.core.activeAccount()): Promise<string> {
+    const signer = account.toLowerCase();
+    const pk = await this.bcc.executor.signer.accountStore.getPrivateKey(account);
+
+    return this.bcc.web3.eth.accounts.sign(msg, '0x' + pk).signature;
   }
 }

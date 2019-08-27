@@ -8,6 +8,15 @@
 ### Deprecations
 
 
+## Version 2.2.0
+### Features
+- check for browser support and block not supported browsers
+
+### Fixes
+- add `loadForAccount` to favorite reloading
+- fix profile verification endless loading
+
+
 ## Version 2.1.2
 ### Fixes
 - fix `takeSnapshot` for mobile native safari clients 

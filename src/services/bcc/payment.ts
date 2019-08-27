@@ -92,9 +92,10 @@ export class EvanPaymentService {
   }
 
   /**
-   * Send an rest get request to the payment agent using the corresponding new build headers.
+   * Send a rest get request to the payment agent using the corresponding new build headers.
    *
-   * @param      {string}        endPoint  endpoint that should be called using this.agentEndpoint
+   * @param      {string}  endPoint  endpoint that should be called using
+   *                                 `${ this.paymentAgentUrl }/${ this.paymentEndPoint }`
    * @return     {Promise<any>}  json result of the request
    */
   public async requestPaymentAgent(endPoint: string): Promise<any> {

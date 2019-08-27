@@ -26,6 +26,10 @@
 */
 
 import {
+  utils
+} from 'dapp-browser';
+
+import {
   referenceApplicationRef,
   stopAngularApplication
 } from '../../classes/ionicAppElement';
@@ -37,13 +41,9 @@ import {
   AfterViewInit, OnInit, OnDestroy
 } from 'angular-libs';
 
-import {
-  EvanRoutingService
-} from '../../services/ui/routing';
-
-import {
-  buildModuleRoutes
-} from '../../classes/routesBuilder';
+import { buildModuleRoutes } from '../../classes/routesBuilder';
+import { EvanCoreService } from '../../services/bcc/core';
+import { EvanRoutingService } from '../../services/ui/routing';
 
 /**************************************************************************************************/
 
@@ -75,11 +75,17 @@ export class BootstrapComponent implements OnInit, AfterViewInit, OnDestroy {
    */
   private ionAppElement: Element;
 
+  /**
+   * Is the current browser allowed?
+   */
+  private supportedBrowser: boolean;
+
   /***************** initialization  *****************/
   constructor(
     private applicationRef: ApplicationRef,
+    private core: EvanCoreService,
     private elementRef: ElementRef,
-    private routingService: EvanRoutingService
+    private routingService: EvanRoutingService,
   ) {  }
 
   /**
@@ -101,6 +107,20 @@ export class BootstrapComponent implements OnInit, AfterViewInit, OnDestroy {
       );
 
       this.routingService.router.resetConfig(routeConfig);
+    }
+
+    // check if the current browser is allowed
+    if (utils.browserName === 'Firefox' && utils.isPrivateMode) {
+      this.supportedBrowser = false;
+    } else {
+      this.supportedBrowser = !utils.browserName || [
+        'Opera',  'Firefox', 'Safari', 'Chrome', 'Edge', 'Blink', 'Cordova',
+      ].indexOf(utils.browserName) !== -1;
+    }
+
+    // hide loading and stop anything, when browser is not supported
+    if (!this.supportedBrowser) {
+      this.core.finishDAppLoading();
     }
   }
 
