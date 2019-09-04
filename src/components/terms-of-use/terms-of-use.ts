@@ -234,7 +234,7 @@ export class EvanTermsOfUseComponent implements OnInit, AfterViewInit {
         .post(`${ this.core.agentUrl }/api/smart-agents/faucet/terms-of-use/accept`, {
           accountId: activeAccount,
           // sign the accept terms of use message 
-          signature: this.bcc.web3.eth.accounts.sign(termsOfUseIpfs, `0x${ privateKey }`).signature
+          signature: this.bcc.web3.eth.accounts.sign(termsOfUseIpfs, `0x${ privateKey }`).signature,
         })
         .toPromise();
 
@@ -255,34 +255,14 @@ export class EvanTermsOfUseComponent implements OnInit, AfterViewInit {
    * @return     {Promise<any>}  json result of the request
    */
   private async requestFaucetAgent(endPoint: string, search = {}): Promise<any> {
-    const activeAccount = this.core.activeAccount();
-    const message = new Date().getTime();
-    const signature = await this.signMessage(message.toString(10), activeAccount);
-    const headers = {
-      authorization: [
-        `EvanAuth ${ activeAccount }`,
-        `EvanMessage ${ message }`,
-        `EvanSignedMessage ${ signature }`
-      ].join(',')
-    };
-
     return (await this.http
-      .get(`${ this.faucetAgentUrl }/${ this.faucetEndPoint }/${ endPoint }`, { headers,search })
+      .get(`${ this.faucetAgentUrl }/${ this.faucetEndPoint }/${ endPoint }`, {
+        headers: {
+          authorization: await CoreBundle.utils.getSmartAgentAuthHeaders(this.bcc.coreRuntime),
+        },
+        search: search,
+      })
       .toPromise()
     ).json();
-  }
-
-  /**
-   * Sign a message for a specific account
-   *
-   * @param      {string}  msg      message that should be signed
-   * @param      {string}  account  account id to sign the message with (default = activeAccount)
-   * @return     {string}  signed message signature
-   */
-  private async signMessage(msg: string, account: string = this.core.activeAccount()): Promise<string> {
-    const signer = account.toLowerCase();
-    const pk = await this.bcc.executor.signer.accountStore.getPrivateKey(account);
-
-    return this.bcc.web3.eth.accounts.sign(msg, '0x' + pk).signature;
   }
 }

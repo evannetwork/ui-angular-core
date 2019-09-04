@@ -4,6 +4,7 @@
 ### Features
 
 ### Fixes
+- use new `getSmartAgentAuthHeaders` to build `EvanAuth` header for smart-agent requests
 
 ### Deprecations
 
