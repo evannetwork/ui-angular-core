@@ -99,7 +99,9 @@ export class EvanPaymentService {
   public async requestPaymentAgent(endPoint: string): Promise<any> {
     return (await this.http
       .get(`${ this.paymentAgentUrl }/${ this.paymentEndPoint }/${ endPoint }`, {
-        authorization: await CoreBundle.utils.getSmartAgentAuthHeaders(this.bcc.coreRuntime)
+        headers: {
+          authorization: await CoreBundle.utils.getSmartAgentAuthHeaders(this.bcc.coreRuntime),
+        },
       })
       .toPromise()
     ).json();
