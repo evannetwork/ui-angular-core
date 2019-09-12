@@ -5,6 +5,7 @@
 
 ### Fixes
 - use new `getSmartAgentAuthHeaders` to build `EvanAuth` header for smart-agent requests
+- fix `takeSnapshot` for mobile native safari clients with Safari V11 and V13
 
 ### Deprecations
 
