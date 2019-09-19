@@ -25,8 +25,7 @@
   https://evan.network/license/
 */
 
-import { Ipld } from 'bcc';
-
+import * as CoreBundle from 'bcc';
 import {
   OnInit,
   Http,
@@ -34,15 +33,14 @@ import {
   Observable,
 } from 'angular-libs';
 
-import { SingletonService } from '../singleton-service';
-
-import { EvanCoreService } from './core';
 import { EvanBCCService } from './bcc';
-import { EvanQueue } from './queue';
-import { QueueId } from './queue-utilities';
-import { EvanTranslationService } from '../ui/translate';
+import { EvanCoreService } from './core';
 import { EvanDescriptionService } from './description';
+import { EvanQueue } from './queue';
+import { EvanTranslationService } from '../ui/translate';
 import { EvanUtilService } from '../utils';
+import { QueueId } from './queue-utilities';
+import { SingletonService } from '../singleton-service';
 
 /**************************************************************************************************/
 
@@ -99,37 +97,13 @@ export class EvanPaymentService {
    * @return     {Promise<any>}  json result of the request
    */
   public async requestPaymentAgent(endPoint: string): Promise<any> {
-    const activeAccount = this.core.activeAccount();
-    const toSignedMessage = this.bcc.web3.utils
-      .soliditySha3(new Date().getTime() + activeAccount)
-      .replace('0x', '');
-    const hexMessage = this.bcc.web3.utils.utf8ToHex(toSignedMessage);
-    const signature = await this.signMessage(toSignedMessage, activeAccount);
-    const headers = {
-      authorization: [
-        `EvanAuth ${ activeAccount }`,
-        `EvanMessage ${ hexMessage }`,
-        `EvanSignedMessage ${ signature }`
-      ].join(',')
-    };
-
     return (await this.http
-      .get(`${ this.paymentAgentUrl }/${ this.paymentEndPoint }/${ endPoint }`, { headers })
+      .get(`${ this.paymentAgentUrl }/${ this.paymentEndPoint }/${ endPoint }`, {
+        headers: {
+          authorization: await CoreBundle.utils.getSmartAgentAuthHeaders(this.bcc.coreRuntime),
+        },
+      })
       .toPromise()
     ).json();
-  }
-
-  /**
-   * Sign a message for a specific account
-   *
-   * @param      {string}  msg      message that should be signed
-   * @param      {string}  account  account id to sign the message with (default = activeAccount)
-   * @return     {string}  signed message signature
-   */
-  public async signMessage(msg: string, account: string = this.core.activeAccount()): Promise<string> {
-    const signer = account.toLowerCase();
-    const pk = await this.bcc.executor.signer.accountStore.getPrivateKey(account);
-
-    return this.bcc.web3.eth.accounts.sign(msg, '0x' + pk).signature;
   }
 }

@@ -50,6 +50,7 @@ import {
   OnInit, Injectable, // '@angular/core';
   NgZone,
   Injector,
+  Http,
 } from 'angular-libs';
 
 import { GlobalPasswordComponent } from '../../components/global-password/global-password';
@@ -128,6 +129,7 @@ export class EvanBCCService {
    */
   constructor(
     private _ngZone: NgZone,
+    private http: Http,
     private injector: Injector,
     private modalService: EvanModalService,
     private utils: EvanUtilService,
@@ -301,6 +303,18 @@ export class EvanBCCService {
             token: agentExecutor.token,
             web3: this.web3,
           });
+
+          // TODO: signMessage is overwritte to enforce ipfs add without signed messages. Implement signer
+          // external sign message!
+          bccProfileOptions.executor.signer.signMessage = async (accountId, message) => {
+            return (await this.http
+              .post(`${bccProfileOptions.executor.agentUrl}/api/smart-agents/executor/signMessage`, {
+                message: message,
+                token: bccProfileOptions.executor.token,
+              })
+              .toPromise()
+            ).json().result;
+          }
         }
 
         // initialize bcc for an profile

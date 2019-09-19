@@ -8,6 +8,12 @@
 ### Deprecations
 
 
+## Version 2.2.1
+### Fixes
+- use new `getSmartAgentAuthHeaders` to build `EvanAuth` header for smart-agent requests
+- fix `takeSnapshot` for mobile native safari clients with Safari V11 and V13
+
+
 ## Version 2.2.0
 ### Features
 - check for browser support and block not supported browsers
