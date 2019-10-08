@@ -7,6 +7,10 @@
 
 ### Deprecations
 
+## Version 2.2.2
+### Fixes
+- remove custom agpl appendix
+
 
 ## Version 2.2.1
 ### Fixes
