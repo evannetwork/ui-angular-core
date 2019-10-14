@@ -19,6 +19,7 @@
 
 import {
   evanGlobals,
+  ipfs,
   getDomainName,
   System,
   utils,
@@ -169,7 +170,7 @@ export class EvanDescriptionService {
 
   /**
    * Takes an array of dapp names and loads their description from the ens.
-   * 
+   *
    * result: have a look at getDescription
    *
    * @param      {Array<string>}        ensAddresses  ENS-Addresses to load
@@ -193,14 +194,14 @@ export class EvanDescriptionService {
 
   /**
    * Gets the ens origin url.
-   * 
+   *
    * Usage:
    *   import {
    *     getDomainName
    *   } from 'dapp-browser';
    *   ...
    *   this.ensOrigin = this.description.getENSOriginUrl(`cool-dapp.${ getDomainName() }`);
-   * 
+   *
    *   <img *oneTime [src]="_DomSanitizer.bypassSecurityTrustUrl(ensOrigin + '/cool-img.png')" />
    *
    * @param      {string}  ensAddress  ens address to get the origin for
@@ -213,8 +214,7 @@ export class EvanDescriptionService {
       return `${window.location.origin}/external/${ withoutDomain }`;
     } else {
       const description = await this.getDescription(ensAddress);
-
-      return evanGlobals.restIpfs.api_url(`/ipfs/${ description.dapp.origin }`);
+      return ipfs.restIpfs.api_url(`/ipfs/${ description.dapp.origin }`);
     }
   }
 }
