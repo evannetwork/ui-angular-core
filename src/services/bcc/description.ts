@@ -109,7 +109,7 @@ export class EvanDescriptionService {
           // check if the devMode is available for this dapp
           const devName = ensAddress.replace(`.${ getDomainName() }`, '');
           if (utils.isDevAvailable(devName)) {
-            description = await evanGlobals.System.import(`${ window.location.origin }/external/${ devName }/dbcp.json!json`);
+            description = await System.import(`${ window.location.origin }/external/${ devName }/dbcp.json!json`);
           }
 
           // if no devMode is available for this application, load it directly from ens
