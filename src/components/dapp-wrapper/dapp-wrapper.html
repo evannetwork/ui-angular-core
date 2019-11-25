@@ -28,7 +28,9 @@
         (click)="openSplitPane()">
         <ion-icon name='menu'></ion-icon>
       </button>
-      <button ion-button icon-only *ngIf="routing.navigateBackStatus" (click)="routing.goBack()">
+      <button ion-button icon-only
+        *ngIf="routing.navigateBackStatus && canNavigateBack()"
+        (click)="routing.goBack()">
         <ion-icon name="arrow-back"></ion-icon>
       </button>
     </ion-buttons>

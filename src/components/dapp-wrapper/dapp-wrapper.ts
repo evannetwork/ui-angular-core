@@ -20,9 +20,10 @@
 import { logLog } from 'bcc';
 
 import {
+  getDomainName,
   notifications,
+  routing,
   utils,
-  getDomainName
 } from 'dapp-browser';
 
 import {
@@ -620,5 +621,12 @@ export class EvanDAppWrapperComponent extends AsyncComponent {
         this.routing.navigate(`/explorer.${ getDomainName() }/detail/${ dapp }`);
       }
     }
+  }
+
+  /**
+   * Check if a history stack is available. Allow only going back when the stack is greater thant 0.
+   */
+  canNavigateBack() {
+    return routing.history.length !== 0;
   }
 }
