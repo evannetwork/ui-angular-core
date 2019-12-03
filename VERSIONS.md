@@ -7,6 +7,13 @@
 
 ### Deprecations
 
+
+## Version 2.2.3
+### Fixes
+- fix camera rotation on iphone
+- show back button only, when history is available
+
+
 ## Version 2.2.2
 ### Fixes
 - remove custom agpl appendix
