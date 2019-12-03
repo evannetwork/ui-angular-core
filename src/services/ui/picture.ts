@@ -278,13 +278,53 @@ export class EvanPictureService {
           ratio = dimensions.max_height / img.height;
         }
 
-        canvasCopy.width = img.width
-        canvasCopy.height = img.height
+        let srcOrientation;
+        switch (window.orientation) {
+          case 0:
+            srcOrientation = 6;
+            break;
+          case 180:
+            srcOrientation = 8;
+            break;
+          case -90:
+            srcOrientation = 3;
+            break;
+          case 90:
+            srcOrientation = 1;
+            break;
+        }
+
+        // set proper canvas dimensions before transform & export
+        if (4 < srcOrientation && srcOrientation < 9) {
+          canvasCopy.width = img.height;
+          canvasCopy.height = img.width;
+        } else {
+          canvasCopy.width = img.width;
+          canvasCopy.height = img.height;
+        }
+        // transform context before drawing image
+        switch (srcOrientation) {
+          case 2: copyContext.transform(-1, 0, 0, 1, img.width, 0); break;
+          case 3: copyContext.transform(-1, 0, 0, -1, img.width, img.height ); break;
+          case 4: copyContext.transform(1, 0, 0, -1, 0, img.height ); break;
+          case 5: copyContext.transform(0, 1, 1, 0, 0, 0); break;
+          case 6: copyContext.transform(0, 1, -1, 0, img.height , 0); break;
+          case 7: copyContext.transform(0, -1, -1, 0, img.height , img.width); break;
+          case 8: copyContext.transform(0, -1, 1, 0, 0, img.width); break;
+          default: break;
+        }
+
         copyContext.drawImage(img, 0, 0)
 
-        canvas.width = img.width * ratio
-        canvas.height = img.height * ratio
-        ctx.drawImage(canvasCopy, 0, 0, canvasCopy.width, canvasCopy.height, 0, 0, canvas.width, canvas.height)  
+        // set proper canvas dimensions before transform & export
+        if (4 < srcOrientation && srcOrientation < 9) {
+          canvas.width = img.height * ratio;
+          canvas.height = img.width * ratio;
+        } else {
+          canvas.width = img.width * ratio;
+          canvas.height = img.height * ratio;
+        }
+        ctx.drawImage(canvasCopy, 0, 0, canvasCopy.width, canvasCopy.height, 0, 0, canvas.width, canvas.height)
         canvas.toBlob((blob) => {
           resolve(blob);
         });
