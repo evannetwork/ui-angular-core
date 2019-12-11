@@ -4,6 +4,7 @@
 ### Features
 
 ### Fixes
+- downscale images that are taken with angular picture service
 
 ### Deprecations
 

@@ -35,6 +35,8 @@ import { SingletonService } from '../singleton-service';
 import { EvanTranslationService } from './translate';
 import { EvanUtilService } from '../utils';
 import { EvanModalService } from './modal';
+import Pica from './pica';
+const pica = Pica();
 
 /**************************************************************************************************/
 
@@ -71,7 +73,25 @@ export class EvanPictureService {
    *   }
    */
   public async takeSnapshot(): Promise<any> {
-    let picture;
+    /**
+     * Takes a file array buffer, downscales it and returns the resolved file.
+     */
+    const transformImage = async (file: ArrayBuffer) => {
+      const urlCreator = (<any>window).URL || (<any>window).webkitURL;
+      const dataUri = urlCreator.createObjectURL(new Blob([file], {type: 'image/png'}));
+      const resizedImageBlob = await this.resizeImage(dataUri);
+      // clear memory
+      urlCreator.revokeObjectURL(dataUri);
+      // get correct data uri for downscaled image
+      const resizedImageDataUri = urlCreator.createObjectURL(resizedImageBlob, {type: 'image/png'});
+
+      return {
+        name: 'capture.png',
+        fileType: 'image/png',
+        file: await this.blobToArrayBuffer(resizedImageBlob),
+        blobURI: this._DomSanitizer.bypassSecurityTrustUrl(resizedImageDataUri)
+      };
+    }
 
     if (this.utils.isNativeMobile()) {
       // Create options for the Camera Dialog
@@ -92,22 +112,8 @@ export class EvanPictureService {
           // create a new blob
           xhr.onload = () => {
             let fileReader = new FileReader();
-
-            fileReader.onloadend = async (e) => {
-              const arrayBuffer = (<any>e.target).result;
-              const urlCreator = (<any>window).URL || (<any>window).webkitURL;
-              const dataUri = urlCreator.createObjectURL(new Blob([arrayBuffer], {type: 'image/png'}));
-              const resizedImageBlob = await this.resizeImage(dataUri);
-              const resizedImageDataUri = urlCreator.createObjectURL(resizedImageBlob, {type: 'image/png'});
-              const resizedImage = await this.blobToArrayBuffer(resizedImageBlob);
-              resolve({
-                name: 'capture.png',
-                fileType: 'image/png',
-                file: resizedImage,
-                blobURI: this._DomSanitizer.bypassSecurityTrustUrl(resizedImageDataUri)
-              });
-            };
-
+            fileReader.onloadend = async (e) =>
+              resolve(await transformImage((<any>e.target).result));
             fileReader.readAsArrayBuffer(xhr.response);
           };
           xhr.send();
@@ -131,20 +137,8 @@ export class EvanPictureService {
 
               if (cameraInput.files && cameraInput.files.length > 0) {
                 let fileReader = new FileReader();
-                fileReader.onloadend = async (e) => {
-                  const arrayBuffer = (<any>e.target).result;
-                  const urlCreator = (<any>window).URL || (<any>window).webkitURL;
-                  const dataUri = urlCreator.createObjectURL(new Blob([arrayBuffer], {type: 'image/png'}));
-                  const resizedImageBlob = await this.resizeImage(dataUri);
-                  const resizedImageDataUri = urlCreator.createObjectURL(resizedImageBlob, {type: 'image/png'});
-                  const resizedImage = await this.blobToArrayBuffer(resizedImageBlob);
-                  resolve({
-                    name: 'capture.png',
-                    fileType: 'image/png',
-                    file: resizedImage,
-                    blobURI: this._DomSanitizer.bypassSecurityTrustUrl(resizedImageDataUri)
-                  });
-                };
+                fileReader.onloadend = async (e) =>
+                  resolve(await transformImage((<any>e.target).result));
                 fileReader.readAsArrayBuffer(cameraInput.files[0]);
               } else {
                 reject();
@@ -161,17 +155,9 @@ export class EvanPictureService {
         cameraInput.click();
       });
     } else {
-      picture = await this.modalService.createModal(SnapshotDialogComponent, {}, true);
-      const urlCreator = (<any>window).URL || (<any>window).webkitURL;
-      const dataUri = urlCreator.createObjectURL(new Blob([picture.file], {type: 'image/png'}));
-      const resizedImageBlob = await this.resizeImage(dataUri);
-      const resizedImageDataUri = urlCreator.createObjectURL(resizedImageBlob, {type: 'image/png'});
-      const resizedImage = await this.blobToArrayBuffer(resizedImageBlob);
-      picture.file = resizedImage;
-      picture.blobURI = this._DomSanitizer.bypassSecurityTrustUrl(resizedImageDataUri);
+      const picture = await this.modalService.createModal(SnapshotDialogComponent, {}, true);
+      return await transformImage(picture.file);
     }
-
-    return picture;
   }
 
   /**
@@ -205,7 +191,7 @@ export class EvanPictureService {
         const arrayBuffer = new ArrayBuffer(byteString.length);
         const _ia = new Uint8Array(arrayBuffer);
         for (let i = 0; i < byteString.length; i++) {
-            _ia[i] = byteString.charCodeAt(i);
+          _ia[i] = byteString.charCodeAt(i);
         }
 
         const dataView = new DataView(arrayBuffer);
@@ -244,11 +230,7 @@ export class EvanPictureService {
   public async blobToArrayBuffer(blob) {
     return new Promise<any>((resolve, reject) => {
       const file = new FileReader();
-
-      file.onload = (result) => {
-        resolve((<FileReader>result.target).result);
-      }
-
+      file.onload = (result) => resolve((<FileReader>result.target).result);
       file.readAsArrayBuffer(blob);
     });
   }
@@ -265,19 +247,12 @@ export class EvanPictureService {
     return new Promise((resolve, reject) => {
       const img = new Image()
       img.src = dataUri;
-      img.onload = function() {
+      img.onload = async function() {
         const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
         const canvasCopy = document.createElement("canvas");
         const copyContext = canvasCopy.getContext("2d");
-        let ratio = 1;
 
-        if (img.width > dimensions.max_width) {
-          ratio = dimensions.max_width / img.width;
-        } else if (img.height > dimensions.max_height) {
-          ratio = dimensions.max_height / img.height;
-        }
-
+        // turn image into correct direction
         let srcOrientation;
         switch (window.orientation) {
           case 0:
@@ -314,8 +289,14 @@ export class EvanPictureService {
           default: break;
         }
 
-        copyContext.drawImage(img, 0, 0)
+        copyContext.drawImage(img, 0, 0);
 
+        let ratio = 1;
+        if (img.width > dimensions.max_width) {
+          ratio = dimensions.max_width / img.width;
+        } else if (img.height > dimensions.max_height) {
+          ratio = dimensions.max_height / img.height;
+        }
         // set proper canvas dimensions before transform & export
         if (4 < srcOrientation && srcOrientation < 9) {
           canvas.width = img.height * ratio;
@@ -324,12 +305,17 @@ export class EvanPictureService {
           canvas.width = img.width * ratio;
           canvas.height = img.height * ratio;
         }
-        ctx.drawImage(canvasCopy, 0, 0, canvasCopy.width, canvasCopy.height, 0, 0, canvas.width, canvas.height)
-        canvas.toBlob((blob) => {
-          resolve(blob);
-        });
+
+        resolve(await pica.toBlob(
+          await pica.resize(canvasCopy, canvas, {
+            unsharpAmount: 80,
+            unsharpRadius: 0.6,
+            unsharpThreshold: 2
+          }),
+          'image/jpeg',
+          0.5
+        ))
       }
     })
-
   }
 }
