@@ -49,7 +49,7 @@ export class EvanVerificationService {
   /**
    * owner of the evan root verification domain
    */
-  public ensRootOwner: string = '0x4a6723fC5a926FA150bAeAf04bfD673B056Ba83D';
+  public ensRootOwner: string = '0x003095339E7bb73ac30B198c48331FA52527EC56';
 
   /**
    * make it standalone and load dependency services
