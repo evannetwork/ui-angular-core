@@ -4,15 +4,17 @@
     "dapp": {
       "dependencies": {
         "angular-libs": "^2.1.2",
+        "olddappbrowser": "^2.8.0",
         "bcc": "^2.15.0",
         "smart-contracts": "^2.7.0"
       },
       "entrypoint": "angularcore.js",
       "files": [
         "angularcore.css",
-        "angularcore.js"
+        "angularcore.js",
+        "img/*"
       ],
-      "origin": "QmT4SPktrFMSPSux3utMGZGoCY9osDXFH2EYKF5Mt6f7JV",
+      "origin": "QmUUgTAp7g3btvkwamD9FRTWAXjaP9gvnr8j8XL628qG22",
       "type": "cached-dapp"
     },
     "dbcpVersion": 2,
@@ -51,7 +53,7 @@
       "2.2.0": "QmfJsbZi98gCF8iuMbMiHEBCXCZNF1tu6Sp8nbkdCmVcuP",
       "2.2.1": "QmY2iwh4oxxnv75j4ZcdSTLoaLUkRYUoA8nNftoqRjWuNE",
       "2.2.2": "QmVRHV1eeBYgAiV2idBd5VBQvvCvniAMvgWJFkBSQEcdSc",
-      "2.2.3": "QmS5xs29M5T5GsrtgTNXstkL4cfPXa6cpvHF7cEQdGXY9E"
+      "2.2.3": "QmX9cdU1XnTSVxttTcCoSBpu5BeCHYxgXsQ3k73fCvnArV"
     }
   }
 }

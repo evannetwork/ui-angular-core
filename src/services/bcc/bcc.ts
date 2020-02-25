@@ -27,12 +27,14 @@ import {
   getCoreOptions,
   getDomainName,
   getLatestKeyProvider,
+  initializeEvanNetworkStructure,
   KeyProvider,
   lightwallet,
   queue,
   routing,
   System,
   updateCoreRuntime,
+  utils,
   web3,
   web3Helper,
 } from 'dapp-browser';
@@ -147,6 +149,9 @@ export class EvanBCCService {
     if (passwordFunction) {
       lightwallet.setPasswordFunction(passwordFunction);
     }
+
+    await initializeEvanNetworkStructure(false);
+    await utils.bccReady;
 
     if (!bccHelper.profileRuntimes[bcc.instanceId]) {
       await this.updateBCC();
