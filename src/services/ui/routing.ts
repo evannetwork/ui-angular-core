@@ -38,16 +38,6 @@ import { SingletonService } from '../singleton-service';
 import { EvanUtilService } from '../utils';
 import { EvanCoreService } from '../bcc/core';
 
-// should be deleted later
-routing.history = routing.history || [ ];
-/**
- * Takes the current navigation history and writes it to the sessionStorage if the user navigates to
- * another page and navigates back
- */
-routing.updateHistory = routing.updateHistory || function() {
-  window.sessionStorage['evan-route-history'] = JSON.stringify(history);
-}
-
 /********************************* Overwrites *****************************************************/
 /**
  * Overwrite some original Router functions to replace the normale angular "routing" call with an

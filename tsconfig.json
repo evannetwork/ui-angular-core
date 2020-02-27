@@ -19,7 +19,7 @@
     "paths": {
       "bcc": ["../../api-blockchain-core/dist/index.js"],
       "smart-contracts": ["../../smart-contracts-core/index.js"],
-      "dapp-browser": ["../../ui-dapp-browser/runtime/build/main"],
+      "dapp-browser": ["../../ui-dapp-browser/dist/dapp-browser"],
       "angular-libs": ["../../ui-angular-libs/dist/angularlibs.js"]
     }
   },
